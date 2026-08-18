@@ -221,6 +221,7 @@
 
         <div class="btn-row">
           <button onclick="copyResult()">Copy to Clipboard</button>
+          <button class="secondary" onclick="downloadResult()">Download File</button>
         </div>
       </div>
     </div>
@@ -266,7 +267,7 @@
       const r = {
         privateKey: '', address: '', dns: '',
         publicKey: '', endpoint: '', presharedKey: '',
-        keepalive: 25
+        reserved: '', keepalive: 25
       };
       let section = '';
       for (let rawLine of text.split('\n')) {
@@ -290,6 +291,7 @@
           if (key === 'publickey') r.publicKey = value;
           if (key === 'endpoint') r.endpoint = value;
           if (key === 'presharedkey') r.presharedKey = value;
+          if (key === 'reserved') r.reserved = value;
           if (key === 'persistentkeepalive') r.keepalive = parseInt(value) || 25;
         }
       }
@@ -361,7 +363,14 @@
         return;
       }
 
-      // Endpoint split supporting [IPv6]:port and Domain:port
+      // Parse Reserved bytes if present (e.g., "0,0,0" or "[0,0,0]")
+      let reservedArray = null;
+      if (d.reserved) {
+        const cleaned = d.reserved.replace(/[\[\]\s]/g, '');
+        if (cleaned) reservedArray = cleaned.split(',').map(n => parseInt(n, 10)).filter(n => !isNaN(n));
+      }
+
+      // Endpoint split supporting [IPv6]:port and Domain:port with safe fallback
       let server = d.endpoint.trim();
       let port = 51820;
       const ipv6Match = server.match(/^\[([a-fA-F0-9:]+)\]:(\d+)$/);
@@ -372,6 +381,8 @@
         const idx = server.lastIndexOf(':');
         port = parseInt(server.slice(idx + 1), 10) || 51820;
         server = server.slice(0, idx);
+      } else {
+        d.endpoint = `${server}:${port}`;
       }
 
       const dnsServer = d.dns || dnsInput;
@@ -388,6 +399,7 @@
           private_key: d.privateKey,
           peer_public_key: d.publicKey,
           pre_shared_key: d.presharedKey || undefined,
+          reserved: reservedArray && reservedArray.length ? reservedArray : undefined,
           mtu: parseInt(mtu, 10),
           amnezia: {
             junk_packet_count: parseInt(jc, 10),
@@ -681,6 +693,20 @@ ${irRules}
       navigator.clipboard.writeText(el.value);
       document.getElementById('status').textContent = '📋 Copied to clipboard!';
       document.getElementById('status').className = 'status success';
+    }
+
+    function downloadResult() {
+      const content = document.getElementById('result').value;
+      if (!content) return;
+      const name = document.getElementById('name').value.trim() || 'config';
+      const extensions = { json: 'json', clash: 'yaml', singbox: 'json', amnezia: 'conf' };
+      const ext = extensions[currentTab] || 'txt';
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${name}.${ext}`;
+      a.click();
+      URL.revokeObjectURL(a.href);
     }
 
     function clearAll() {
