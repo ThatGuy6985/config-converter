@@ -201,6 +201,7 @@
 
         <div class="btn-row">
           <button onclick="convert()">Convert</button>
+          <button class="secondary" onclick="randomizeAmnezia()">Randomize AWG</button>
           <button class="secondary" onclick="clearAll()">Clear</button>
         </div>
         <div id="status" class="status"></div>
@@ -211,6 +212,7 @@
         <div class="tabs">
           <div class="tab active" onclick="switchTab('json', this)">Xray JSON</div>
           <div class="tab" onclick="switchTab('clash', this)">Clash YAML</div>
+          <div class="tab" onclick="switchTab('singbox', this)">Sing-box JSON</div>
           <div class="tab" onclick="switchTab('amnezia', this)">Amnezia Conf</div>
         </div>
 
@@ -228,6 +230,23 @@
     let currentTab = 'json';
     let currentMode = 'paste';
 
+    function randomizeAmnezia() {
+      // Random Junk count 3-10
+      document.getElementById('jc').value = Math.floor(Math.random() * 8) + 3;
+      document.getElementById('jmin').value = Math.floor(Math.random() * 40) + 20;
+      document.getElementById('jmax').value = Math.floor(Math.random() * 80) + 70;
+      document.getElementById('s1').value = Math.floor(Math.random() * 50) + 15;
+      document.getElementById('s2').value = Math.floor(Math.random() * 50) + 15;
+
+      // Unique 32-bit integer headers
+      const randHeader = () => Math.floor(Math.random() * 2147483647) + 1;
+      document.getElementById('h1').value = randHeader();
+      document.getElementById('h2').value = randHeader();
+      document.getElementById('h3').value = randHeader();
+      document.getElementById('h4').value = randHeader();
+      convert();
+    }
+    
     function setMode(mode) {
       currentMode = mode;
       document.getElementById('modePaste').classList.toggle('active', mode === 'paste');
@@ -334,20 +353,91 @@
       let ipv4 = addresses.find(a => !a.includes(':')) || '10.2.0.2/32';
       let ipv6 = addresses.find(a => a.includes(':')) || '';
 
-      // Endpoint split
-      let server = d.endpoint;
+      // Validate Base64 WG Key format (44 chars base64)
+      const isValidWGKey = (key) => /^[A-Za-z0-9+/]{43}=$/.test(key);
+      if (!isValidWGKey(d.privateKey) || !isValidWGKey(d.publicKey)) {
+        status.className = 'status error';
+        status.textContent = 'Invalid PrivateKey or PublicKey format (must be standard 44-char base64).';
+        return;
+      }
+
+      // Endpoint split supporting [IPv6]:port and Domain:port
+      let server = d.endpoint.trim();
       let port = 51820;
-      if (d.endpoint.includes(':')) {
-        const idx = d.endpoint.lastIndexOf(':');
-        server = d.endpoint.slice(0, idx);
-        port = d.endpoint.slice(idx + 1);
+      const ipv6Match = server.match(/^\[([a-fA-F0-9:]+)\]:(\d+)$/);
+      if (ipv6Match) {
+        server = ipv6Match[1];
+        port = parseInt(ipv6Match[2], 10);
+      } else if (server.includes(':') && !server.endsWith(':')) {
+        const idx = server.lastIndexOf(':');
+        port = parseInt(server.slice(idx + 1), 10) || 51820;
+        server = server.slice(0, idx);
       }
 
       const dnsServer = d.dns || dnsInput;
       let result = '';
 
+      // ========== SING-BOX ==========
+      else if (currentTab === 'singbox') {
+        const singBoxOutbound = {
+          type: "wireguard",
+          tag: name,
+          server: server,
+          server_port: parseInt(port, 10),
+          local_address: addresses,
+          private_key: d.privateKey,
+          peer_public_key: d.publicKey,
+          pre_shared_key: d.presharedKey || undefined,
+          mtu: parseInt(mtu, 10),
+          amnezia: {
+            junk_packet_count: parseInt(jc, 10),
+            junk_packet_min_size: parseInt(jmin, 10),
+            junk_packet_max_size: parseInt(jmax, 10),
+            init_packet_junk_size: parseInt(s1, 10),
+            response_packet_junk_size: parseInt(s2, 10),
+            init_packet_magic_header: parseInt(h1, 10),
+            response_packet_magic_header: parseInt(h2, 10),
+            underload_packet_magic_header: parseInt(h3, 10),
+            transport_packet_magic_header: parseInt(h4, 10)
+          }
+        };
+
+        const singboxConfig = {
+          dns: {
+            servers: [
+              { tag: "remote-dns", address: dnsServer, detour: name },
+              { tag: "direct-dns", address: "8.8.8.8", detour: "direct" }
+            ],
+            rules: irBypass ? [{ geoip: ["ir", "private"], server: "direct-dns" }] : []
+          },
+          inbounds: [
+            {
+              type: "tun",
+              inet4_address: "172.19.0.1/30",
+              auto_route: true,
+              strict_route: true,
+              sniff: true
+            }
+          ],
+          outbounds: [
+            singBoxOutbound,
+            { type: "direct", tag: "direct" },
+            { type: "block", tag: "block" }
+          ],
+          route: {
+            auto_detect_interface: true,
+            rules: irBypass ? [
+              { geoip: ["private", "ir"], outbound: "direct" },
+              { geosite: ["category-ir"], outbound: "direct" }
+            ] : []
+          }
+        };
+
+        result = JSON.stringify(singboxConfig, null, 2);
+      }
+
       // ========== AMNEZIA ==========
-      if (currentTab === 'amnezia') {
+      else if (currentTab === 'amnezia') {
         result = `[Interface]
 PrivateKey = ${d.privateKey}
 Address = ${d.address || '10.2.0.2/32'}
@@ -374,6 +464,8 @@ PersistentKeepalive = ${d.keepalive || keepaliveInput}`;
       // ========== CLASH ==========
       else if (currentTab === 'clash') {
         const irRule = irBypass ? `  - GEOIP,IR,DIRECT,no-resolve\n` : '';
+        const pskLine = d.presharedKey ? `\n    pre-shared-key: ${d.presharedKey}` : '';
+        const ipVersionLine = ipv6 ? `ipv6: ${ipv6}\n    ip-version: dual` : `ip-version: ipv4`;
 
         result = `mixed-port: 7890
 ipv6: true
@@ -436,12 +528,11 @@ proxies:
   - name: "${name}"
     type: wireguard
     ip: ${ipv4}
-    ${ipv6 ? 'ipv6: ' + ipv6 + '\n    ip-version: dual' : 'ip-version: ipv4'}
+    ${ipVersionLine}
     private-key: ${d.privateKey}
     server: ${server}
     port: ${port}
-    public-key: ${d.publicKey}
-    ${d.presharedKey ? 'pre-shared-key: ' + d.presharedKey : ''}
+    public-key: ${d.publicKey}${pskLine}
     allowed-ips:
       - 0.0.0.0/0
       - ::/0
