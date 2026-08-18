@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>WG Converter | Amnezia + Clash + Xray</title>
+  <title>WireGuard Converter Pro</title>
   <style>
     :root {
       --bg: #0f172a;
@@ -12,6 +12,8 @@
       --primary: #0ea5e9;
       --text: #e2e8f0;
       --muted: #94a3b8;
+      --success: #4ade80;
+      --error: #f87171;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -21,18 +23,18 @@
       line-height: 1.5;
       padding: 20px;
     }
-    .container { max-width: 1200px; margin: 0 auto; }
-    h1 { text-align: center; color: var(--primary); margin-bottom: 6px; }
+    .container { max-width: 1300px; margin: 0 auto; }
+    h1 { text-align: center; color: var(--primary); margin-bottom: 4px; font-size: 28px; }
     .subtitle { text-align: center; color: var(--muted); margin-bottom: 24px; font-size: 14px; }
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+    @media (max-width: 1000px) { .grid { grid-template-columns: 1fr; } }
     .card {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
+      border-radius: 14px;
+      padding: 18px;
     }
-    label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; font-weight: 600; }
+    label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 5px; font-weight: 600; }
     textarea, input, select {
       width: 100%;
       background: #0f172a;
@@ -43,10 +45,10 @@
       font-family: ui-monospace, monospace;
       font-size: 13px;
     }
-    textarea { min-height: 180px; resize: vertical; }
-    .row { display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+    textarea { min-height: 140px; resize: vertical; }
+    .row { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
     .row > div { flex: 1; min-width: 110px; }
-    .checkbox { display: flex; align-items: center; gap: 8px; margin: 10px 0; }
+    .checkbox { display: flex; align-items: center; gap: 8px; margin: 8px 0; }
     .checkbox input { width: auto; }
     button {
       background: var(--primary);
@@ -57,6 +59,7 @@
       cursor: pointer;
       font-weight: 600;
       font-size: 14px;
+      transition: 0.2s;
     }
     button:hover { background: #0284c7; }
     button.secondary { background: #334155; }
@@ -64,43 +67,122 @@
     .btn-row { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
     .tabs { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
     .tab {
-      padding: 6px 14px;
+      padding: 7px 16px;
       background: #334155;
-      border-radius: 6px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .tab.active { background: var(--primary); }
+    .status { margin-top: 12px; font-size: 13px; min-height: 20px; }
+    .success { color: var(--success); }
+    .error { color: var(--error); }
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--primary);
+      margin: 16px 0 10px 0;
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--border);
+    }
+    .mode-switch {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .mode-btn {
+      flex: 1;
+      text-align: center;
+      padding: 8px;
+      background: #334155;
+      border-radius: 8px;
       cursor: pointer;
       font-size: 13px;
     }
-    .tab.active { background: var(--primary); }
-    .status { margin-top: 10px; font-size: 13px; min-height: 20px; }
-    .success { color: #4ade80; }
-    .error { color: #f87171; }
+    .mode-btn.active { background: var(--primary); }
+    .hidden { display: none; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>WireGuard Converter</h1>
-    <p class="subtitle">AmneziaWG + Clash Meta + Xray JSON | with IR Bypass & Noise</p>
+    <h1>WireGuard Converter Pro</h1>
+    <p class="subtitle">Full Config or Manual Input → Amnezia + Clash + Xray | IR Bypass & Noise</p>
 
     <div class="grid">
-      <!-- Left Panel -->
+      <!-- ================= LEFT PANEL ================= -->
       <div class="card">
-        <label>Proxy Name</label>
-        <input type="text" id="name" value="My-WG" style="margin-bottom:12px">
+        <!-- Mode Switch -->
+        <div class="mode-switch">
+          <div class="mode-btn active" id="modePaste" onclick="setMode('paste')">Paste Full Config</div>
+          <div class="mode-btn" id="modeManual" onclick="setMode('manual')">Manual Input</div>
+        </div>
 
-        <label>WireGuard Config</label>
-        <textarea id="wg" placeholder="Paste your [Interface] + [Peer] config here..."></textarea>
+        <!-- Proxy Name -->
+        <label>Proxy Name</label>
+        <input type="text" id="name" value="My-WG" style="margin-bottom:14px">
+
+        <!-- ===== PASTE MODE ===== -->
+        <div id="pasteMode">
+          <label>WireGuard Config</label>
+          <textarea id="wg" placeholder="Paste your full [Interface] + [Peer] config here..."></textarea>
+        </div>
+
+        <!-- ===== MANUAL MODE ===== -->
+        <div id="manualMode" class="hidden">
+          <div class="section-title">Essential Fields</div>
+          <label>Private Key</label>
+          <input type="text" id="manualPrivate" placeholder="PrivateKey = ...">
+
+          <label style="margin-top:10px">Public Key</label>
+          <input type="text" id="manualPublic" placeholder="PublicKey = ...">
+
+          <label style="margin-top:10px">Endpoint (IP or Domain)</label>
+          <input type="text" id="manualEndpoint" placeholder="example.com or 1.2.3.4">
+
+          <div class="row" style="margin-top:10px">
+            <div>
+              <label>Port</label>
+              <input type="number" id="manualPort" value="51820">
+            </div>
+            <div>
+              <label>Address (IPv4)</label>
+              <input type="text" id="manualAddress" value="10.2.0.2/32">
+            </div>
+          </div>
+
+          <label style="margin-top:10px">Preshared Key (optional)</label>
+          <input type="text" id="manualPSK" placeholder="Leave empty if none">
+        </div>
+
+        <!-- Common Settings -->
+        <div class="section-title">Extra Settings</div>
+        <div class="row">
+          <div>
+            <label>DNS</label>
+            <input type="text" id="dns" value="1.1.1.1">
+          </div>
+          <div>
+            <label>MTU</label>
+            <input type="number" id="mtu" value="1280">
+          </div>
+          <div>
+            <label>KeepAlive</label>
+            <input type="number" id="keepalive" value="25">
+          </div>
+        </div>
 
         <div class="checkbox">
           <input type="checkbox" id="irBypass" checked>
-          <label for="irBypass" style="margin:0; color:var(--text)">Add IR Bypass rules</label>
+          <label for="irBypass" style="margin:0;color:var(--text)">Add IR Bypass rules</label>
         </div>
-
         <div class="checkbox">
           <input type="checkbox" id="useNoise" checked>
-          <label for="useNoise" style="margin:0; color:var(--text)">Enable Noise / finalmask (Xray)</label>
+          <label for="useNoise" style="margin:0;color:var(--text)">Enable Noise / finalmask (Xray)</label>
         </div>
 
-        <label style="margin-top:14px">Amnezia Parameters</label>
+        <!-- Amnezia Parameters -->
+        <div class="section-title">Amnezia Parameters</div>
         <div class="row">
           <div><label>Jc</label><input type="number" id="jc" value="5"></div>
           <div><label>Jmin</label><input type="number" id="jmin" value="50"></div>
@@ -124,7 +206,7 @@
         <div id="status" class="status"></div>
       </div>
 
-      <!-- Right Panel -->
+      <!-- ================= RIGHT PANEL ================= -->
       <div class="card">
         <div class="tabs">
           <div class="tab active" onclick="switchTab('json')">Xray JSON</div>
@@ -132,8 +214,8 @@
           <div class="tab" onclick="switchTab('amnezia')">Amnezia Conf</div>
         </div>
 
-        <label>Result (you can edit it)</label>
-        <textarea id="result" style="min-height: 480px"></textarea>
+        <label>Result (editable)</label>
+        <textarea id="result" style="min-height: 560px"></textarea>
 
         <div class="btn-row">
           <button onclick="copyResult()">Copy to Clipboard</button>
@@ -144,6 +226,15 @@
 
   <script>
     let currentTab = 'json';
+    let currentMode = 'paste';
+
+    function setMode(mode) {
+      currentMode = mode;
+      document.getElementById('modePaste').classList.toggle('active', mode === 'paste');
+      document.getElementById('modeManual').classList.toggle('active', mode === 'manual');
+      document.getElementById('pasteMode').classList.toggle('hidden', mode !== 'paste');
+      document.getElementById('manualMode').classList.toggle('hidden', mode !== 'manual');
+    }
 
     function switchTab(tab) {
       currentTab = tab;
@@ -188,25 +279,46 @@
 
     function convert() {
       const status = document.getElementById('status');
-      const input = document.getElementById('wg').value.trim();
       const name = document.getElementById('name').value.trim() || 'My-WG';
       const irBypass = document.getElementById('irBypass').checked;
       const useNoise = document.getElementById('useNoise').checked;
+      const mtu = document.getElementById('mtu').value || 1280;
+      const dnsInput = document.getElementById('dns').value.trim() || '1.1.1.1';
+      const keepaliveInput = parseInt(document.getElementById('keepalive').value) || 25;
 
-      if (!input) {
-        status.className = 'status error';
-        status.textContent = 'Please paste a WireGuard config.';
-        return;
+      let d = {};
+
+      if (currentMode === 'paste') {
+        const input = document.getElementById('wg').value.trim();
+        if (!input) {
+          status.className = 'status error';
+          status.textContent = 'Please paste a WireGuard config.';
+          return;
+        }
+        d = parseWG(input);
+      } else {
+        // Manual mode
+        d.privateKey = document.getElementById('manualPrivate').value.trim();
+        d.publicKey = document.getElementById('manualPublic').value.trim();
+        d.endpoint = document.getElementById('manualEndpoint').value.trim();
+        const port = document.getElementById('manualPort').value || 51820;
+        if (d.endpoint && !d.endpoint.includes(':')) {
+          d.endpoint = d.endpoint + ':' + port;
+        }
+        d.address = document.getElementById('manualAddress').value.trim() || '10.2.0.2/32';
+        d.presharedKey = document.getElementById('manualPSK').value.trim();
+        d.dns = dnsInput;
+        d.keepalive = keepaliveInput;
       }
 
-      const d = parseWG(input);
+      // Validation
       if (!d.privateKey || !d.publicKey || !d.endpoint) {
         status.className = 'status error';
-        status.textContent = 'Missing PrivateKey / PublicKey / Endpoint';
+        status.textContent = 'Missing required fields: PrivateKey, PublicKey or Endpoint';
         return;
       }
 
-      // Parameters
+      // Amnezia params
       const jc = document.getElementById('jc').value;
       const jmin = document.getElementById('jmin').value;
       const jmax = document.getElementById('jmax').value;
@@ -217,12 +329,12 @@
       const h3 = document.getElementById('h3').value;
       const h4 = document.getElementById('h4').value;
 
-      // Address handling
+      // Address
       let addresses = d.address ? d.address.split(',').map(s => s.trim()) : ['10.2.0.2/32'];
       let ipv4 = addresses.find(a => !a.includes(':')) || '10.2.0.2/32';
       let ipv6 = addresses.find(a => a.includes(':')) || '';
 
-      // Endpoint
+      // Endpoint split
       let server = d.endpoint;
       let port = 51820;
       if (d.endpoint.includes(':')) {
@@ -231,16 +343,16 @@
         port = d.endpoint.slice(idx + 1);
       }
 
-      const dnsServer = d.dns || '1.1.1.1';
+      const dnsServer = d.dns || dnsInput;
       let result = '';
 
-      // ==================== AMNEZIA ====================
+      // ========== AMNEZIA ==========
       if (currentTab === 'amnezia') {
         result = `[Interface]
 PrivateKey = ${d.privateKey}
 Address = ${d.address || '10.2.0.2/32'}
 DNS = ${dnsServer}
-MTU = 1280
+MTU = ${mtu}
 Jc = ${jc}
 Jmin = ${jmin}
 Jmax = ${jmax}
@@ -255,11 +367,11 @@ H4 = ${h4}
 PublicKey = ${d.publicKey}
 AllowedIPs = 0.0.0.0/0, ::/0
 Endpoint = ${d.endpoint}
-PersistentKeepalive = ${d.keepalive}`;
+PersistentKeepalive = ${d.keepalive || keepaliveInput}`;
         if (d.presharedKey) result += `\nPresharedKey = ${d.presharedKey}`;
       }
 
-      // ==================== CLASH YAML ====================
+      // ========== CLASH ==========
       else if (currentTab === 'clash') {
         const irRule = irBypass ? `  - GEOIP,IR,DIRECT,no-resolve\n` : '';
 
@@ -333,9 +445,9 @@ proxies:
     allowed-ips:
       - 0.0.0.0/0
       - ::/0
-    persistent-keepalive: ${d.keepalive}
+    persistent-keepalive: ${d.keepalive || keepaliveInput}
     udp: true
-    mtu: 1280
+    mtu: ${mtu}
     amnezia-wg-option:
       jc: ${jc}
       jmin: ${jmin}
@@ -373,7 +485,7 @@ ntp:
   interval: 30`;
       }
 
-      // ==================== XRAY JSON ====================
+      // ========== XRAY JSON ==========
       else {
         const noiseBlock = useNoise ? `,
       "streamSettings": {
@@ -439,12 +551,12 @@ ntp:
       "settings": {
         "secretKey": "${d.privateKey}",
         "address": ${JSON.stringify(addresses)},
-        "mtu": 1280,
+        "mtu": ${mtu},
         "peers": [{
           "endpoint": "${d.endpoint}",
           "publicKey": "${d.publicKey}",
           ${d.presharedKey ? `"preSharedKey": "${d.presharedKey}",` : ''}
-          "keepAlive": ${d.keepalive},
+          "keepAlive": ${d.keepalive || keepaliveInput},
           "allowedIPs": ["0.0.0.0/0", "::/0"]
         }]
       }${noiseBlock},
@@ -482,6 +594,10 @@ ${irRules}
 
     function clearAll() {
       document.getElementById('wg').value = '';
+      document.getElementById('manualPrivate').value = '';
+      document.getElementById('manualPublic').value = '';
+      document.getElementById('manualEndpoint').value = '';
+      document.getElementById('manualPSK').value = '';
       document.getElementById('result').value = '';
       document.getElementById('status').textContent = '';
     }
