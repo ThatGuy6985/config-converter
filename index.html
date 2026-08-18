@@ -45,8 +45,8 @@
     }
     textarea { min-height: 180px; resize: vertical; }
     .row { display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
-    .row > div { flex: 1; min-width: 120px; }
-    .checkbox { display: flex; align-items: center; gap: 8px; margin: 12px 0; }
+    .row > div { flex: 1; min-width: 110px; }
+    .checkbox { display: flex; align-items: center; gap: 8px; margin: 10px 0; }
     .checkbox input { width: auto; }
     button {
       background: var(--primary);
@@ -62,7 +62,7 @@
     button.secondary { background: #334155; }
     button.secondary:hover { background: #475569; }
     .btn-row { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
-    .tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
     .tab {
       padding: 6px 14px;
       background: #334155;
@@ -82,25 +82,25 @@
     <p class="subtitle">AmneziaWG + Clash Meta + Xray JSON | with IR Bypass & Noise</p>
 
     <div class="grid">
-      <!-- Left: Input -->
+      <!-- Left Panel -->
       <div class="card">
         <label>Proxy Name</label>
-        <input type="text" id="name" value="Proton-NL" style="margin-bottom:12px">
+        <input type="text" id="name" value="My-WG" style="margin-bottom:12px">
 
         <label>WireGuard Config</label>
-        <textarea id="wg" placeholder="Paste your [Interface] + [Peer] here..."></textarea>
+        <textarea id="wg" placeholder="Paste your [Interface] + [Peer] config here..."></textarea>
 
         <div class="checkbox">
           <input type="checkbox" id="irBypass" checked>
-          <label for="irBypass" style="margin:0;color:var(--text)">Add IR Bypass rules (for JSON)</label>
+          <label for="irBypass" style="margin:0; color:var(--text)">Add IR Bypass rules</label>
         </div>
 
         <div class="checkbox">
           <input type="checkbox" id="useNoise" checked>
-          <label for="useNoise" style="margin:0;color:var(--text)">Enable Noise / finalmask</label>
+          <label for="useNoise" style="margin:0; color:var(--text)">Enable Noise / finalmask (Xray)</label>
         </div>
 
-        <label style="margin-top:12px">Amnezia / Noise Parameters</label>
+        <label style="margin-top:14px">Amnezia Parameters</label>
         <div class="row">
           <div><label>Jc</label><input type="number" id="jc" value="5"></div>
           <div><label>Jmin</label><input type="number" id="jmin" value="50"></div>
@@ -124,7 +124,7 @@
         <div id="status" class="status"></div>
       </div>
 
-      <!-- Right: Output -->
+      <!-- Right Panel -->
       <div class="card">
         <div class="tabs">
           <div class="tab active" onclick="switchTab('json')">Xray JSON</div>
@@ -132,8 +132,8 @@
           <div class="tab" onclick="switchTab('amnezia')">Amnezia Conf</div>
         </div>
 
-        <label>Result (editable)</label>
-        <textarea id="result" style="min-height:420px"></textarea>
+        <label>Result (you can edit it)</label>
+        <textarea id="result" style="min-height: 480px"></textarea>
 
         <div class="btn-row">
           <button onclick="copyResult()">Copy to Clipboard</button>
@@ -149,20 +149,28 @@
       currentTab = tab;
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       event.target.classList.add('active');
-      convert(); // re-generate for the selected tab
+      convert();
     }
 
     function parseWG(text) {
-      const r = { privateKey:'', address:'', dns:'', publicKey:'', endpoint:'', presharedKey:'', keepalive:25 };
+      const r = {
+        privateKey: '', address: '', dns: '',
+        publicKey: '', endpoint: '', presharedKey: '',
+        keepalive: 25
+      };
       let section = '';
       for (let line of text.split('\n')) {
         line = line.trim();
         if (!line || line.startsWith('#')) continue;
-        if (line.startsWith('[')) { section = line.toLowerCase(); continue; }
+        if (line.startsWith('[')) {
+          section = line.toLowerCase();
+          continue;
+        }
         const eq = line.indexOf('=');
         if (eq === -1) continue;
-        const key = line.slice(0,eq).trim().toLowerCase();
-        const value = line.slice(eq+1).trim();
+        const key = line.slice(0, eq).trim().toLowerCase();
+        const value = line.slice(eq + 1).trim();
+
         if (section.includes('interface')) {
           if (key === 'privatekey') r.privateKey = value;
           if (key === 'address') r.address = value;
@@ -187,7 +195,7 @@
 
       if (!input) {
         status.className = 'status error';
-        status.textContent = 'Please paste a WireGuard config first.';
+        status.textContent = 'Please paste a WireGuard config.';
         return;
       }
 
@@ -198,7 +206,7 @@
         return;
       }
 
-      // Amnezia params
+      // Parameters
       const jc = document.getElementById('jc').value;
       const jmin = document.getElementById('jmin').value;
       const jmax = document.getElementById('jmax').value;
@@ -209,27 +217,29 @@
       const h3 = document.getElementById('h3').value;
       const h4 = document.getElementById('h4').value;
 
-      // Address
+      // Address handling
       let addresses = d.address ? d.address.split(',').map(s => s.trim()) : ['10.2.0.2/32'];
       let ipv4 = addresses.find(a => !a.includes(':')) || '10.2.0.2/32';
       let ipv6 = addresses.find(a => a.includes(':')) || '';
 
       // Endpoint
-      let server = d.endpoint, port = 51820;
+      let server = d.endpoint;
+      let port = 51820;
       if (d.endpoint.includes(':')) {
         const idx = d.endpoint.lastIndexOf(':');
         server = d.endpoint.slice(0, idx);
         port = d.endpoint.slice(idx + 1);
       }
 
+      const dnsServer = d.dns || '1.1.1.1';
       let result = '';
 
-      // ========== AMNEZIA CONF ==========
+      // ==================== AMNEZIA ====================
       if (currentTab === 'amnezia') {
         result = `[Interface]
 PrivateKey = ${d.privateKey}
 Address = ${d.address || '10.2.0.2/32'}
-DNS = ${d.dns || '1.1.1.1'}
+DNS = ${dnsServer}
 MTU = 1280
 Jc = ${jc}
 Jmin = ${jmin}
@@ -249,38 +259,80 @@ PersistentKeepalive = ${d.keepalive}`;
         if (d.presharedKey) result += `\nPresharedKey = ${d.presharedKey}`;
       }
 
-      // ========== CLASH YAML ==========
+      // ==================== CLASH YAML ====================
       else if (currentTab === 'clash') {
+        const irRule = irBypass ? `  - GEOIP,IR,DIRECT,no-resolve\n` : '';
+
         result = `mixed-port: 7890
 ipv6: true
 allow-lan: true
-mode: rule
+unified-delay: false
 log-level: warning
+mode: rule
+geo-auto-update: true
+geo-update-interval: 168
 external-controller: 127.0.0.1:9090
+external-controller-cors:
+  allow-origins:
+    - "*"
+  allow-private-network: true
+external-ui: ui
+external-ui-url: https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip
+profile:
+  store-selected: true
+  store-fake-ip: true
 
 dns:
   enable: true
-  enhanced-mode: redir-host
+  respect-rules: true
+  use-system-hosts: false
+  listen: 0.0.0.0:1053
+  ipv6: false
   nameserver:
-    - ${d.dns || '1.1.1.1'}
+    - ${dnsServer}#${name}
+    - 1.1.1.1#${name}
+  proxy-server-nameserver:
+    - 8.8.8.8#DIRECT
+  direct-nameserver:
+    - 8.8.8.8#DIRECT
+  direct-nameserver-follow-policy: true
+  enhanced-mode: redir-host
 
 tun:
   enable: true
   stack: mixed
   auto-route: true
+  strict-route: true
   auto-detect-interface: true
+  dns-hijack:
+    - any:53
+    - tcp://any:53
+  mtu: 9000
+
+sniffer:
+  enable: true
+  force-dns-mapping: true
+  parse-pure-ip: true
+  override-destination: true
+  sniff:
+    HTTP:
+      ports: [80, 8080, 8880, 2052, 2082, 2086, 2095]
+    TLS:
+      ports: [443, 8443, 2053, 2083, 2087, 2096]
 
 proxies:
   - name: "${name}"
     type: wireguard
     ip: ${ipv4}
-    ${ipv6 ? 'ipv6: ' + ipv6 : ''}
+    ${ipv6 ? 'ipv6: ' + ipv6 + '\n    ip-version: dual' : 'ip-version: ipv4'}
     private-key: ${d.privateKey}
     server: ${server}
     port: ${port}
     public-key: ${d.publicKey}
     ${d.presharedKey ? 'pre-shared-key: ' + d.presharedKey : ''}
-    allowed-ips: ['0.0.0.0/0', '::/0']
+    allowed-ips:
+      - 0.0.0.0/0
+      - ::/0
     persistent-keepalive: ${d.keepalive}
     udp: true
     mtu: 1280
@@ -296,38 +348,51 @@ proxies:
       h4: ${h4}
 
 proxy-groups:
-  - name: "Selector"
+  - name: "✅ Selector"
     type: select
-    proxies: ["${name}", DIRECT]
+    proxies:
+      - ${name}
+      - DIRECT
+  - name: "Auto"
+    type: url-test
+    proxies:
+      - ${name}
+    url: https://www.gstatic.com/generate_204
+    interval: 30
+    tolerance: 50
 
 rules:
+  - GEOIP,lan,DIRECT,no-resolve
   - GEOIP,private,DIRECT,no-resolve
-  - GEOIP,IR,DIRECT,no-resolve
-  - MATCH,Selector`;
+${irRule}  - MATCH,✅ Selector
+
+ntp:
+  enable: true
+  server: time.cloudflare.com
+  port: 123
+  interval: 30`;
       }
 
-      // ========== XRAY JSON ==========
+      // ==================== XRAY JSON ====================
       else {
-        const noiseBlock = useNoise ? `
+        const noiseBlock = useNoise ? `,
       "streamSettings": {
         "finalmask": {
-          "udp": [
-            {
-              "type": "noise",
-              "settings": {
-                "reset": "30-60",
-                "noise": [
-                  {"rand": "50-100", "randRange": "0-255", "delay": "1-5"},
-                  {"rand": "50-100", "randRange": "0-255", "delay": "1-5"},
-                  {"rand": "50-100", "randRange": "0-255", "delay": "1-5"},
-                  {"rand": "50-100", "randRange": "0-255", "delay": "1-5"},
-                  {"rand": "50-100", "randRange": "0-255", "delay": "1-5"}
-                ]
-              }
+          "udp": [{
+            "type": "noise",
+            "settings": {
+              "reset": "30-60",
+              "noise": [
+                {"rand": "50-100", "randRange": "0-255", "delay": "1-5"},
+                {"rand": "50-100", "randRange": "0-255", "delay": "1-5"},
+                {"rand": "50-100", "randRange": "0-255", "delay": "1-5"},
+                {"rand": "50-100", "randRange": "0-255", "delay": "1-5"},
+                {"rand": "50-100", "randRange": "0-255", "delay": "1-5"}
+              ]
             }
-          ]
+          }]
         }
-      },` : '';
+      }` : '';
 
         const irRules = irBypass ? `
       {
@@ -351,25 +416,23 @@ rules:
   "log": { "loglevel": "warning" },
   "dns": {
     "servers": [
-      { "address": "${d.dns || '1.1.1.1'}", "tag": "remote-dns" },
+      { "address": "${dnsServer}", "tag": "remote-dns" },
       "1.1.1.1"
     ],
     "queryStrategy": "UseIPv4"
   },
-  "inbounds": [
-    {
-      "listen": "0.0.0.0",
-      "port": 10808,
-      "protocol": "mixed",
-      "settings": { "auth": "noauth", "udp": true },
-      "sniffing": {
-        "destOverride": ["http", "tls"],
-        "enabled": true,
-        "routeOnly": true
-      },
-      "tag": "mixed-in"
-    }
-  ],
+  "inbounds": [{
+    "listen": "0.0.0.0",
+    "port": 10808,
+    "protocol": "mixed",
+    "settings": { "auth": "noauth", "udp": true },
+    "sniffing": {
+      "destOverride": ["http", "tls"],
+      "enabled": true,
+      "routeOnly": true
+    },
+    "tag": "mixed-in"
+  }],
   "outbounds": [
     {
       "protocol": "wireguard",
@@ -377,16 +440,14 @@ rules:
         "secretKey": "${d.privateKey}",
         "address": ${JSON.stringify(addresses)},
         "mtu": 1280,
-        "peers": [
-          {
-            "endpoint": "${d.endpoint}",
-            "publicKey": "${d.publicKey}",
-            ${d.presharedKey ? `"preSharedKey": "${d.presharedKey}",` : ''}
-            "keepAlive": ${d.keepalive},
-            "allowedIPs": ["0.0.0.0/0", "::/0"]
-          }
-        ]
-      },${noiseBlock}
+        "peers": [{
+          "endpoint": "${d.endpoint}",
+          "publicKey": "${d.publicKey}",
+          ${d.presharedKey ? `"preSharedKey": "${d.presharedKey}",` : ''}
+          "keepAlive": ${d.keepalive},
+          "allowedIPs": ["0.0.0.0/0", "::/0"]
+        }]
+      }${noiseBlock},
       "tag": "proxy"
     },
     { "protocol": "freedom", "tag": "direct" },
@@ -415,7 +476,7 @@ ${irRules}
       const el = document.getElementById('result');
       el.select();
       navigator.clipboard.writeText(el.value);
-      document.getElementById('status').textContent = '📋 Copied!';
+      document.getElementById('status').textContent = '📋 Copied to clipboard!';
       document.getElementById('status').className = 'status success';
     }
 
