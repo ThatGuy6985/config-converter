@@ -209,9 +209,9 @@
       <!-- ================= RIGHT PANEL ================= -->
       <div class="card">
         <div class="tabs">
-          <div class="tab active" onclick="switchTab('json')">Xray JSON</div>
-          <div class="tab" onclick="switchTab('clash')">Clash YAML</div>
-          <div class="tab" onclick="switchTab('amnezia')">Amnezia Conf</div>
+          <div class="tab active" onclick="switchTab('json', this)">Xray JSON</div>
+          <div class="tab" onclick="switchTab('clash', this)">Clash YAML</div>
+          <div class="tab" onclick="switchTab('amnezia', this)">Amnezia Conf</div>
         </div>
 
         <label>Result (editable)</label>
@@ -236,10 +236,10 @@
       document.getElementById('manualMode').classList.toggle('hidden', mode !== 'manual');
     }
 
-    function switchTab(tab) {
+    function switchTab(tab, element) {
       currentTab = tab;
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      event.target.classList.add('active');
+      if (element) element.classList.add('active');
       convert();
     }
 
@@ -250,9 +250,9 @@
         keepalive: 25
       };
       let section = '';
-      for (let line of text.split('\n')) {
-        line = line.trim();
-        if (!line || line.startsWith('#')) continue;
+      for (let rawLine of text.split('\n')) {
+        let line = rawLine.split('#')[0].split(';')[0].trim();
+        if (!line) continue;
         if (line.startsWith('[')) {
           section = line.toLowerCase();
           continue;
