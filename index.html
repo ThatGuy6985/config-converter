@@ -45,7 +45,7 @@
       font-family: ui-monospace, monospace;
       font-size: 13px;
     }
-    textarea { min-height: 140px; resize: vertical; }
+    textarea { min-height: 130px; resize: vertical; }
     .row { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
     .row > div { flex: 1; min-width: 110px; }
     .checkbox { display: flex; align-items: center; gap: 8px; margin: 8px 0; }
@@ -107,35 +107,33 @@
 <body>
   <div class="container">
     <h1>WireGuard Converter Pro</h1>
-    <p class="subtitle">Full Config or Manual Input → Amnezia + Clash + Xray | IR Bypass & Noise</p>
+    <p class="subtitle">Full Config or Manual Input → Amnezia + Clash + Xray + Sing-box | IPv4/IPv6 Safe | IR Bypass & Noise Presets</p>
 
     <div class="grid">
-      <!-- ================= LEFT PANEL ================= -->
+      <!-- LEFT PANEL -->
       <div class="card">
-        <!-- Mode Switch -->
         <div class="mode-switch">
           <div class="mode-btn active" id="modePaste" onclick="setMode('paste')">Paste Full Config</div>
           <div class="mode-btn" id="modeManual" onclick="setMode('manual')">Manual Input</div>
         </div>
 
-        <!-- Proxy Name -->
         <label>Proxy Name</label>
         <input type="text" id="name" value="My-WG" style="margin-bottom:14px">
 
-        <!-- ===== PASTE MODE ===== -->
+        <!-- Paste Mode -->
         <div id="pasteMode">
           <label>WireGuard Config</label>
           <textarea id="wg" placeholder="Paste your full [Interface] + [Peer] config here..."></textarea>
         </div>
 
-        <!-- ===== MANUAL MODE ===== -->
+        <!-- Manual Mode -->
         <div id="manualMode" class="hidden">
           <div class="section-title">Essential Fields</div>
           <label>Private Key</label>
-          <input type="text" id="manualPrivate" placeholder="PrivateKey = ...">
+          <input type="text" id="manualPrivate" placeholder="PrivateKey">
 
           <label style="margin-top:10px">Public Key</label>
-          <input type="text" id="manualPublic" placeholder="PublicKey = ...">
+          <input type="text" id="manualPublic" placeholder="PublicKey">
 
           <label style="margin-top:10px">Endpoint (IP or Domain)</label>
           <input type="text" id="manualEndpoint" placeholder="example.com or 1.2.3.4">
@@ -146,16 +144,22 @@
               <input type="number" id="manualPort" value="51820">
             </div>
             <div>
-              <label>Address (IPv4)</label>
+              <label>IPv4 Address</label>
               <input type="text" id="manualAddress" value="10.2.0.2/32">
             </div>
           </div>
+
+          <label style="margin-top:10px">IPv6 Address (optional)</label>
+          <input type="text" id="manualIPv6" placeholder="fd00::1/128">
+
+          <label style="margin-top:10px">AllowedIPs</label>
+          <input type="text" id="manualAllowed" value="0.0.0.0/0, ::/0">
 
           <label style="margin-top:10px">Preshared Key (optional)</label>
           <input type="text" id="manualPSK" placeholder="Leave empty if none">
         </div>
 
-        <!-- Common Settings -->
+        <!-- Extra Settings -->
         <div class="section-title">Extra Settings</div>
         <div class="row">
           <div>
@@ -172,6 +176,23 @@
           </div>
         </div>
 
+        <div class="row">
+          <div>
+            <label>IP Mode</label>
+            <select id="ipMode">
+              <option value="ipv4" selected>IPv4 only (recommended)</option>
+              <option value="dual">Dual stack (IPv4 + IPv6)</option>
+            </select>
+          </div>
+          <div>
+            <label>Conversion Mode</label>
+            <select id="conversionMode">
+              <option value="safe" selected>Safe (remove incompatible data)</option>
+              <option value="strict">Strict (error on incompatible data)</option>
+            </select>
+          </div>
+        </div>
+
         <div class="checkbox">
           <input type="checkbox" id="irBypass" checked>
           <label for="irBypass" style="margin:0;color:var(--text)">Add IR Bypass rules</label>
@@ -179,6 +200,24 @@
         <div class="checkbox">
           <input type="checkbox" id="useNoise" checked>
           <label for="useNoise" style="margin:0;color:var(--text)">Enable Noise / finalmask (Xray)</label>
+        </div>
+
+        <!-- Noise Settings -->
+        <div class="section-title">Noise Settings (Xray)</div>
+        <div class="row">
+          <div>
+            <label>Noise Preset</label>
+            <select id="noisePreset" onchange="applyNoisePreset()">
+              <option value="light">Light (3 packets)</option>
+              <option value="normal" selected>Normal (5 packets)</option>
+              <option value="strong">Strong (8 packets)</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+          <div>
+            <label>Noise Packets</label>
+            <input type="number" id="noiseCount" value="5" min="1" max="12">
+          </div>
         </div>
 
         <!-- Amnezia Parameters -->
@@ -207,7 +246,7 @@
         <div id="status" class="status"></div>
       </div>
 
-      <!-- ================= RIGHT PANEL ================= -->
+      <!-- RIGHT PANEL -->
       <div class="card">
         <div class="tabs">
           <div class="tab active" onclick="switchTab('json', this)">Xray JSON</div>
@@ -230,30 +269,89 @@
   <script>
     let currentTab = 'json';
     let currentMode = 'paste';
+    const $ = id => document.getElementById(id);
+
+    // ========== Save / Load Settings ==========
+    function saveSettings() {
+      const settings = {
+        name: $('name').value,
+        dns: $('dns').value,
+        mtu: $('mtu').value,
+        keepalive: $('keepalive').value,
+        ipMode: $('ipMode').value,
+        conversionMode: $('conversionMode').value,
+        irBypass: $('irBypass').checked,
+        useNoise: $('useNoise').checked,
+        noisePreset: $('noisePreset').value,
+        noiseCount: $('noiseCount').value,
+        jc: $('jc').value, jmin: $('jmin').value, jmax: $('jmax').value,
+        s1: $('s1').value, s2: $('s2').value,
+        h1: $('h1').value, h2: $('h2').value, h3: $('h3').value, h4: $('h4').value
+      };
+      localStorage.setItem('wgConverterPro', JSON.stringify(settings));
+    }
+
+    function loadSettings() {
+      const saved = localStorage.getItem('wgConverterPro');
+      if (!saved) return;
+      try {
+        const s = JSON.parse(saved);
+        if (s.name) $('name').value = s.name;
+        if (s.dns) $('dns').value = s.dns;
+        if (s.mtu) $('mtu').value = s.mtu;
+        if (s.keepalive) $('keepalive').value = s.keepalive;
+        if (s.ipMode) $('ipMode').value = s.ipMode;
+        if (s.conversionMode) $('conversionMode').value = s.conversionMode;
+        if (typeof s.irBypass === 'boolean') $('irBypass').checked = s.irBypass;
+        if (typeof s.useNoise === 'boolean') $('useNoise').checked = s.useNoise;
+        if (s.noisePreset) $('noisePreset').value = s.noisePreset;
+        if (s.noiseCount) $('noiseCount').value = s.noiseCount;
+        if (s.jc) $('jc').value = s.jc;
+        if (s.jmin) $('jmin').value = s.jmin;
+        if (s.jmax) $('jmax').value = s.jmax;
+        if (s.s1) $('s1').value = s.s1;
+        if (s.s2) $('s2').value = s.s2;
+        if (s.h1) $('h1').value = s.h1;
+        if (s.h2) $('h2').value = s.h2;
+        if (s.h3) $('h3').value = s.h3;
+        if (s.h4) $('h4').value = s.h4;
+      } catch (e) {}
+    }
+
+    // Auto-save on change
+    document.addEventListener('change', saveSettings);
+    document.addEventListener('input', () => {
+      clearTimeout(window.saveTimeout);
+      window.saveTimeout = setTimeout(saveSettings, 800);
+    });
+
+    function applyNoisePreset() {
+      const preset = $('noisePreset').value;
+      if (preset === 'light') $('noiseCount').value = 3;
+      else if (preset === 'normal') $('noiseCount').value = 5;
+      else if (preset === 'strong') $('noiseCount').value = 8;
+    }
 
     function randomizeAmnezia() {
-      // Random Junk count 3-10
-      document.getElementById('jc').value = Math.floor(Math.random() * 8) + 3;
-      document.getElementById('jmin').value = Math.floor(Math.random() * 40) + 20;
-      document.getElementById('jmax').value = Math.floor(Math.random() * 80) + 70;
-      document.getElementById('s1').value = Math.floor(Math.random() * 50) + 15;
-      document.getElementById('s2').value = Math.floor(Math.random() * 50) + 15;
-
-      // Unique 32-bit integer headers
+      $('jc').value = Math.floor(Math.random() * 8) + 3;
+      $('jmin').value = Math.floor(Math.random() * 40) + 20;
+      $('jmax').value = Math.floor(Math.random() * 80) + 70;
+      $('s1').value = Math.floor(Math.random() * 50) + 15;
+      $('s2').value = Math.floor(Math.random() * 50) + 15;
       const randHeader = () => Math.floor(Math.random() * 2147483647) + 1;
-      document.getElementById('h1').value = randHeader();
-      document.getElementById('h2').value = randHeader();
-      document.getElementById('h3').value = randHeader();
-      document.getElementById('h4').value = randHeader();
+      $('h1').value = randHeader();
+      $('h2').value = randHeader();
+      $('h3').value = randHeader();
+      $('h4').value = randHeader();
       convert();
     }
-    
+
     function setMode(mode) {
       currentMode = mode;
-      document.getElementById('modePaste').classList.toggle('active', mode === 'paste');
-      document.getElementById('modeManual').classList.toggle('active', mode === 'manual');
-      document.getElementById('pasteMode').classList.toggle('hidden', mode !== 'paste');
-      document.getElementById('manualMode').classList.toggle('hidden', mode !== 'manual');
+      $('modePaste').classList.toggle('active', mode === 'paste');
+      $('modeManual').classList.toggle('active', mode === 'manual');
+      $('pasteMode').classList.toggle('hidden', mode !== 'paste');
+      $('manualMode').classList.toggle('hidden', mode !== 'manual');
     }
 
     function switchTab(tab, element) {
@@ -263,18 +361,56 @@
       convert();
     }
 
+    // ========== Parsing helpers (kept from your improved version) ==========
+    function parseList(value) {
+      if (!value) return [];
+      return value.split(/[;,]/).flatMap(part => part.trim().split(/\s+/)).map(v => v.trim()).filter(Boolean);
+    }
+
+    function isIPv4(value) {
+      const host = value.trim().split('/')[0];
+      const octets = host.split('.');
+      return octets.length === 4 && octets.every(o => /^\d+$/.test(o) && Number(o) >= 0 && Number(o) <= 255);
+    }
+
+    function isIPv6(value) {
+      return value.trim().split('/')[0].includes(':');
+    }
+
+    function classifyAddress(value) {
+      if (isIPv4(value)) return 'ipv4';
+      if (isIPv6(value)) return 'ipv6';
+      return 'unknown';
+    }
+
+    function validCIDR(value) {
+      const parts = value.trim().split('/');
+      if (parts.length !== 2 || !/^\d+$/.test(parts[1])) return false;
+      const prefix = Number(parts[1]);
+      const family = classifyAddress(value);
+      if (family === 'ipv4') return prefix >= 0 && prefix <= 32;
+      if (family === 'ipv6') return prefix >= 0 && prefix <= 128;
+      return false;
+    }
+
+    function isValidWGKey(key) {
+      return /^[A-Za-z0-9+/]{43}=$/.test(key || '');
+    }
+
     function parseWG(text) {
       const r = {
-        privateKey: '', address: '', dns: '',
-        publicKey: '', endpoint: '', presharedKey: '',
-        reserved: '', keepalive: 25
+        privateKey: '', addresses: [], dnsServers: [], publicKey: '',
+        endpoint: '', presharedKey: '', reserved: '', keepalive: 25, allowedIPs: []
       };
       let section = '';
-      for (let rawLine of text.split('\n')) {
-        let line = rawLine.split('#')[0].split(';')[0].trim();
+      let peerCount = 0;
+
+      for (const rawLine of text.split(/\r?\n/)) {
+        const line = rawLine.split('#')[0].split(';')[0].trim();
         if (!line) continue;
-        if (line.startsWith('[')) {
+        if (line.startsWith('[') && line.endsWith(']')) {
           section = line.toLowerCase();
+          if (section.includes('peer')) peerCount++;
           continue;
         }
         const eq = line.indexOf('=');
@@ -284,203 +420,244 @@
 
         if (section.includes('interface')) {
           if (key === 'privatekey') r.privateKey = value;
-          if (key === 'address') r.address = value;
-          if (key === 'dns') r.dns = value;
+          else if (key === 'address') r.addresses = parseList(value);
+          else if (key === 'dns') r.dnsServers = parseList(value);
         }
-        if (section.includes('peer')) {
+        if (section.includes('peer') && peerCount <= 1) {
           if (key === 'publickey') r.publicKey = value;
-          if (key === 'endpoint') r.endpoint = value;
-          if (key === 'presharedkey') r.presharedKey = value;
-          if (key === 'reserved') r.reserved = value;
-          if (key === 'persistentkeepalive') r.keepalive = parseInt(value) || 25;
+          else if (key === 'endpoint') r.endpoint = value;
+          else if (key === 'presharedkey') r.presharedKey = value;
+          else if (key === 'reserved') r.reserved = value;
+          else if (key === 'persistentkeepalive') r.keepalive = parseInt(value, 10) || 25;
+          else if (key === 'allowedips') r.allowedIPs = parseList(value);
         }
       }
       return r;
     }
 
-    function convert() {
-      const status = document.getElementById('status');
-      const name = document.getElementById('name').value.trim() || 'My-WG';
-      const irBypass = document.getElementById('irBypass').checked;
-      const useNoise = document.getElementById('useNoise').checked;
-      const mtu = document.getElementById('mtu').value || 1280;
-      const dnsInput = document.getElementById('dns').value.trim() || '1.1.1.1';
-      const keepaliveInput = parseInt(document.getElementById('keepalive').value) || 25;
+    function parseEndpoint(rawEndpoint) {
+      const raw = (rawEndpoint || '').trim();
+      if (!raw) return { ok: false, error: 'Endpoint is empty.' };
 
-      let d = {};
-
-      if (currentMode === 'paste') {
-        const input = document.getElementById('wg').value.trim();
-        if (!input) {
-          status.className = 'status error';
-          status.textContent = 'Please paste a WireGuard config.';
-          return;
-        }
-        d = parseWG(input);
-      } else {
-        // Manual mode
-        d.privateKey = document.getElementById('manualPrivate').value.trim();
-        d.publicKey = document.getElementById('manualPublic').value.trim();
-        d.endpoint = document.getElementById('manualEndpoint').value.trim();
-        const port = document.getElementById('manualPort').value || 51820;
-        if (d.endpoint && !d.endpoint.includes(':')) {
-          d.endpoint = d.endpoint + ':' + port;
-        }
-        d.address = document.getElementById('manualAddress').value.trim() || '10.2.0.2/32';
-        d.presharedKey = document.getElementById('manualPSK').value.trim();
-        d.dns = dnsInput;
-        d.keepalive = keepaliveInput;
+      const bracketed = raw.match(/^\[([^\]]+)\](?::(\d+))?$/);
+      if (bracketed) {
+        const host = bracketed[1].trim();
+        const port = Number(bracketed[2] || 51820);
+        if (!isIPv6(host)) return { ok: false, error: 'Bracketed endpoint is not a valid IPv6 address.' };
+        if (!Number.isInteger(port) || port < 1 || port > 65535) return { ok: false, error: 'Invalid port.' };
+        return { ok: true, host, port, family: 'ipv6', formatted: `[${host}]:${port}` };
       }
 
-      // Validation
+      if ((raw.match(/:/g) || []).length > 1) {
+        return { ok: false, error: 'IPv6 endpoint must use [IPv6]:port notation.' };
+      }
+
+      const lastColon = raw.lastIndexOf(':');
+      if (lastColon > -1) {
+        const host = raw.slice(0, lastColon).trim();
+        const portText = raw.slice(lastColon + 1).trim();
+        if (/^\d+$/.test(portText)) {
+          const port = Number(portText);
+          if (!Number.isInteger(port) || port < 1 || port > 65535) return { ok: false, error: 'Invalid port.' };
+          if (!host) return { ok: false, error: 'Endpoint host is empty.' };
+          if (isIPv6(host)) return { ok: true, host, port, family: 'ipv6', formatted: `[${host}]:${port}` };
+          return { ok: true, host, port, family: isIPv4(host) ? 'ipv4' : 'domain', formatted: `${host}:${port}` };
+        }
+      }
+
+      return { ok: true, host: raw, port: 51820, family: isIPv4(raw) ? 'ipv4' : 'domain', formatted: `${raw}:51820` };
+    }
+
+    function normalizeInput(d) {
+      const mode = $('ipMode').value === 'dual' ? 'dual' : 'ipv4';
+      const conversionMode = $('conversionMode').value === 'strict' ? 'strict' : 'safe';
+      const warnings = [];
+      const errors = [];
+
       if (!d.privateKey || !d.publicKey || !d.endpoint) {
+        errors.push('Missing required fields: PrivateKey, PublicKey or Endpoint.');
+      }
+      if (d.privateKey && !isValidWGKey(d.privateKey)) errors.push('Invalid PrivateKey format.');
+      if (d.publicKey && !isValidWGKey(d.publicKey)) errors.push('Invalid PublicKey format.');
+      if (d.presharedKey && !isValidWGKey(d.presharedKey)) errors.push('Invalid PresharedKey format.');
+
+      const endpoint = parseEndpoint(d.endpoint);
+      if (!endpoint.ok) errors.push(endpoint.error);
+
+      const addresses = d.addresses.length ? d.addresses : ['10.2.0.2/32'];
+      const allowed = d.allowedIPs.length ? d.allowedIPs : ['0.0.0.0/0', '::/0'];
+
+      const ipv4Addresses = addresses.filter(a => classifyAddress(a) === 'ipv4');
+      const ipv6Addresses = addresses.filter(a => classifyAddress(a) === 'ipv6');
+      const ipv4DNS = (d.dnsServers || []).filter(a => classifyAddress(a) === 'ipv4');
+      const ipv6DNS = (d.dnsServers || []).filter(a => classifyAddress(a) === 'ipv6');
+      const ipv4Allowed = allowed.filter(a => classifyAddress(a) === 'ipv4');
+      const ipv6Allowed = allowed.filter(a => classifyAddress(a) === 'ipv6');
+
+      if (mode === 'ipv4') {
+        if (ipv6Addresses.length) warnings.push(`Removed ${ipv6Addresses.length} IPv6 address(es).`);
+        if (ipv6DNS.length) warnings.push(`Removed ${ipv6DNS.length} IPv6 DNS.`);
+        if (ipv6Allowed.length) warnings.push(`Removed ${ipv6Allowed.length} IPv6 AllowedIPs.`);
+      }
+
+      let cleanAddresses = mode === 'ipv4' ? ipv4Addresses : [...ipv4Addresses, ...ipv6Addresses];
+      let cleanDNS = mode === 'ipv4' ? ipv4DNS : [...ipv4DNS, ...ipv6DNS];
+      let cleanAllowed = mode === 'ipv4' ? ipv4Allowed : [...ipv4Allowed, ...ipv6Allowed];
+
+      if (!cleanAddresses.length) {
+        errors.push(mode === 'ipv4' ? 'No IPv4 interface address remains.' : 'No valid interface address found.');
+      }
+      if (!cleanAllowed.length) {
+        cleanAllowed = mode === 'ipv4' ? ['0.0.0.0/0'] : ['0.0.0.0/0', '::/0'];
+        warnings.push('Default AllowedIPs were added.');
+      }
+
+      const remoteDNS = cleanDNS.find(x => isIPv4(x)) || cleanDNS[0] || $('dns').value.trim() || '1.1.1.1';
+
+      const mtu = parseInt($('mtu').value, 10) || 1280;
+      const keepalive = parseInt($('keepalive').value, 10) || d.keepalive || 25;
+
+      return {
+        ok: errors.length === 0,
+        errors, warnings, mode,
+        endpoint, privateKey: d.privateKey, publicKey: d.publicKey,
+        presharedKey: d.presharedKey, addresses: cleanAddresses,
+        dnsServers: cleanDNS, remoteDNS, allowedIPs: cleanAllowed,
+        mtu, keepalive
+      };
+    }
+
+    function showStatus(ok, errors, warnings) {
+      const status = $('status');
+      if (!ok) {
         status.className = 'status error';
-        status.textContent = 'Missing required fields: PrivateKey, PublicKey or Endpoint';
+        status.innerHTML = '❌ ' + errors.map(e => e.replace(/</g, '&lt;')).join('<br>');
         return;
       }
+      status.className = 'status success';
+      let msg = '✅ Converted successfully!';
+      if (warnings.length) msg += '<br>⚠️ ' + warnings.map(w => w.replace(/</g, '&lt;')).join('<br>⚠️ ');
+      status.innerHTML = msg;
+    }
 
-      // Amnezia params
-      const jc = document.getElementById('jc').value;
-      const jmin = document.getElementById('jmin').value;
-      const jmax = document.getElementById('jmax').value;
-      const s1 = document.getElementById('s1').value;
-      const s2 = document.getElementById('s2').value;
-      const h1 = document.getElementById('h1').value;
-      const h2 = document.getElementById('h2').value;
-      const h3 = document.getElementById('h3').value;
-      const h4 = document.getElementById('h4').value;
+    // ========== Builders ==========
+    function buildXrayConfig(c, name, useNoise, irBypass) {
+      const count = Math.max(1, Math.min(12, parseInt($('noiseCount').value) || 5));
+      const noiseArray = Array.from({ length: count }, () => ({
+        rand: '50-100', randRange: '0-255', delay: '1-5'
+      }));
 
-      // Address
-      let addresses = d.address ? d.address.split(',').map(s => s.trim()) : ['10.2.0.2/32'];
-      let ipv4 = addresses.find(a => !a.includes(':')) || '10.2.0.2/32';
-      let ipv6 = addresses.find(a => a.includes(':')) || '';
-
-      // Validate Base64 WG Key format (44 chars base64)
-      const isValidWGKey = (key) => /^[A-Za-z0-9+/]{43}=$/.test(key);
-      if (!isValidWGKey(d.privateKey) || !isValidWGKey(d.publicKey)) {
-        status.className = 'status error';
-        status.textContent = 'Invalid PrivateKey or PublicKey format (must be standard 44-char base64).';
-        return;
-      }
-
-      // Parse Reserved bytes if present (e.g., "0,0,0" or "[0,0,0]")
-      let reservedArray = null;
-      if (d.reserved) {
-        const cleaned = d.reserved.replace(/[\[\]\s]/g, '');
-        if (cleaned) reservedArray = cleaned.split(',').map(n => parseInt(n, 10)).filter(n => !isNaN(n));
-      }
-
-      // Endpoint split supporting [IPv6]:port and Domain:port with safe fallback
-      let server = d.endpoint.trim();
-      let port = 51820;
-      const ipv6Match = server.match(/^\[([a-fA-F0-9:]+)\]:(\d+)$/);
-      if (ipv6Match) {
-        server = ipv6Match[1];
-        port = parseInt(ipv6Match[2], 10);
-      } else if (server.includes(':') && !server.endsWith(':')) {
-        const idx = server.lastIndexOf(':');
-        port = parseInt(server.slice(idx + 1), 10) || 51820;
-        server = server.slice(0, idx);
-      } else {
-        d.endpoint = `${server}:${port}`;
-      }
-
-      const dnsServer = d.dns || dnsInput;
-      let result = '';
-
-      // ========== SING-BOX ==========
-      if (currentTab === 'singbox') {
-        const singBoxOutbound = {
-          type: "wireguard",
-          tag: name,
-          server: server,
-          server_port: parseInt(port, 10),
-          local_address: addresses,
-          private_key: d.privateKey,
-          peer_public_key: d.publicKey,
-          pre_shared_key: d.presharedKey || undefined,
-          reserved: reservedArray && reservedArray.length ? reservedArray : undefined,
-          mtu: parseInt(mtu, 10),
-          amnezia: {
-            junk_packet_count: parseInt(jc, 10),
-            junk_packet_min_size: parseInt(jmin, 10),
-            junk_packet_max_size: parseInt(jmax, 10),
-            init_packet_junk_size: parseInt(s1, 10),
-            response_packet_junk_size: parseInt(s2, 10),
-            init_packet_magic_header: parseInt(h1, 10),
-            response_packet_magic_header: parseInt(h2, 10),
-            underload_packet_magic_header: parseInt(h3, 10),
-            transport_packet_magic_header: parseInt(h4, 10)
+      const noiseBlock = useNoise ? {
+        streamSettings: {
+          finalmask: {
+            udp: [{
+              type: 'noise',
+              settings: {
+                reset: '30-60',
+                noise: noiseArray
+              }
+            }]
           }
-        };
+        }
+      } : {};
 
-        const singboxConfig = {
-          dns: {
-            servers: [
-              { tag: "remote-dns", address: dnsServer, detour: name },
-              { tag: "direct-dns", address: "8.8.8.8", detour: "direct" }
-            ],
-            rules: irBypass ? [{ geoip: ["ir", "private"], server: "direct-dns" }] : []
+      return {
+        remarks: name,
+        log: { loglevel: 'warning' },
+        dns: {
+          servers: [
+            { address: c.remoteDNS, tag: 'remote-dns' },
+            '1.1.1.1'
+          ],
+          queryStrategy: 'UseIPv4'
+        },
+        inbounds: [{
+          listen: '0.0.0.0',
+          port: 10808,
+          protocol: 'mixed',
+          settings: { auth: 'noauth', udp: true },
+          sniffing: { destOverride: ['http', 'tls'], enabled: true, routeOnly: true },
+          tag: 'mixed-in'
+        }],
+        outbounds: [{
+          protocol: 'wireguard',
+          settings: {
+            secretKey: c.privateKey,
+            address: c.addresses,
+            mtu: c.mtu,
+            peers: [{
+              endpoint: c.endpoint.formatted,
+              publicKey: c.publicKey,
+              ...(c.presharedKey ? { preSharedKey: c.presharedKey } : {}),
+              keepAlive: c.keepalive,
+              allowedIPs: c.allowedIPs
+            }]
           },
-          inbounds: [
-            {
-              type: "tun",
-              inet4_address: "172.19.0.1/30",
-              auto_route: true,
-              strict_route: true,
-              sniff: true
-            }
-          ],
-          outbounds: [
-            singBoxOutbound,
-            { type: "direct", tag: "direct" },
-            { type: "block", tag: "block" }
-          ],
-          route: {
-            auto_detect_interface: true,
-            rules: irBypass ? [
-              { geoip: ["private", "ir"], outbound: "direct" },
-              { geosite: ["category-ir"], outbound: "direct" }
-            ] : []
-          }
-        };
+          ...noiseBlock,
+          tag: 'proxy'
+        },
+        { protocol: 'freedom', tag: 'direct' },
+        { protocol: 'blackhole', tag: 'block' }],
+        routing: {
+          domainStrategy: 'IPIfNonMatch',
+          rules: [
+            ...(irBypass
+              ? [
+                  { type: 'field', ip: ['geoip:private', 'geoip:ir'], outboundTag: 'direct' },
+                  { type: 'field', domain: ['regexp:.*\\.ir$', 'geosite:category-ir'], outboundTag: 'direct' }
+                ]
+              : [{ type: 'field', ip: ['geoip:private'], outboundTag: 'direct' }]),
+            { type: 'field', network: 'tcp,udp', outboundTag: 'proxy' }
+          ]
+        }
+      };
+    }
 
-        result = JSON.stringify(singboxConfig, null, 2);
+    function buildClash(c, name, irBypass, jc, jmin, jmax, s1, s2, h1, h2, h3, h4) {
+      const dual = c.mode === 'dual';
+      const ipv4 = c.addresses.find(a => classifyAddress(a) === 'ipv4') || c.addresses[0];
+      const ipv6 = c.addresses.find(a => classifyAddress(a) === 'ipv6') || '';
+
+      let proxy = `  - name: "${name}"
+    type: wireguard
+    ip: ${ipv4}
+`;
+      if (dual && ipv6) {
+        proxy += `    ipv6: ${ipv6}
+    ip-version: dual
+`;
+      } else {
+        proxy += `    ip-version: ipv4
+`;
       }
 
-      // ========== AMNEZIA ==========
-      else if (currentTab === 'amnezia') {
-        result = `[Interface]
-PrivateKey = ${d.privateKey}
-Address = ${d.address || '10.2.0.2/32'}
-DNS = ${dnsServer}
-MTU = ${mtu}
-Jc = ${jc}
-Jmin = ${jmin}
-Jmax = ${jmax}
-S1 = ${s1}
-S2 = ${s2}
-H1 = ${h1}
-H2 = ${h2}
-H3 = ${h3}
-H4 = ${h4}
+      proxy += `    private-key: ${c.privateKey}
+    server: ${c.endpoint.host}
+    port: ${c.endpoint.port}
+    public-key: ${c.publicKey}
+`;
+      if (c.presharedKey) proxy += `    pre-shared-key: ${c.presharedKey}
+`;
+      proxy += `    allowed-ips:
+${c.allowedIPs.map(ip => `      - ${ip}`).join('\n')}
+    persistent-keepalive: ${c.keepalive}
+    udp: true
+    mtu: ${c.mtu}
+    amnezia-wg-option:
+      jc: ${jc}
+      jmin: ${jmin}
+      jmax: ${jmax}
+      s1: ${s1}
+      s2: ${s2}
+      h1: ${h1}
+      h2: ${h2}
+      h3: ${h3}
+      h4: ${h4}`;
 
-[Peer]
-PublicKey = ${d.publicKey}
-AllowedIPs = 0.0.0.0/0, ::/0
-Endpoint = ${d.endpoint}
-PersistentKeepalive = ${d.keepalive || keepaliveInput}`;
-        if (d.presharedKey) result += `\nPresharedKey = ${d.presharedKey}`;
-      }
+      const irRule = irBypass ? `  - GEOIP,IR,DIRECT,no-resolve\n` : '';
 
-      // ========== CLASH ==========
-      else if (currentTab === 'clash') {
-        const irRule = irBypass ? `  - GEOIP,IR,DIRECT,no-resolve\n` : '';
-        const pskLine = d.presharedKey ? `\n    pre-shared-key: ${d.presharedKey}` : '';
-        const ipVersionLine = ipv6 ? `ipv6: ${ipv6}\n    ip-version: dual` : `ip-version: ipv4`;
-
-        result = `mixed-port: 7890
-ipv6: true
+      return `mixed-port: 7890
+ipv6: ${dual}
 allow-lan: true
 unified-delay: false
 log-level: warning
@@ -505,7 +682,7 @@ dns:
   listen: 0.0.0.0:1053
   ipv6: false
   nameserver:
-    - ${dnsServer}#${name}
+    - ${c.remoteDNS}#${name}
     - 1.1.1.1#${name}
   proxy-server-nameserver:
     - 8.8.8.8#DIRECT
@@ -537,30 +714,7 @@ sniffer:
       ports: [443, 8443, 2053, 2083, 2087, 2096]
 
 proxies:
-  - name: "${name}"
-    type: wireguard
-    ip: ${ipv4}
-    ${ipVersionLine}
-    private-key: ${d.privateKey}
-    server: ${server}
-    port: ${port}
-    public-key: ${d.publicKey}${pskLine}
-    allowed-ips:
-      - 0.0.0.0/0
-      - ::/0
-    persistent-keepalive: ${d.keepalive || keepaliveInput}
-    udp: true
-    mtu: ${mtu}
-    amnezia-wg-option:
-      jc: ${jc}
-      jmin: ${jmin}
-      jmax: ${jmax}
-      s1: ${s1}
-      s2: ${s2}
-      h1: ${h1}
-      h2: ${h2}
-      h3: ${h3}
-      h4: ${h4}
+${proxy}
 
 proxy-groups:
   - name: "✅ Selector"
@@ -586,138 +740,166 @@ ntp:
   server: time.cloudflare.com
   port: 123
   interval: 30`;
-      }
+    }
 
-      // ========== XRAY JSON ==========
-      else {
-        const noiseBlock = useNoise ? `,
-      "streamSettings": {
-        "finalmask": {
-          "udp": [{
-            "type": "noise",
-            "settings": {
-              "reset": "30-60",
-              "noise": [
-                {"rand": "50-100", "randRange": "0-255", "delay": "1-5"},
-                {"rand": "50-100", "randRange": "0-255", "delay": "1-5"},
-                {"rand": "50-100", "randRange": "0-255", "delay": "1-5"},
-                {"rand": "50-100", "randRange": "0-255", "delay": "1-5"},
-                {"rand": "50-100", "randRange": "0-255", "delay": "1-5"}
-              ]
+    function buildAmnezia(c, jc, jmin, jmax, s1, s2, h1, h2, h3, h4) {
+      return `[Interface]
+PrivateKey = ${c.privateKey}
+Address = ${c.addresses.join(', ')}
+DNS = ${c.remoteDNS}
+MTU = ${c.mtu}
+Jc = ${jc}
+Jmin = ${jmin}
+Jmax = ${jmax}
+S1 = ${s1}
+S2 = ${s2}
+H1 = ${h1}
+H2 = ${h2}
+H3 = ${h3}
+H4 = ${h4}
+
+[Peer]
+PublicKey = ${c.publicKey}
+AllowedIPs = ${c.allowedIPs.join(', ')}
+Endpoint = ${c.endpoint.formatted}
+PersistentKeepalive = ${c.keepalive}${c.presharedKey ? `\nPresharedKey = ${c.presharedKey}` : ''}`;
+    }
+
+    function buildSingbox(c, name, irBypass, jc, jmin, jmax, s1, s2, h1, h2, h3, h4) {
+      return {
+        dns: {
+          servers: [
+            { tag: 'remote', address: c.remoteDNS, detour: name },
+            { tag: 'local', address: 'local' }
+          ]
+        },
+        inbounds: [{ type: 'tun', tag: 'tun-in', inet4_address: '172.19.0.1/30', auto_route: true, strict_route: true }],
+        outbounds: [
+          {
+            type: 'wireguard',
+            tag: name,
+            server: c.endpoint.host,
+            server_port: c.endpoint.port,
+            local_address: c.addresses,
+            private_key: c.privateKey,
+            peer_public_key: c.publicKey,
+            ...(c.presharedKey ? { pre_shared_key: c.presharedKey } : {}),
+            mtu: c.mtu,
+            amnezia: {
+              junk_packet_count: parseInt(jc),
+              junk_packet_min_size: parseInt(jmin),
+              junk_packet_max_size: parseInt(jmax),
+              init_packet_junk_size: parseInt(s1),
+              response_packet_junk_size: parseInt(s2),
+              init_packet_magic_header: parseInt(h1),
+              response_packet_magic_header: parseInt(h2),
+              underload_packet_magic_header: parseInt(h3),
+              transport_packet_magic_header: parseInt(h4)
             }
-          }]
+          },
+          { type: 'direct', tag: 'direct' },
+          { type: 'block', tag: 'block' }
+        ],
+        route: {
+          rules: irBypass ? [
+            { geoip: ['private', 'ir'], outbound: 'direct' },
+            { geosite: ['category-ir'], outbound: 'direct' }
+          ] : [],
+          final: name
         }
-      }` : '';
+      };
+    }
 
-        const irRules = irBypass ? `
-      {
-        "type": "field",
-        "ip": ["geoip:private", "geoip:ir"],
-        "outboundTag": "direct"
-      },
-      {
-        "type": "field",
-        "domain": ["regexp:.*\\\\.ir$", "geosite:category-ir"],
-        "outboundTag": "direct"
-      },` : `
-      {
-        "type": "field",
-        "ip": ["geoip:private"],
-        "outboundTag": "direct"
-      },`;
+    function convert() {
+      const name = $('name').value.trim() || 'My-WG';
+      const irBypass = $('irBypass').checked;
+      const useNoise = $('useNoise').checked;
+      const jc = $('jc').value, jmin = $('jmin').value, jmax = $('jmax').value;
+      const s1 = $('s1').value, s2 = $('s2').value;
+      const h1 = $('h1').value, h2 = $('h2').value, h3 = $('h3').value, h4 = $('h4').value;
 
-        result = `{
-  "remarks": "${name}",
-  "log": { "loglevel": "warning" },
-  "dns": {
-    "servers": [
-      { "address": "${dnsServer}", "tag": "remote-dns" },
-      "1.1.1.1"
-    ],
-    "queryStrategy": "UseIPv4"
-  },
-  "inbounds": [{
-    "listen": "0.0.0.0",
-    "port": 10808,
-    "protocol": "mixed",
-    "settings": { "auth": "noauth", "udp": true },
-    "sniffing": {
-      "destOverride": ["http", "tls"],
-      "enabled": true,
-      "routeOnly": true
-    },
-    "tag": "mixed-in"
-  }],
-  "outbounds": [
-    {
-      "protocol": "wireguard",
-      "settings": {
-        "secretKey": "${d.privateKey}",
-        "address": ${JSON.stringify(addresses)},
-        "mtu": ${mtu},
-        "peers": [{
-          "endpoint": "${d.endpoint}",
-          "publicKey": "${d.publicKey}",
-          ${d.presharedKey ? `"preSharedKey": "${d.presharedKey}",` : ''}
-          "keepAlive": ${d.keepalive || keepaliveInput},
-          "allowedIPs": ["0.0.0.0/0", "::/0"]
-        }]
-      }${noiseBlock},
-      "tag": "proxy"
-    },
-    { "protocol": "freedom", "tag": "direct" },
-    { "protocol": "blackhole", "tag": "block" }
-  ],
-  "routing": {
-    "domainStrategy": "IPIfNonMatch",
-    "rules": [
-${irRules}
-      {
-        "type": "field",
-        "network": "tcp,udp",
-        "outboundTag": "proxy"
-      }
-    ]
-  }
-}`;
+      let d;
+      if (currentMode === 'paste') {
+        const input = $('wg').value.trim();
+        if (!input) {
+          showStatus(false, ['Please paste a WireGuard config.'], []);
+          return;
+        }
+        d = parseWG(input);
+      } else {
+        const ipv4 = $('manualAddress').value.trim() || '10.2.0.2/32';
+        const ipv6 = $('manualIPv6').value.trim();
+        d = {
+          privateKey: $('manualPrivate').value.trim(),
+          publicKey: $('manualPublic').value.trim(),
+          endpoint: $('manualEndpoint').value.trim(),
+          addresses: ipv6 ? [ipv4, ipv6] : [ipv4],
+          dnsServers: parseList($('dns').value.trim() || '1.1.1.1'),
+          presharedKey: $('manualPSK').value.trim(),
+          keepalive: parseInt($('keepalive').value) || 25,
+          allowedIPs: parseList($('manualAllowed').value.trim() || '0.0.0.0/0, ::/0')
+        };
+        const port = $('manualPort').value || '51820';
+        if (d.endpoint && !d.endpoint.includes(':')) d.endpoint += `:${port}`;
       }
 
-      document.getElementById('result').value = result;
-      status.className = 'status success';
-      status.textContent = '✅ Converted successfully!';
+      const c = normalizeInput(d);
+      if (!c.ok) {
+        showStatus(false, c.errors, c.warnings);
+        $('result').value = '';
+        return;
+      }
+
+      let result = '';
+      if (currentTab === 'json') {
+        result = JSON.stringify(buildXrayConfig(c, name, useNoise, irBypass), null, 2);
+      } else if (currentTab === 'clash') {
+        result = buildClash(c, name, irBypass, jc, jmin, jmax, s1, s2, h1, h2, h3, h4);
+      } else if (currentTab === 'singbox') {
+        result = JSON.stringify(buildSingbox(c, name, irBypass, jc, jmin, jmax, s1, s2, h1, h2, h3, h4), null, 2);
+      } else {
+        result = buildAmnezia(c, jc, jmin, jmax, s1, s2, h1, h2, h3, h4);
+      }
+
+      $('result').value = result;
+      showStatus(true, [], c.warnings);
+      saveSettings();
     }
 
     function copyResult() {
-      const el = document.getElementById('result');
-      el.select();
-      navigator.clipboard.writeText(el.value);
-      document.getElementById('status').textContent = '📋 Copied to clipboard!';
-      document.getElementById('status').className = 'status success';
+      const el = $('result');
+      if (!el.value) return;
+      navigator.clipboard.writeText(el.value).then(() => {
+        $('status').textContent = '📋 Copied to clipboard!';
+        $('status').className = 'status success';
+      });
     }
 
     function downloadResult() {
-      const content = document.getElementById('result').value;
+      const content = $('result').value;
       if (!content) return;
-      const name = document.getElementById('name').value.trim() || 'config';
-      const extensions = { json: 'json', clash: 'yaml', singbox: 'json', amnezia: 'conf' };
-      const ext = extensions[currentTab] || 'txt';
-      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      const name = $('name').value.trim() || 'config';
+      const ext = { json: 'json', clash: 'yaml', singbox: 'json', amnezia: 'conf' }[currentTab] || 'txt';
       const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
+      a.href = URL.createObjectURL(new Blob([content], { type: 'text/plain' }));
       a.download = `${name}.${ext}`;
       a.click();
-      URL.revokeObjectURL(a.href);
     }
 
     function clearAll() {
-      document.getElementById('wg').value = '';
-      document.getElementById('manualPrivate').value = '';
-      document.getElementById('manualPublic').value = '';
-      document.getElementById('manualEndpoint').value = '';
-      document.getElementById('manualPSK').value = '';
-      document.getElementById('result').value = '';
-      document.getElementById('status').textContent = '';
+      $('wg').value = '';
+      $('manualPrivate').value = '';
+      $('manualPublic').value = '';
+      $('manualEndpoint').value = '';
+      $('manualIPv6').value = '';
+      $('manualPSK').value = '';
+      $('result').value = '';
+      $('status').textContent = '';
     }
+
+    // Init
+    loadSettings();
+    applyNoisePreset();
   </script>
 </body>
 </html>
