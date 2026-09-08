@@ -124,6 +124,44 @@
           <input type="checkbox" id="useNoise" checked>
           <label for="useNoise" style="margin:0;color:var(--text)">Default: Noise/Obfuscation ON for parsed configs</label>
         </div>
+        <div class="checkbox">
+          <input type="checkbox" id="useFragment" checked>
+          <label for="useFragment" style="margin:0;color:var(--text)">Default: Fragment (finalmask) ON for parsed configs</label>
+        </div>
+
+        <div class="section-title">Fragment Settings (Xray finalmask)</div>
+        <div class="row">
+          <div>
+            <label>Fragment Preset</label>
+            <select id="fragmentPreset" onchange="applyFragmentPreset()">
+              <option value="light">Light (50-100 / 1)</option>
+              <option value="normal" selected>Normal (100-200 / 1) ← most common</option>
+              <option value="heavy">Heavy (10-50 / 1-2)</option>
+              <option value="aggressive">Aggressive (1-20 / 1-1)</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Packets</label>
+            <select id="fragPackets">
+              <option value="tlshello" selected>tlshello</option>
+              <option value="1-1">1-1</option>
+              <option value="1-2">1-2</option>
+              <option value="1-3">1-3</option>
+              <option value="1-5">1-5</option>
+            </select>
+          </div>
+          <div>
+            <label>Length (e.g. 100-200)</label>
+            <input type="text" id="fragLength" value="100-200" placeholder="100-200">
+          </div>
+          <div>
+            <label>Delay (e.g. 1 or 1-1)</label>
+            <input type="text" id="fragDelay" value="1" placeholder="1">
+          </div>
+        </div>
 
         <div class="section-title">UDP Noise Settings (non-WireGuard, Xray outbound)</div>
         <div class="row">
@@ -229,7 +267,7 @@
 
     async function fetchSubscription() {
       const rawUrlFull = $('inputData').value.trim();
-      const rawUrl = rawUrlFull.split('#')[0]; // strip fragment, browsers won't send it anyway but keep input clean
+      const rawUrl = rawUrlFull.split('#')[0];
       if (!rawUrl.startsWith('http://') && !rawUrl.startsWith('https://')) {
         showStatus(false, ['Please input a valid HTTP(S) Subscription URL.'], []);
         return;
@@ -299,6 +337,28 @@
       if (p === 'light') $('noiseCount').value = 3;
       else if (p === 'normal') $('noiseCount').value = 5;
       else if (p === 'strong') $('noiseCount').value = 8;
+    }
+
+    function applyFragmentPreset() {
+      const p = $('fragmentPreset').value;
+      if (p === 'light') {
+        $('fragPackets').value = 'tlshello';
+        $('fragLength').value = '50-100';
+        $('fragDelay').value = '1';
+      } else if (p === 'normal') {
+        $('fragPackets').value = 'tlshello';
+        $('fragLength').value = '100-200';
+        $('fragDelay').value = '1';
+      } else if (p === 'heavy') {
+        $('fragPackets').value = 'tlshello';
+        $('fragLength').value = '10-50';
+        $('fragDelay').value = '1-2';
+      } else if (p === 'aggressive') {
+        $('fragPackets').value = 'tlshello';
+        $('fragLength').value = '1-20';
+        $('fragDelay').value = '1-1';
+      }
+      // custom → leave current values
     }
 
     function randomizeAmnezia() {
@@ -402,8 +462,6 @@
       return r;
     }
 
-    // ---------- Builders now take explicit settings instead of reading global DOM ----------
-
     function noiseBlock(count) {
       const n = Math.max(1, Math.min(12, count || 5));
       return Array.from({ length: n }, () => ({ rand: '50-100', randRange: '0-255', delay: '1-5' }));
@@ -422,13 +480,34 @@
         if (s.awg) out.settings.amnezia = { Jc: s.awg.jc, Jmin: s.awg.jmin, Jmax: s.awg.jmax, S1: s.awg.s1, S2: s.awg.s2, H1: s.awg.h1, H2: s.awg.h2, H3: s.awg.h3, H4: s.awg.h4 };
         return out;
       }
+
       const streamSettings = { network: p.type === 'hy2' ? 'quic' : p.type, security: p.security };
       if (p.security === 'tls') streamSettings.tlsSettings = { serverName: p.sni, fingerprint: p.fp || 'chrome', ...(p.alpn ? { alpn: p.alpn } : {}) };
       else if (p.security === 'reality') streamSettings.realitySettings = { serverName: p.sni, fingerprint: p.fp || 'chrome', publicKey: p.pbk, shortId: p.sid, spiderX: '/' };
       if (p.type === 'ws') streamSettings.wsSettings = { path: p.path, headers: { Host: p.hostHeader } };
       else if (p.type === 'grpc') streamSettings.grpcSettings = { serviceName: p.serviceName, multiMode: true };
       else if (p.type === 'httpupgrade') streamSettings.httpupgradeSettings = { path: p.path, host: p.hostHeader };
-      if (s.noise) streamSettings.sockopt = { ...(streamSettings.sockopt || {}), udpNoises: noiseBlock(s.noiseCount) };
+
+      // Noise
+      if (s.noise) {
+        streamSettings.sockopt = { ...(streamSettings.sockopt || {}), udpNoises: noiseBlock(s.noiseCount) };
+      }
+
+      // Fragment (finalmask) - the important part
+      if (s.fragment) {
+        streamSettings.finalmask = {
+          tcp: [
+            {
+              type: "fragment",
+              settings: {
+                packets: s.fragPackets || "tlshello",
+                length: s.fragLength || "100-200",
+                delay: s.fragDelay || "1"
+              }
+            }
+          ]
+        };
+      }
 
       return {
         protocol: p.protocol, tag,
@@ -441,7 +520,6 @@
     }
 
     function buildXrayConfig(proxyEntries) {
-      // proxyEntries: [{p, s}]
       const outbounds = proxyEntries.map(({ p, s }) => buildXrayOutbound(p, s));
       outbounds.push({ protocol: 'freedom', tag: 'direct' });
       outbounds.push({ protocol: 'blackhole', tag: 'block' });
@@ -562,13 +640,15 @@ Endpoint = ${p.endpoint}
 PersistentKeepalive = ${p.keepalive}${p.presharedKey ? `\nPresharedKey = ${p.presharedKey}` : ''}`;
     }
 
-    // ---------- Rendering & per-item interactivity ----------
-
     function defaultSettings() {
       return {
         irBypass: $('irBypass').checked,
         noise: $('useNoise').checked,
         noiseCount: parseInt($('noiseCount').value) || 5,
+        fragment: $('useFragment').checked,
+        fragPackets: $('fragPackets').value || 'tlshello',
+        fragLength: $('fragLength').value.trim() || '100-200',
+        fragDelay: $('fragDelay').value.trim() || '1',
         dns: $('dns').value.trim() || '1.1.1.1',
         mtu: parseInt($('mtu').value) || 1280,
         awg: null
@@ -593,13 +673,14 @@ PersistentKeepalive = ${p.keepalive}${p.presharedKey ? `\nPresharedKey = ${p.pre
         const displayUri = item.rawUri || `${item.protocol}://${item.host}:${item.port}`;
         const isWg = item.protocol === 'wireguard';
         const irBadge = item.settings.irBypass ? `<span class="badge badge-applied">IR-BYPASS</span>` : '';
+        const fragBadge = item.settings.fragment ? `<span class="badge badge-applied">FRAGMENT</span>` : '';
 
         itemDiv.innerHTML = `
           <div class="config-summary" onclick="toggleDetails(${i})">
             <div class="config-info">
               <span class="badge ${badgeClass}">${item.protocol}</span>
               <span class="config-title">${escapeHtml(item.name)}</span>
-              ${irBadge}
+              ${irBadge} ${fragBadge}
             </div>
             <div style="display: flex; gap: 6px;" onclick="event.stopPropagation()">
               <button class="secondary" style="padding: 3px 8px; font-size: 11px;" onclick="copySingleLink(${i})">Copy Link</button>
@@ -613,7 +694,10 @@ PersistentKeepalive = ${p.keepalive}${p.presharedKey ? `\nPresharedKey = ${p.pre
               <button class="${item.settings.irBypass ? 'warn-btn' : ''}" onclick="toggleIrBypass(${i})">${item.settings.irBypass ? 'Remove IR Bypass' : 'Apply IR Bypass'}</button>
               ${isWg
                 ? `<button onclick="applyAwg(${i})">${item.settings.awg ? 'Re-apply Amnezia Params' : 'Apply Amnezia Params'}</button>`
-                : `<button class="${item.settings.noise ? 'warn-btn' : ''}" onclick="toggleNoise(${i})">${item.settings.noise ? 'Remove Noise' : 'Apply Noise'}</button>`
+                : `
+                  <button class="${item.settings.noise ? 'warn-btn' : ''}" onclick="toggleNoise(${i})">${item.settings.noise ? 'Remove Noise' : 'Apply Noise'}</button>
+                  <button class="${item.settings.fragment ? 'warn-btn' : ''}" onclick="toggleFragment(${i})">${item.settings.fragment ? 'Remove Fragment' : 'Apply Fragment'}</button>
+                `
               }
               <select id="fmt-${i}" onchange="generateIndividual(${i})">
                 <option value="link">Share Link</option>
@@ -661,6 +745,25 @@ PersistentKeepalive = ${p.keepalive}${p.presharedKey ? `\nPresharedKey = ${p.pre
       } else {
         item.settings.noise = true;
         itemMsg(i, 'success', 'Noise masking applied.');
+      }
+      renderList();
+      $(`details-${i}`)?.classList.add('open');
+      generateIndividual(i);
+    }
+
+    function toggleFragment(i) {
+      const item = parsedProxiesGlobal[i];
+      // Always take current global values when enabling
+      item.settings.fragPackets = $('fragPackets').value || 'tlshello';
+      item.settings.fragLength = $('fragLength').value.trim() || '100-200';
+      item.settings.fragDelay = $('fragDelay').value.trim() || '1';
+
+      if (item.settings.fragment) {
+        item.settings.fragment = false;
+        itemMsg(i, 'warn', 'Fragment removed from this config.');
+      } else {
+        item.settings.fragment = true;
+        itemMsg(i, 'success', `Fragment applied (${item.settings.fragPackets} / ${item.settings.fragLength} / ${item.settings.fragDelay})`);
       }
       renderList();
       $(`details-${i}`)?.classList.add('open');
@@ -835,6 +938,7 @@ PersistentKeepalive = ${p.keepalive}${p.presharedKey ? `\nPresharedKey = ${p.pre
     }
 
     applyNoisePreset();
+    applyFragmentPreset();
   </script>
 </body>
 </html>
