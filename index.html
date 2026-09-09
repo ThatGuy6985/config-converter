@@ -1,214 +1,214 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
- <meta charset="UTF-8" />
- <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
- <title>Universal Proxy & VPN Converter Pro v3 (Fixed)</title>
- <style>
- :root {
- --bg: #0f172a; --card: #1e293b; --border: #334155;
- --primary: #0ea5e9; --primary-hover: #0284c7;
- --text: #e2e8f0; --muted: #94a3b8;
- --success: #4ade80; --error: #f87171; --warn: #fbbf24;
- }
- * { box-sizing: border-box; margin: 0; padding: 0; }
- body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; padding: 20px; }
- .container { max-width: 1450px; margin: 0 auto; }
- h1 { text-align: center; color: var(--primary); margin-bottom: 4px; font-size: 26px; }
- .subtitle { text-align: center; color: var(--muted); margin-bottom: 22px; font-size: 13px; }
- .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
- @media (max-width: 1100px) { .grid { grid-template-columns: 1fr; } }
- .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
- label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; font-weight: 600; }
- textarea, input, select {
- width: 100%; background: #0f172a; border: 1px solid var(--border); border-radius: 8px;
- color: var(--text); padding: 9px 11px; font-family: ui-monospace, monospace; font-size: 12.5px;
- }
- textarea { min-height: 120px; resize: vertical; }
- .row { display: flex; gap: 10px; margin-bottom: 9px; flex-wrap: wrap; }
- .row > div { flex: 1; min-width: 100px; }
- .checkbox { display: flex; align-items: center; gap: 8px; margin: 7px 0; }
- .checkbox input { width: auto; }
- button { background: var(--primary); color: white; border: none; padding: 9px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; transition: 0.2s; }
- button:hover { background: var(--primary-hover); }
- button.secondary { background: #334155; }
- button.secondary:hover { background: #475569; }
- button.success-btn { background: #16a34a; }
- button.success-btn:hover { background: #15803d; }
- button.warn-btn { background: #92400e; }
- button.warn-btn:hover { background: #78350f; }
- .btn-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
- .tabs { display: flex; gap: 7px; margin-bottom: 10px; flex-wrap: wrap; }
- .tab { padding: 6px 14px; background: #334155; border-radius: 8px; cursor: pointer; font-size: 12.5px; font-weight: 500; }
- .tab.active { background: var(--primary); }
- .status { margin-top: 10px; font-size: 12.5px; min-height: 18px; }
- .success { color: var(--success); } .error { color: var(--error); } .warn { color: var(--warn); }
- .section-title { font-size: 13px; font-weight: 600; color: var(--primary); margin: 14px 0 8px 0; padding-bottom: 3px; border-bottom: 1px solid var(--border); }
- .mode-switch { display: flex; gap: 8px; margin-bottom: 12px; }
- .mode-btn { flex: 1; text-align: center; padding: 7px; background: #334155; border-radius: 8px; cursor: pointer; font-size: 12.5px; }
- .mode-btn.active { background: var(--primary); }
- .hidden { display: none; }
- .action-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
- .config-item { background: #0f172a; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 7px; overflow: hidden; }
- .config-summary { display: flex; justify-content: space-between; align-items: center; padding: 9px 11px; cursor: pointer; }
- .config-summary:hover { background: #162032; }
- .config-info { display: flex; align-items: center; gap: 7px; flex: 1; overflow: hidden; }
- .badge { padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
- .badge-vless { background: #0284c7; color: white; }
- .badge-trojan { background: #d97706; color: white; }
- .badge-vmess { background: #16a34a; color: white; }
- .badge-wireguard { background: #059669; color: white; }
- .badge-json { background: #7c3aed; color: white; }
- .badge-applied { background: #14532d; color: #4ade80; border: 1px solid #4ade80; }
- .config-title { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
- .config-details { padding: 9px 11px; border-top: 1px solid var(--border); background: #0a0f1d; display: none; }
- .config-details.open { display: block; }
- .item-toolbar { display: flex; gap: 6px; flex-wrap: wrap; margin: 9px 0; align-items: center; }
- .item-toolbar select { width: auto; padding: 5px 7px; font-size: 11.5px; }
- .item-toolbar button { padding: 4px 9px; font-size: 11px; }
- .item-status { font-size: 11px; margin: 3px 0; min-height: 14px; }
- .item-output { min-height: 130px; font-size: 11px; margin-top: 5px; }
- .fetch-log { font-size: 11px; color: var(--muted); margin-top: 5px; max-height: 80px; overflow-y: auto; }
- </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Universal Proxy Converter v3.3</title>
+  <style>
+    :root {
+      --bg: #0f172a; --card: #1e293b; --border: #334155;
+      --primary: #0ea5e9; --primary-hover: #0284c7;
+      --text: #e2e8f0; --muted: #94a3b8;
+      --success: #4ade80; --error: #f87171; --warn: #fbbf24;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; padding: 20px; }
+    .container { max-width: 1450px; margin: 0 auto; }
+    h1 { text-align: center; color: var(--primary); margin-bottom: 4px; font-size: 25px; }
+    .subtitle { text-align: center; color: var(--muted); margin-bottom: 20px; font-size: 13px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    @media (max-width: 1100px) { .grid { grid-template-columns: 1fr; } }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+    label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; font-weight: 600; }
+    textarea, input, select {
+      width: 100%; background: #0f172a; border: 1px solid var(--border); border-radius: 8px;
+      color: var(--text); padding: 9px 11px; font-family: ui-monospace, monospace; font-size: 12.5px;
+    }
+    textarea { min-height: 115px; resize: vertical; }
+    .row { display: flex; gap: 10px; margin-bottom: 9px; flex-wrap: wrap; }
+    .row > div { flex: 1; min-width: 100px; }
+    .checkbox { display: flex; align-items: center; gap: 8px; margin: 7px 0; }
+    .checkbox input { width: auto; }
+    button { background: var(--primary); color: white; border: none; padding: 9px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; }
+    button:hover { background: var(--primary-hover); }
+    button.secondary { background: #334155; }
+    button.secondary:hover { background: #475569; }
+    button.success-btn { background: #16a34a; }
+    button.warn-btn { background: #92400e; }
+    .btn-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+    .tabs { display: flex; gap: 7px; margin-bottom: 10px; flex-wrap: wrap; }
+    .tab { padding: 6px 14px; background: #334155; border-radius: 8px; cursor: pointer; font-size: 12.5px; }
+    .tab.active { background: var(--primary); }
+    .status { margin-top: 10px; font-size: 12.5px; min-height: 18px; }
+    .success { color: var(--success); } .error { color: var(--error); } .warn { color: var(--warn); }
+    .section-title { font-size: 13px; font-weight: 600; color: var(--primary); margin: 14px 0 8px 0; padding-bottom: 3px; border-bottom: 1px solid var(--border); }
+    .mode-switch { display: flex; gap: 8px; margin-bottom: 12px; }
+    .mode-btn { flex: 1; text-align: center; padding: 7px; background: #334155; border-radius: 8px; cursor: pointer; font-size: 12.5px; }
+    .mode-btn.active { background: var(--primary); }
+    .hidden { display: none; }
+    .action-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
+    .config-item { background: #0f172a; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 7px; overflow: hidden; }
+    .config-summary { display: flex; justify-content: space-between; align-items: center; padding: 9px 11px; cursor: pointer; }
+    .config-summary:hover { background: #162032; }
+    .config-info { display: flex; align-items: center; gap: 7px; flex: 1; overflow: hidden; }
+    .badge { padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
+    .badge-vless { background: #0284c7; color: white; }
+    .badge-trojan { background: #d97706; color: white; }
+    .badge-vmess { background: #16a34a; color: white; }
+    .badge-wireguard { background: #059669; color: white; }
+    .badge-json { background: #7c3aed; color: white; }
+    .badge-limited { background: #b45309; color: white; }
+    .badge-applied { background: #14532d; color: #4ade80; border: 1px solid #4ade80; }
+    .config-title { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .config-details { padding: 9px 11px; border-top: 1px solid var(--border); background: #0a0f1d; display: none; }
+    .config-details.open { display: block; }
+    .item-toolbar { display: flex; gap: 6px; flex-wrap: wrap; margin: 9px 0; align-items: center; }
+    .item-toolbar select { width: auto; padding: 5px 7px; font-size: 11.5px; }
+    .item-toolbar button { padding: 4px 9px; font-size: 11px; }
+    .item-status { font-size: 11px; margin: 3px 0; min-height: 14px; }
+    .item-output { min-height: 130px; font-size: 11px; margin-top: 5px; }
+    .fetch-log { font-size: 11px; color: var(--muted); margin-top: 5px; max-height: 80px; overflow-y: auto; }
+    .note { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  </style>
 </head>
 <body>
- <div class="container">
- <h1>Universal Proxy & VPN Converter Pro v3</h1>
- <p class="subtitle">Fixed • Proper Clash YAML • Correct Download • Smart IR Bypass • Fragment • Noise</p>
+  <div class="container">
+    <h1>Universal Proxy Converter v3.3</h1>
+    <p class="subtitle">Improved Clash YAML (TUN + DNS) • Clean .yaml download • Amnezia support</p>
 
- <div class="grid">
- <!-- LEFT -->
- <div class="card">
- <div class="mode-switch">
- <div class="mode-btn active" id="modePaste" onclick="setMode('paste')">Universal Import</div>
- <div class="mode-btn" id="modeManual" onclick="setMode('manual')">Manual WireGuard</div>
- </div>
+    <div class="grid">
+      <!-- LEFT PANEL -->
+      <div class="card">
+        <div class="mode-switch">
+          <div class="mode-btn active" id="modePaste" onclick="setMode('paste')">Universal Import</div>
+          <div class="mode-btn" id="modeManual" onclick="setMode('manual')">Manual WireGuard</div>
+        </div>
 
- <label>Proxy Name / Tag Override</label>
- <input type="text" id="name" value="Config-1" style="margin-bottom:12px">
+        <label>Proxy Name / Tag Override</label>
+        <input type="text" id="name" value="Config-1" style="margin-bottom:12px">
 
- <div id="pasteMode">
- <label>URI Links / Full Xray JSON / Base64 / Sub URL</label>
- <textarea id="inputData" placeholder="Paste vless:// , full Xray JSON, WireGuard INI or subscription URL..." oninput="autoDetectName()"></textarea>
- <div style="margin-top:7px;">
- <button class="secondary" style="padding:5px 11px;font-size:12px;" onclick="fetchSubscription()">Fetch Online Sub</button>
- </div>
- <div id="fetchLog" class="fetch-log"></div>
- </div>
+        <div id="pasteMode">
+          <label>URI Links / Full Xray JSON / Base64 / Sub URL</label>
+          <textarea id="inputData" placeholder="Paste vless://, trojan://, vmess://, full Xray JSON, WireGuard INI or subscription URL..."></textarea>
+          <div style="margin-top:7px;">
+            <button class="secondary" style="padding:5px 11px;font-size:12px;" onclick="fetchSubscription()">Fetch Online Sub</button>
+          </div>
+          <div id="fetchLog" class="fetch-log"></div>
+        </div>
 
- <div id="manualMode" class="hidden">
- <div class="section-title">WireGuard Fields</div>
- <label>Private Key</label><input type="text" id="manualPrivate">
- <label style="margin-top:8px">Public Key</label><input type="text" id="manualPublic">
- <label style="margin-top:8px">Endpoint</label><input type="text" id="manualEndpoint" placeholder="ip:port">
- <div class="row" style="margin-top:8px">
- <div><label>IPv4</label><input type="text" id="manualAddress" value="10.2.0.2/32"></div>
- <div><label>IPv6</label><input type="text" id="manualIPv6"></div>
- </div>
- <label style="margin-top:8px">AllowedIPs</label><input type="text" id="manualAllowed" value="0.0.0.0/0, ::/0">
- <label style="margin-top:8px">Preshared Key</label><input type="text" id="manualPSK">
- </div>
+        <div id="manualMode" class="hidden">
+          <div class="section-title">WireGuard Fields</div>
+          <label>Private Key</label><input type="text" id="manualPrivate">
+          <label style="margin-top:8px">Public Key</label><input type="text" id="manualPublic">
+          <label style="margin-top:8px">Endpoint (supports IPv6)</label><input type="text" id="manualEndpoint" placeholder="ip:port or [ipv6]:port">
+          <div class="row" style="margin-top:8px">
+            <div><label>IPv4</label><input type="text" id="manualAddress" value="10.2.0.2/32"></div>
+            <div><label>IPv6</label><input type="text" id="manualIPv6"></div>
+          </div>
+          <label style="margin-top:8px">AllowedIPs</label><input type="text" id="manualAllowed" value="0.0.0.0/0, ::/0">
+          <label style="margin-top:8px">Preshared Key</label><input type="text" id="manualPSK">
+        </div>
 
- <div class="section-title">Global Defaults</div>
- <div class="row">
- <div><label>Remote DNS</label><input type="text" id="dns" value="1.1.1.1"></div>
- <div><label>MTU</label><input type="number" id="mtu" value="1280"></div>
- </div>
- <div class="checkbox"><input type="checkbox" id="irBypass" checked><label for="irBypass" style="margin:0;color:var(--text)">IR Bypass ON</label></div>
- <div class="checkbox"><input type="checkbox" id="useNoise" checked><label for="useNoise" style="margin:0;color:var(--text)">Noise ON</label></div>
- <div class="checkbox"><input type="checkbox" id="useFragment" checked><label for="useFragment" style="margin:0;color:var(--text)">Fragment ON</label></div>
+        <div class="section-title">Global Defaults</div>
+        <div class="row">
+          <div><label>Remote DNS</label><input type="text" id="dns" value="1.1.1.1"></div>
+          <div><label>MTU</label><input type="number" id="mtu" value="1280" min="576" max="9000"></div>
+        </div>
+        <div class="checkbox"><input type="checkbox" id="irBypass" checked><label for="irBypass" style="margin:0;color:var(--text)">IR Bypass ON</label></div>
+        <div class="checkbox"><input type="checkbox" id="useNoise" checked><label for="useNoise" style="margin:0;color:var(--text)">Noise ON <span class="note">(Xray only)</span></label></div>
+        <div class="checkbox"><input type="checkbox" id="useFragment" checked><label for="useFragment" style="margin:0;color:var(--text)">Fragment ON <span class="note">(Xray only)</span></label></div>
 
- <div class="section-title">Fragment Settings</div>
- <div class="row">
- <div>
- <label>Preset</label>
- <select id="fragmentPreset" onchange="applyFragmentPreset()">
- <option value="light">Light (50-100)</option>
- <option value="normal" selected>Normal (100-200)</option>
- <option value="heavy">Heavy (10-50)</option>
- <option value="aggressive">Aggressive (1-20)</option>
- <option value="custom">Custom</option>
- </select>
- </div>
- </div>
- <div class="row">
- <div>
- <label>Packets</label>
- <select id="fragPackets">
- <option value="tlshello" selected>tlshello</option>
- <option value="1-1">1-1</option>
- <option value="1-3">1-3</option>
- </select>
- </div>
- <div><label>Length</label><input type="text" id="fragLength" value="100-200"></div>
- <div><label>Delay</label><input type="text" id="fragDelay" value="1"></div>
- </div>
+        <div class="section-title">Fragment Settings (Xray)</div>
+        <div class="row">
+          <div>
+            <label>Preset</label>
+            <select id="fragmentPreset" onchange="applyFragmentPreset()">
+              <option value="light">Light (50-100)</option>
+              <option value="normal" selected>Normal (100-200)</option>
+              <option value="heavy">Heavy (10-50)</option>
+              <option value="aggressive">Aggressive (1-20)</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Packets</label>
+            <select id="fragPackets">
+              <option value="tlshello" selected>tlshello</option>
+              <option value="1-1">1-1</option>
+              <option value="1-3">1-3</option>
+            </select>
+          </div>
+          <div><label>Length</label><input type="text" id="fragLength" value="100-200"></div>
+          <div><label>Delay</label><input type="text" id="fragDelay" value="1"></div>
+        </div>
 
- <div class="section-title">UDP Noise</div>
- <div class="row">
- <div>
- <label>Preset</label>
- <select id="noisePreset" onchange="applyNoisePreset()">
- <option value="light">Light (3)</option>
- <option value="normal" selected>Normal (5)</option>
- <option value="strong">Strong (8)</option>
- </select>
- </div>
- <div><label>Count</label><input type="number" id="noiseCount" value="5" min="1" max="12"></div>
- </div>
+        <div class="section-title">UDP Noise (Xray)</div>
+        <div class="row">
+          <div>
+            <label>Preset</label>
+            <select id="noisePreset" onchange="applyNoisePreset()">
+              <option value="light">Light (3)</option>
+              <option value="normal" selected>Normal (5)</option>
+              <option value="strong">Strong (8)</option>
+            </select>
+          </div>
+          <div><label>Count</label><input type="number" id="noiseCount" value="5" min="1" max="12"></div>
+        </div>
 
- <div class="section-title">Amnezia WG</div>
- <div class="row">
- <div><label>Jc</label><input type="number" id="jc" value="5"></div>
- <div><label>Jmin</label><input type="number" id="jmin" value="50"></div>
- <div><label>Jmax</label><input type="number" id="jmax" value="100"></div>
- </div>
- <div class="row">
- <div><label>S1</label><input type="number" id="s1" value="0"></div>
- <div><label>S2</label><input type="number" id="s2" value="0"></div>
- </div>
- <div class="row">
- <div><label>H1</label><input type="number" id="h1" value="1"></div>
- <div><label>H2</label><input type="number" id="h2" value="2"></div>
- <div><label>H3</label><input type="number" id="h3" value="3"></div>
- <div><label>H4</label><input type="number" id="h4" value="4"></div>
- </div>
+        <div class="section-title">Amnezia WG</div>
+        <div class="row">
+          <div><label>Jc</label><input type="number" id="jc" value="5"></div>
+          <div><label>Jmin</label><input type="number" id="jmin" value="50"></div>
+          <div><label>Jmax</label><input type="number" id="jmax" value="100"></div>
+        </div>
+        <div class="row">
+          <div><label>S1</label><input type="number" id="s1" value="0"></div>
+          <div><label>S2</label><input type="number" id="s2" value="0"></div>
+        </div>
+        <div class="row">
+          <div><label>H1</label><input type="number" id="h1" value="1"></div>
+          <div><label>H2</label><input type="number" id="h2" value="2"></div>
+          <div><label>H3</label><input type="number" id="h3" value="3"></div>
+          <div><label>H4</label><input type="number" id="h4" value="4"></div>
+        </div>
 
- <div class="btn-row">
- <button onclick="convert()">Parse / Refresh</button>
- <button class="secondary" onclick="randomizeAmnezia()">Randomize AWG</button>
- <button class="secondary" onclick="clearAll()">Clear</button>
- </div>
- <div id="status" class="status"></div>
- </div>
+        <div class="btn-row">
+          <button onclick="convert()">Parse / Refresh</button>
+          <button class="secondary" onclick="randomizeAmnezia()">Randomize AWG</button>
+          <button class="secondary" onclick="clearAll()">Clear All</button>
+        </div>
+        <div id="status" class="status"></div>
+      </div>
 
- <!-- RIGHT -->
- <div class="card">
- <div class="action-header">
- <div style="font-weight:600;color:var(--primary);" id="configCountText">Parsed Configs</div>
- <div style="display:flex;gap:7px;">
- <button class="success-btn" style="padding:5px 11px;font-size:12px;" onclick="copyAllLinks()">Copy Links</button>
- <button class="secondary" style="padding:5px 11px;font-size:12px;" onclick="toggleExpandAll()">Expand All</button>
- </div>
- </div>
+      <!-- RIGHT PANEL -->
+      <div class="card">
+        <div class="action-header">
+          <div style="font-weight:600;color:var(--primary);" id="configCountText">Parsed Configs</div>
+          <div style="display:flex;gap:7px;">
+            <button class="success-btn" style="padding:5px 11px;font-size:12px;" onclick="copyAllLinks()">Copy Links</button>
+            <button class="secondary" style="padding:5px 11px;font-size:12px;" onclick="toggleExpandAll()">Expand All</button>
+          </div>
+        </div>
 
- <div id="configList" style="max-height:420px;overflow-y:auto;margin-bottom:14px;"></div>
+        <div id="configList" style="max-height:420px;overflow-y:auto;margin-bottom:14px;"></div>
 
- <div class="section-title">Combined Export</div>
- <div class="tabs">
- <div class="tab active" onclick="switchTab('json', this)">Xray JSON</div>
- <div class="tab" onclick="switchTab('singbox', this)">Sing-Box</div>
- <div class="tab" onclick="switchTab('clash', this)">Clash Meta</div>
- <div class="tab" onclick="switchTab('amnezia', this)">AmneziaWG</div>
- </div>
- <textarea id="result" style="min-height:200px"></textarea>
- <div class="btn-row">
- <button onclick="copyResult()">Copy Combined</button>
- <button class="secondary" onclick="downloadResult()">Download</button>
- </div>
- </div>
- </div>
- </div>
+        <div class="section-title">Combined Export</div>
+        <div class="tabs">
+          <div class="tab active" onclick="switchTab('json', this)">Xray JSON</div>
+          <div class="tab" onclick="switchTab('clash', this)">Clash Meta</div>
+          <div class="tab" onclick="switchTab('singbox', this)">Sing-Box</div>
+          <div class="tab" onclick="switchTab('amnezia', this)">AmneziaWG</div>
+        </div>
+        <textarea id="result" style="min-height:220px"></textarea>
+        <div class="btn-row">
+          <button onclick="copyResult()">Copy Combined</button>
+          <button class="secondary" onclick="downloadResult()">Download</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 <script>
 let currentTab = 'json';
@@ -217,542 +217,495 @@ let parsedProxiesGlobal = [];
 let allExpanded = false;
 const $ = id => document.getElementById(id);
 
+// ===================== HELPERS =====================
+function parseEndpoint(endpoint) {
+  if (!endpoint) return { host: '', port: 51820 };
+  endpoint = endpoint.trim();
+  const ipv6Match = endpoint.match(/^\[([^\]]+)\](?::(\d+))?$/);
+  if (ipv6Match) return { host: ipv6Match[1], port: parseInt(ipv6Match[2] || '51820', 10) };
+  const lastColon = endpoint.lastIndexOf(':');
+  if (lastColon > 0) {
+    const possiblePort = endpoint.slice(lastColon + 1);
+    if (/^\d+$/.test(possiblePort)) return { host: endpoint.slice(0, lastColon), port: parseInt(possiblePort, 10) };
+  }
+  return { host: endpoint, port: 51820 };
+}
+
+function isValidMtu(mtu) {
+  const m = parseInt(mtu, 10);
+  return Number.isInteger(m) && m >= 576 && m <= 9000;
+}
+
+function isValidRange(str) {
+  if (!str) return false;
+  const m = str.trim().match(/^(\d+)(?:-(\d+))?$/);
+  if (!m) return false;
+  const min = parseInt(m[1], 10), max = parseInt(m[2] || m[1], 10);
+  return min > 0 && max >= min;
+}
+
 function decodeBase64Safe(str) {
- try {
- let clean = str.replace(/\s/g, '');
- while (clean.length % 4 !== 0) clean += '=';
- const decoded = atob(clean);
- if (decoded && (decoded.includes('://') || decoded.includes('{') || decoded.includes('['))) return decoded;
- } catch(e) {}
- return str;
+  try {
+    let clean = str.replace(/\s/g, '');
+    if (!/^[A-Za-z0-9+/=]+$/.test(clean) || clean.length < 20) return str;
+    while (clean.length % 4 !== 0) clean += '=';
+    const decoded = atob(clean);
+    if (decoded.includes('://') || decoded.trim().startsWith('{') || decoded.trim().startsWith('[')) return decoded;
+  } catch (e) {}
+  return str;
 }
 
-function autoDetectName() {
- if (currentMode !== 'paste') return;
- let text = $('inputData').value.trim();
- if (!text) return;
- text = decodeBase64Safe(text);
- try {
- const j = JSON.parse(text);
- if (j.remarks) { $('name').value = j.remarks; return; }
- } catch(e) {}
- const first = text.split('\n')[0].trim();
- if (first.includes('#')) {
- const m = first.match(/#([^#\r\n]+)$/);
- if (m) $('name').value = decodeURIComponent(m[1].trim());
- }
+function escapeHtml(str) {
+  return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-function logFetch(msg) {
- $('fetchLog').innerHTML += `<div>${msg}</div>`;
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); return true; } catch (e) { return false; }
 }
 
-async function fetchSubscription() {
- const url = $('inputData').value.trim().split('#')[0];
- if (!url.startsWith('http')) return showStatus(false, ['Enter a valid URL'], []);
- $('fetchLog').innerHTML = '';
- showStatus(true, [], ['Fetching...']);
- const proxies = [
- {l:'direct', b:u=>u},
- {l:'allorigins', b:u=>`https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`},
- {l:'codetabs', b:u=>`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`}
- ];
- for (const p of proxies) {
- try {
- logFetch(`Trying ${p.l}...`);
- const res = await fetch(p.b(url));
- if (res.ok) {
- const t = await res.text();
- if (t && t.length > 20 && !t.startsWith('<!')) {
- $('inputData').value = decodeBase64Safe(t.trim());
- autoDetectName();
- convert();
- return;
- }
- }
- } catch(e) {}
- }
- showStatus(false, ['Fetch failed'], []);
+function downloadFile(content, filename) {
+  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
 }
 
+// ===================== UI HELPERS =====================
 function setMode(m) {
- currentMode = m;
- $('modePaste').classList.toggle('active', m==='paste');
- $('modeManual').classList.toggle('active', m==='manual');
- $('pasteMode').classList.toggle('hidden', m!=='paste');
- $('manualMode').classList.toggle('hidden', m!=='manual');
+  currentMode = m;
+  $('modePaste').classList.toggle('active', m === 'paste');
+  $('modeManual').classList.toggle('active', m === 'manual');
+  $('pasteMode').classList.toggle('hidden', m !== 'paste');
+  $('manualMode').classList.toggle('hidden', m !== 'manual');
 }
 
 function switchTab(tab, el) {
- currentTab = tab;
- document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
- if (el) el.classList.add('active');
- buildCombinedExport();
+  currentTab = tab;
+  document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+  if (el) el.classList.add('active');
+  buildCombinedExport();
 }
 
 function applyFragmentPreset() {
- const p = $('fragmentPreset').value;
- if (p === 'light') { $('fragPackets').value = 'tlshello'; $('fragLength').value = '50-100'; $('fragDelay').value = '1'; }
- if (p === 'normal') { $('fragPackets').value = 'tlshello'; $('fragLength').value = '100-200'; $('fragDelay').value = '1'; }
- if (p === 'heavy') { $('fragPackets').value = 'tlshello'; $('fragLength').value = '10-50'; $('fragDelay').value = '1-2'; }
- if (p === 'aggressive') { $('fragPackets').value = 'tlshello'; $('fragLength').value = '1-20'; $('fragDelay').value = '1-1'; }
+  const p = $('fragmentPreset').value;
+  if (p === 'light') { $('fragPackets').value = 'tlshello'; $('fragLength').value = '50-100'; $('fragDelay').value = '1'; }
+  if (p === 'normal') { $('fragPackets').value = 'tlshello'; $('fragLength').value = '100-200'; $('fragDelay').value = '1'; }
+  if (p === 'heavy') { $('fragPackets').value = 'tlshello'; $('fragLength').value = '10-50'; $('fragDelay').value = '1-2'; }
+  if (p === 'aggressive') { $('fragPackets').value = 'tlshello'; $('fragLength').value = '1-20'; $('fragDelay').value = '1-1'; }
 }
 
 function applyNoisePreset() {
- const p = $('noisePreset').value;
- if (p === 'light') $('noiseCount').value = 3;
- if (p === 'normal') $('noiseCount').value = 5;
- if (p === 'strong') $('noiseCount').value = 8;
+  const p = $('noisePreset').value;
+  if (p === 'light') $('noiseCount').value = 3;
+  if (p === 'normal') $('noiseCount').value = 5;
+  if (p === 'strong') $('noiseCount').value = 8;
 }
 
 function randomizeAmnezia() {
- $('jc').value = Math.floor(Math.random()*8)+3;
- $('jmin').value = Math.floor(Math.random()*40)+20;
- $('jmax').value = Math.floor(Math.random()*80)+70;
- $('s1').value = Math.floor(Math.random()*50)+15;
- $('s2').value = Math.floor(Math.random()*50)+15;
- const r = () => Math.floor(Math.random()*2147483647)+1;
- $('h1').value = r(); $('h2').value = r(); $('h3').value = r(); $('h4').value = r();
+  const jmin = Math.floor(Math.random() * 40) + 20;
+  const jmax = jmin + Math.floor(Math.random() * 60) + 20;
+  $('jc').value = Math.floor(Math.random() * 8) + 3;
+  $('jmin').value = jmin;
+  $('jmax').value = jmax;
+  $('s1').value = Math.floor(Math.random() * 50) + 15;
+  $('s2').value = Math.floor(Math.random() * 50) + 15;
+  const values = new Set();
+  while (values.size < 4) values.add(Math.floor(Math.random() * 2147483647) + 1);
+  const arr = [...values];
+  $('h1').value = arr[0]; $('h2').value = arr[1]; $('h3').value = arr[2]; $('h4').value = arr[3];
 }
 
 // ===================== PARSERS =====================
-
 function parseUniversalLink(link, defaultName, index) {
- link = link.trim();
- if (!link) return null;
- let name = `${defaultName}-${index+1}`;
- const hash = link.indexOf('#');
- if (hash !== -1) name = decodeURIComponent(link.substring(hash+1)).trim() || name;
- const clean = hash !== -1 ? link.substring(0, hash) : link;
- const protocol = clean.split('://')[0].toLowerCase();
+  link = link.trim();
+  if (!link) return null;
+  let name = `${defaultName}-${index + 1}`;
+  const hashIdx = link.indexOf('#');
+  if (hashIdx !== -1) name = decodeURIComponent(link.substring(hashIdx + 1)).trim() || name;
+  const clean = hashIdx !== -1 ? link.substring(0, hashIdx) : link;
+  const protocol = clean.split('://')[0].toLowerCase();
+  if (!['vless', 'trojan', 'vmess', 'ss', 'hysteria2', 'hy2', 'tuic'].includes(protocol)) return null;
 
- if (['vless','trojan','ss','hysteria2','hy2','tuic'].includes(protocol)) {
- try {
- const main = clean.substring(protocol.length + 3);
- const [authHost, qs] = main.split('?');
- const lastAt = authHost.lastIndexOf('@');
- const auth = lastAt !== -1 ? authHost.substring(0, lastAt) : '';
- let hostPort = lastAt !== -1 ? authHost.substring(lastAt+1) : authHost;
- let host = hostPort, port = 443;
- if (hostPort.includes(':')) {
- const lc = hostPort.lastIndexOf(':');
- port = parseInt(hostPort.substring(lc+1)) || 443;
- host = hostPort.substring(0, lc);
- }
- const params = new URLSearchParams(qs || '');
- return {
- protocol: protocol === 'hy2' ? 'hysteria2' : protocol,
- name, rawUri: link, uuid: auth, host, port,
- type: params.get('type') || params.get('net') || 'tcp',
- security: params.get('security') || (protocol === 'trojan' ? 'tls' : 'none'),
- sni: params.get('sni') || params.get('peer') || host,
- path: params.get('path') || '/',
- hostHeader: params.get('host') || host,
- alpn: params.get('alpn') ? params.get('alpn').split(',') : undefined,
- fp: params.get('fp') || 'chrome',
- pbk: params.get('pbk') || '', sid: params.get('sid') || '',
- flow: params.get('flow') || ''
- };
- } catch(e) { return null; }
- }
- if (protocol === 'vmess') {
- try {
- const json = JSON.parse(atob(clean.substring(8)));
- return {
- protocol: 'vmess', name: json.ps || name, rawUri: link, uuid: json.id,
- host: json.add, port: parseInt(json.port) || 443,
- type: json.net || 'tcp', security: json.tls || 'none',
- sni: json.sni || json.host || json.add, path: json.path || '/',
- hostHeader: json.host || json.add, fp: json.fp || 'chrome'
- };
- } catch(e) { return null; }
- }
- return null;
+  if (protocol === 'vmess') {
+    try {
+      const json = JSON.parse(decodeBase64Safe(clean.substring(8)));
+      return {
+        protocol: 'vmess', name: json.ps || name, rawUri: link, uuid: json.id,
+        host: json.add, port: parseInt(json.port) || 443, type: json.net || 'tcp',
+        security: json.tls || 'none', sni: json.sni || json.host || json.add,
+        path: json.path || '/', hostHeader: json.host || json.add, fp: json.fp || 'chrome', limited: false
+      };
+    } catch (e) { return null; }
+  }
+
+  try {
+    const main = clean.substring(protocol.length + 3);
+    const [authHost, qs] = main.split('?');
+    const lastAt = authHost.lastIndexOf('@');
+    const auth = lastAt !== -1 ? authHost.substring(0, lastAt) : '';
+    let hostPort = lastAt !== -1 ? authHost.substring(lastAt + 1) : authHost;
+    let host = hostPort, port = 443;
+    if (hostPort.includes(':')) {
+      const lastColon = hostPort.lastIndexOf(':');
+      const possiblePort = hostPort.substring(lastColon + 1);
+      if (/^\d+$/.test(possiblePort)) {
+        port = parseInt(possiblePort, 10);
+        host = hostPort.substring(0, lastColon);
+      }
+    }
+    const params = new URLSearchParams(qs || '');
+    const isLimited = ['ss', 'hysteria2', 'hy2', 'tuic'].includes(protocol);
+    return {
+      protocol: protocol === 'hy2' ? 'hysteria2' : protocol,
+      name, rawUri: link, uuid: auth, host, port,
+      type: params.get('type') || params.get('net') || 'tcp',
+      security: params.get('security') || (protocol === 'trojan' ? 'tls' : 'none'),
+      sni: params.get('sni') || params.get('peer') || host,
+      path: params.get('path') || '/', hostHeader: params.get('host') || host,
+      alpn: params.get('alpn') ? params.get('alpn').split(',') : undefined,
+      fp: params.get('fp') || 'chrome', pbk: params.get('pbk') || '', sid: params.get('sid') || '',
+      flow: params.get('flow') || '', limited: isLimited
+    };
+  } catch (e) { return null; }
 }
 
 function parseWireGuard(text) {
- const r = { privateKey:'', addresses:[], publicKey:'', endpoint:'', presharedKey:'', keepalive:25, allowedIPs:[] };
- let section = '';
- for (const raw of text.split(/\r?\n/)) {
- const line = raw.split('#')[0].split(';')[0].trim();
- if (!line) continue;
- if (line.startsWith('[') && line.endsWith(']')) { section = line.toLowerCase(); continue; }
- const eq = line.indexOf('=');
- if (eq === -1) continue;
- const k = line.slice(0,eq).trim().toLowerCase();
- const v = line.slice(eq+1).trim();
- if (section.includes('interface')) {
- if (k === 'privatekey') r.privateKey = v;
- else if (k === 'address') r.addresses = v.split(',').map(s => s.trim());
- }
- if (section.includes('peer')) {
- if (k === 'publickey') r.publicKey = v;
- else if (k === 'endpoint') r.endpoint = v;
- else if (k === 'presharedkey') r.presharedKey = v;
- else if (k === 'persistentkeepalive') r.keepalive = parseInt(v) || 25;
- else if (k === 'allowedips') r.allowedIPs = v.split(',').map(s => s.trim());
- }
- }
- return r;
+  const r = { privateKey: '', addresses: [], publicKey: '', endpoint: '', presharedKey: '', keepalive: 25, allowedIPs: [] };
+  let section = '';
+  for (const raw of text.split(/\r?\n/)) {
+    let line = raw.trim();
+    if (!line || line.startsWith('#') || line.startsWith(';')) continue;
+    if (line.startsWith('[') && line.endsWith(']')) { section = line.toLowerCase(); continue; }
+    const eq = line.indexOf('=');
+    if (eq === -1) continue;
+    const k = line.slice(0, eq).trim().toLowerCase();
+    const v = line.slice(eq + 1).trim();
+    if (section.includes('interface')) {
+      if (k === 'privatekey') r.privateKey = v;
+      else if (k === 'address') r.addresses = v.split(',').map(s => s.trim());
+    }
+    if (section.includes('peer')) {
+      if (k === 'publickey') r.publicKey = v;
+      else if (k === 'endpoint') r.endpoint = v;
+      else if (k === 'presharedkey') r.presharedKey = v;
+      else if (k === 'persistentkeepalive') r.keepalive = parseInt(v) || 25;
+      else if (k === 'allowedips') r.allowedIPs = v.split(',').map(s => s.trim());
+    }
+  }
+  return r;
 }
 
 function parseFullXrayJSON(text) {
- try {
- const conf = JSON.parse(text);
- if (!conf.outbounds || !Array.isArray(conf.outbounds)) return null;
+  try {
+    const conf = JSON.parse(text);
+    if (!conf.outbounds || !Array.isArray(conf.outbounds)) return null;
+    const results = [];
+    conf.outbounds.forEach((ob, idx) => {
+      if (!ob.protocol || ['freedom', 'blackhole', 'dns', 'block', 'direct'].includes(ob.protocol)) return;
+      const item = { protocol: ob.protocol, name: conf.remarks || ob.tag || `proxy-${idx + 1}`, isFromJson: true, limited: false };
+      if (ob.protocol === 'vless' || ob.protocol === 'vmess') {
+        const v = ob.settings?.vnext?.[0] || ob.settings;
+        item.host = v?.address; item.port = v?.port || 443;
+        item.uuid = v?.users?.[0]?.id || v?.id || ''; item.flow = v?.users?.[0]?.flow || '';
+      } else if (ob.protocol === 'trojan') {
+        const s = ob.settings?.servers?.[0] || ob.settings;
+        item.host = s?.address; item.port = s?.port || 443; item.uuid = s?.password || '';
+      } else if (ob.protocol === 'wireguard') {
+        item.privateKey = ob.settings?.secretKey;
+        item.addresses = ob.settings?.address || [];
+        const peer = ob.settings?.peers?.[0] || {};
+        item.publicKey = peer.publicKey; item.endpoint = peer.endpoint;
+        item.presharedKey = peer.preSharedKey || ''; item.keepalive = peer.keepAlive || 25;
+        item.allowedIPs = peer.allowedIPs || ['0.0.0.0/0', '::/0'];
+      } else item.limited = true;
 
- const results = [];
- conf.outbounds.forEach((ob, idx) => {
- if (!ob.protocol || ['freedom','blackhole','dns','block','direct'].includes(ob.protocol)) return;
-
- const item = {
- protocol: ob.protocol,
- name: conf.remarks || ob.tag || `proxy-${idx+1}`,
- isFromJson: true,
- originalOutbound: ob
- };
-
- if (ob.protocol === 'vless' || ob.protocol === 'vmess') {
- const v = ob.settings?.vnext?.[0] || ob.settings;
- item.host = v?.address;
- item.port = v?.port || 443;
- item.uuid = v?.users?.[0]?.id || v?.id || '';
- item.flow = v?.users?.[0]?.flow || '';
- } else if (ob.protocol === 'trojan') {
- const s = ob.settings?.servers?.[0] || ob.settings;
- item.host = s?.address;
- item.port = s?.port || 443;
- item.uuid = s?.password || '';
- } else if (ob.protocol === 'wireguard') {
- item.privateKey = ob.settings?.secretKey;
- item.addresses = ob.settings?.address || [];
- const peer = ob.settings?.peers?.[0] || {};
- item.publicKey = peer.publicKey;
- item.endpoint = peer.endpoint;
- item.presharedKey = peer.preSharedKey || '';
- item.keepalive = peer.keepAlive || 25;
- item.allowedIPs = peer.allowedIPs || ['0.0.0.0/0', '::/0'];
- }
-
- const ss = ob.streamSettings || {};
- item.type = ss.network || 'tcp';
- item.security = ss.security || 'none';
-
- if (ss.tlsSettings) {
- item.sni = ss.tlsSettings.serverName || item.host;
- item.fp = ss.tlsSettings.fingerprint || 'chrome';
- item.alpn = ss.tlsSettings.alpn;
- }
- if (ss.realitySettings) {
- item.sni = ss.realitySettings.serverName;
- item.fp = ss.realitySettings.fingerprint || 'chrome';
- item.pbk = ss.realitySettings.publicKey;
- item.sid = ss.realitySettings.shortId || '';
- item.security = 'reality';
- }
- if (ss.wsSettings) {
- item.path = ss.wsSettings.path || '/';
- item.hostHeader = ss.wsSettings.host || ss.wsSettings.headers?.Host || item.host;
- }
-
- results.push(item);
- });
- return results.length ? results : null;
- } catch(e) {
- return null;
- }
+      const ss = ob.streamSettings || {};
+      item.type = ss.network || 'tcp'; item.security = ss.security || 'none';
+      if (ss.tlsSettings) {
+        item.sni = ss.tlsSettings.serverName || item.host;
+        item.fp = ss.tlsSettings.fingerprint || 'chrome'; item.alpn = ss.tlsSettings.alpn;
+      }
+      if (ss.realitySettings) {
+        item.sni = ss.realitySettings.serverName; item.fp = ss.realitySettings.fingerprint || 'chrome';
+        item.pbk = ss.realitySettings.publicKey; item.sid = ss.realitySettings.shortId || '';
+        item.security = 'reality';
+      }
+      if (ss.wsSettings) {
+        item.path = ss.wsSettings.path || '/';
+        item.hostHeader = ss.wsSettings.host || ss.wsSettings.headers?.Host || item.host;
+      }
+      results.push(item);
+    });
+    return results.length ? results : null;
+  } catch (e) { return null; }
 }
 
 // ===================== BUILDERS =====================
-
 function noiseBlock(count) {
- const n = Math.max(1, Math.min(12, count || 5));
- return Array.from({length: n}, () => ({ rand: '50-100', randRange: '0-255', delay: '1-5' }));
+  const n = Math.max(1, Math.min(12, count || 5));
+  return Array.from({ length: n }, () => ({ rand: '50-100', randRange: '0-255', delay: '1-5' }));
 }
 
 function buildXrayOutbound(p, s) {
- // IMPORTANT: tag = name (remarks) so address shows correctly in clients
- const tag = p.name || 'proxy';
+  const tag = p.name || 'proxy';
+  if (p.protocol === 'wireguard') {
+    const out = {
+      protocol: 'wireguard', tag,
+      settings: {
+        secretKey: p.privateKey, address: p.addresses, mtu: s.mtu,
+        peers: [{
+          endpoint: p.endpoint, publicKey: p.publicKey,
+          keepAlive: p.keepalive || 25,
+          allowedIPs: p.allowedIPs?.length ? p.allowedIPs : ['0.0.0.0/0', '::/0']
+        }]
+      }
+    };
+    if (p.presharedKey) out.settings.peers[0].preSharedKey = p.presharedKey;
+    if (s.awg) {
+      out.settings.amnezia = {
+        Jc: s.awg.jc, Jmin: s.awg.jmin, Jmax: s.awg.jmax,
+        S1: s.awg.s1, S2: s.awg.s2, H1: s.awg.h1, H2: s.awg.h2, H3: s.awg.h3, H4: s.awg.h4
+      };
+    }
+    if (s.noise) {
+      out.streamSettings = { finalmask: { udp: [{ type: 'noise', settings: { reset: '30-60', noise: noiseBlock(s.noiseCount) } }] } };
+    }
+    return out;
+  }
 
- if (p.protocol === 'wireguard') {
- const out = {
- protocol: 'wireguard',
- tag,
- settings: {
- secretKey: p.privateKey,
- address: p.addresses,
- mtu: s.mtu,
- peers: [{
- endpoint: p.endpoint,
- publicKey: p.publicKey,
- ...(p.presharedKey ? { preSharedKey: p.presharedKey } : {}),
- keepAlive: p.keepalive || 25,
- allowedIPs: p.allowedIPs?.length ? p.allowedIPs : ['0.0.0.0/0', '::/0']
- }]
- }
- };
- if (s.awg) {
- out.settings.amnezia = {
- Jc: s.awg.jc, Jmin: s.awg.jmin, Jmax: s.awg.jmax,
- S1: s.awg.s1, S2: s.awg.s2,
- H1: s.awg.h1, H2: s.awg.h2, H3: s.awg.h3, H4: s.awg.h4
- };
- }
- if (s.noise) {
- out.streamSettings = {
- finalmask: {
- udp: [{
- type: 'noise',
- settings: { reset: '30-60', noise: noiseBlock(s.noiseCount) }
- }]
- }
- };
- }
- return out;
- }
+  if (p.limited) return { protocol: p.protocol, tag, settings: {}, streamSettings: { network: 'tcp' } };
 
- const streamSettings = {
- network: p.type || 'tcp',
- security: p.security || 'none'
- };
+  const streamSettings = { network: p.type || 'tcp', security: p.security || 'none' };
+  if (p.security === 'tls') {
+    streamSettings.tlsSettings = { serverName: p.sni || p.host, fingerprint: p.fp || 'chrome' };
+    if (p.alpn) streamSettings.tlsSettings.alpn = p.alpn;
+  } else if (p.security === 'reality') {
+    streamSettings.realitySettings = { serverName: p.sni, fingerprint: p.fp || 'chrome', publicKey: p.pbk, shortId: p.sid || '' };
+  }
+  if (p.type === 'ws') {
+    streamSettings.wsSettings = { path: p.path || '/', headers: { Host: p.hostHeader || p.host } };
+  }
+  if (s.fragment) {
+    streamSettings.finalmask = { tcp: [{ type: 'fragment', settings: { packets: s.fragPackets || 'tlshello', length: s.fragLength || '100-200', delay: s.fragDelay || '1' } }] };
+  }
+  if (s.noise) {
+    if (!streamSettings.finalmask) streamSettings.finalmask = {};
+    streamSettings.finalmask.udp = [{ type: 'noise', settings: { reset: '30-60', noise: noiseBlock(s.noiseCount) } }];
+  }
 
- if (p.security === 'tls') {
- streamSettings.tlsSettings = {
- serverName: p.sni || p.host,
- fingerprint: p.fp || 'chrome',
- ...(p.alpn ? { alpn: p.alpn } : {})
- };
- } else if (p.security === 'reality') {
- streamSettings.realitySettings = {
- serverName: p.sni,
- fingerprint: p.fp || 'chrome',
- publicKey: p.pbk,
- shortId: p.sid || '',
- spiderX: '/'
- };
- }
-
- if (p.type === 'ws') {
- streamSettings.wsSettings = {
- path: p.path || '/',
- headers: { Host: p.hostHeader || p.host }
- };
- }
-
- // Fragment
- if (s.fragment) {
- streamSettings.finalmask = {
- tcp: [{
- type: 'fragment',
- settings: {
- packets: s.fragPackets || 'tlshello',
- length: s.fragLength || '100-200',
- delay: s.fragDelay || '1'
- }
- }]
- };
- }
-
- // Noise
- if (s.noise) {
- if (!streamSettings.finalmask) streamSettings.finalmask = {};
- streamSettings.finalmask.udp = [{
- type: 'noise',
- settings: { reset: '30-60', noise: noiseBlock(s.noiseCount) }
- }];
- }
-
- const out = {
- protocol: p.protocol,
- tag,
- settings: {},
- streamSettings
- };
-
- if (p.protocol === 'vless') {
- out.settings.vnext = [{
- address: p.host,
- port: p.port,
- users: [{ id: p.uuid, encryption: 'none', ...(p.flow ? { flow: p.flow } : {}) }]
- }];
- } else if (p.protocol === 'trojan') {
- out.settings.servers = [{ address: p.host, port: p.port, password: p.uuid }];
- } else if (p.protocol === 'vmess') {
- out.settings.vnext = [{
- address: p.host,
- port: p.port,
- users: [{ id: p.uuid, alterId: 0, security: 'auto' }]
- }];
- }
-
- return out;
+  const out = { protocol: p.protocol, tag, settings: {}, streamSettings };
+  if (p.protocol === 'vless') {
+    out.settings.vnext = [{ address: p.host, port: p.port, users: [{ id: p.uuid, encryption: 'none', ...(p.flow ? { flow: p.flow } : {}) }] }];
+  } else if (p.protocol === 'trojan') {
+    out.settings.servers = [{ address: p.host, port: p.port, password: p.uuid }];
+  } else if (p.protocol === 'vmess') {
+    out.settings.vnext = [{ address: p.host, port: p.port, users: [{ id: p.uuid, alterId: 0, security: 'auto' }] }];
+  }
+  return out;
 }
 
 function buildXrayConfig(entries) {
- const outbounds = entries.map(({p, s}) => buildXrayOutbound(p, s));
- outbounds.push({ protocol: 'freedom', tag: 'direct' });
- outbounds.push({ protocol: 'blackhole', tag: 'block' });
+  const outbounds = entries.map(({ p, s }) => buildXrayOutbound(p, s));
+  outbounds.push({ protocol: 'freedom', tag: 'direct' });
+  outbounds.push({ protocol: 'blackhole', tag: 'block' });
+  const anyIr = entries.some(({ s }) => s.irBypass);
+  const mainTag = outbounds[0].tag;
+  const dns = entries[0]?.s.dns || '1.1.1.1';
 
- const anyIr = entries.some(({s}) => s.irBypass);
- const mainTag = outbounds[0].tag;
- const dns = entries[0]?.s.dns || '1.1.1.1';
-
- return {
- remarks: $('name').value.trim() || mainTag,
- log: { loglevel: 'warning' },
- dns: {
- servers: [
- { address: dns, tag: 'remote-dns' },
- {
- address: '1.1.1.1',
- domains: ['geosite:category-ir', 'regexp:.*\\.ir$'],
- expectIPs: ['geoip:ir'],
- skipFallback: true
- }
- ],
- queryStrategy: 'UseIP'
- },
- inbounds: [{
- listen: '0.0.0.0',
- port: 10808,
- protocol: 'mixed',
- settings: { auth: 'noauth', udp: true },
- sniffing: { destOverride: ['http', 'tls'], enabled: true, routeOnly: true },
- tag: 'mixed-in'
- }],
- outbounds,
- routing: {
- domainStrategy: 'IPIfNonMatch',
- rules: [
- ...(anyIr ? [
- { type: 'field', ip: ['geoip:private', 'geoip:ir'], outboundTag: 'direct' },
- { type: 'field', domain: ['regexp:.*\\.ir$', 'geosite:category-ir'], outboundTag: 'direct' }
- ] : [
- { type: 'field', ip: ['geoip:private'], outboundTag: 'direct' }
- ]),
- { type: 'field', network: 'tcp,udp', outboundTag: mainTag }
- ]
- }
- };
+  return {
+    remarks: $('name').value.trim() || mainTag,
+    log: { loglevel: 'warning' },
+    dns: {
+      servers: [
+        { address: dns, tag: 'remote-dns' },
+        { address: '1.1.1.1', domains: ['geosite:category-ir', 'regexp:.*\\.ir$'], expectIPs: ['geoip:ir'], skipFallback: true }
+      ],
+      queryStrategy: 'UseIP'
+    },
+    inbounds: [{
+      listen: '0.0.0.0', port: 10808, protocol: 'mixed',
+      settings: { auth: 'noauth', udp: true },
+      sniffing: { destOverride: ['http', 'tls'], enabled: true, routeOnly: true },
+      tag: 'mixed-in'
+    }],
+    outbounds,
+    routing: {
+      domainStrategy: 'IPIfNonMatch',
+      rules: [
+        ...(anyIr ? [
+          { type: 'field', ip: ['geoip:private', 'geoip:ir'], outboundTag: 'direct' },
+          { type: 'field', domain: ['regexp:.*\\.ir$', 'geosite:category-ir'], outboundTag: 'direct' }
+        ] : [{ type: 'field', ip: ['geoip:private'], outboundTag: 'direct' }]),
+        { type: 'field', network: 'tcp,udp', outboundTag: mainTag }
+      ]
+    }
+  };
 }
 
-// Proper Clash YAML generator (FIXED)
 function buildClashConfig(entries) {
- const anyIr = entries.some(({s}) => s.irBypass);
- let yaml = `port: 7890
-socks-port: 7891
-allow-lan: false
+  const anyIr = entries.some(({ s }) => s.irBypass);
+  const firstName = entries[0]?.p?.name || 'PROXY';
+
+  let yaml = `mixed-port: 7890
+ipv6: true
+allow-lan: true
+unified-delay: false
+log-level: warning
 mode: rule
-log-level: info
+
+dns:
+  enable: true
+  respect-rules: true
+  use-system-hosts: false
+  ipv6: false
+  enhanced-mode: redir-host
+  nameserver:
+    - 10.2.0.1#${firstName}
+    - 1.1.1.1#${firstName}
+  proxy-server-nameserver:
+    - 8.8.8.8#DIRECT
+  direct-nameserver:
+    - 8.8.8.8#DIRECT
+
+tun:
+  enable: true
+  stack: mixed
+  auto-route: true
+  strict-route: true
+  auto-detect-interface: true
+  dns-hijack:
+    - any:53
+    - tcp://any:53
+  mtu: 9000
 
 proxies:
 `;
 
- entries.forEach(({p, s}) => {
- const name = p.name.replace(/"/g, '\\"');
- if (p.protocol === 'wireguard') {
- yaml += ` - name: "${name}"
- type: wireguard
- server: ${p.endpoint?.split(':')[0] || ''}
- port: ${parseInt(p.endpoint?.split(':')[1]) || 51820}
- private-key: ${p.privateKey}
- public-key: ${p.publicKey}
- ip: ${p.addresses?.[0]?.split('/')[0] || '10.2.0.2'}
- mtu: ${s.mtu}
- udp: true
+  entries.forEach(({ p, s }) => {
+    const name = String(p.name).replace(/"/g, '\\"');
+    if (p.protocol === 'wireguard') {
+      const ep = parseEndpoint(p.endpoint);
+      const ip = (p.addresses?.[0] || '10.2.0.2/32');
+      yaml += `  - name: "${name}"
+    type: wireguard
+    server: ${ep.host}
+    port: ${ep.port}
+    private-key: ${p.privateKey}
+    public-key: ${p.publicKey}
+    ip: ${ip.includes('/') ? ip : ip + '/32'}
+    ip-version: ipv4
+    mtu: ${s.mtu}
+    udp: true
+    persistent-keepalive: ${p.keepalive || 25}
+    allowed-ips:
+      - 0.0.0.0/0
+      - ::/0
 `;
- } else {
- yaml += ` - name: "${name}"
- type: ${p.protocol}
- server: ${p.host}
- port: ${p.port}
- uuid: ${p.uuid}
- tls: ${p.security === 'tls' || p.security === 'reality'}
- servername: ${p.sni || p.host}
- network: ${p.type || 'tcp'}
- udp: true
+      if (p.presharedKey) yaml += `    pre-shared-key: ${p.presharedKey}\n`;
+      if (s.awg) {
+        yaml += `    amnezia-wg-option:
+      jc: ${s.awg.jc}
+      jmin: ${s.awg.jmin}
+      jmax: ${s.awg.jmax}
+      s1: ${s.awg.s1}
+      s2: ${s.awg.s2}
+      h1: ${s.awg.h1}
+      h2: ${s.awg.h2}
+      h3: ${s.awg.h3}
+      h4: ${s.awg.h4}
 `;
- if (p.type === 'ws') {
- yaml += ` ws-opts:
- path: ${p.path || '/'}
- headers:
- Host: ${p.hostHeader || p.host}
+      }
+    } else {
+      // non-wireguard (simplified)
+      yaml += `  - name: "${name}"
+    type: ${p.protocol}
+    server: ${p.host}
+    port: ${p.port}
+    uuid: ${p.uuid || ''}
+    tls: ${p.security === 'tls' || p.security === 'reality'}
+    servername: ${p.sni || p.host}
+    network: ${p.type || 'tcp'}
+    udp: true
 `;
- }
- }
- });
+      if (p.type === 'ws') {
+        yaml += `    ws-opts:
+      path: ${p.path || '/'}
+      headers:
+        Host: ${p.hostHeader || p.host}
+`;
+      }
+    }
+  });
 
- yaml += `
+  yaml += `
 proxy-groups:
- - name: PROXY
- type: select
- proxies:
+  - name: "✅ Selector"
+    type: select
+    proxies:
 `;
- entries.forEach(({p}) => {
- yaml += ` - "${p.name.replace(/"/g, '\\"')}"
+  entries.forEach(({ p }) => {
+    yaml += `      - "${String(p.name).replace(/"/g, '\\"')}"
 `;
- });
+  });
+  yaml += `      - DIRECT
+`;
 
- yaml += `
+  yaml += `
 rules:
+  - GEOIP,lan,DIRECT,no-resolve
+  - GEOIP,private,DIRECT,no-resolve
 `;
- if (anyIr) {
- yaml += ` - GEOIP,IR,DIRECT
- - GEOSITE,category-ir,DIRECT
+  if (anyIr) yaml += `  - GEOIP,IR,DIRECT,no-resolve\n`;
+  yaml += `  - MATCH,✅ Selector
 `;
- }
- yaml += ` - GEOIP,PRIVATE,DIRECT
- - MATCH,PROXY
-`;
- return yaml;
+  return yaml;
 }
 
 function buildSingBoxConfig(entries) {
- const outbounds = entries.map(({p, s}) => {
- if (p.protocol === 'wireguard') {
- return {
- type: 'wireguard', tag: p.name,
- server: p.endpoint?.split(':')[0],
- server_port: parseInt(p.endpoint?.split(':')[1]) || 51820,
- local_address: p.addresses,
- private_key: p.privateKey,
- peer_public_key: p.publicKey,
- mtu: s.mtu
- };
- }
- return {
- type: p.protocol, tag: p.name,
- server: p.host, server_port: p.port,
- uuid: p.protocol === 'vless' ? p.uuid : undefined,
- password: p.protocol === 'trojan' ? p.uuid : undefined,
- tls: (p.security === 'tls' || p.security === 'reality') ? {
- enabled: true, server_name: p.sni || p.host,
- utls: { enabled: true, fingerprint: p.fp || 'chrome' }
- } : undefined,
- transport: p.type === 'ws' ? {
- type: 'ws', path: p.path || '/',
- headers: { Host: p.hostHeader || p.host }
- } : undefined
- };
- });
- outbounds.push({ type: 'direct', tag: 'direct' });
- const anyIr = entries.some(({s}) => s.irBypass);
- return {
- log: { level: 'info' },
- dns: { servers: [{ tag: 'dns-remote', address: entries[0]?.s.dns || '1.1.1.1' }] },
- inbounds: [{ type: 'mixed', tag: 'mixed-in', listen: '127.0.0.1', listen_port: 10808 }],
- outbounds,
- route: {
- rules: anyIr
- ? [{ geoip: ['private', 'ir'], outbound: 'direct' }, { geosite: ['category-ir'], outbound: 'direct' }]
- : [{ geoip: ['private'], outbound: 'direct' }]
- }
- };
+  const outbounds = entries.map(({ p, s }) => {
+    if (p.protocol === 'wireguard') {
+      const ep = parseEndpoint(p.endpoint);
+      const out = {
+        type: 'wireguard', tag: p.name,
+        server: ep.host, server_port: ep.port,
+        local_address: p.addresses, private_key: p.privateKey,
+        peer_public_key: p.publicKey, mtu: s.mtu
+      };
+      if (p.presharedKey) out.pre_shared_key = p.presharedKey;
+      return out;
+    }
+    const out = { type: p.protocol, tag: p.name, server: p.host, server_port: p.port };
+    if (p.protocol === 'vless') out.uuid = p.uuid;
+    if (p.protocol === 'trojan') out.password = p.uuid;
+    if (p.security === 'tls' || p.security === 'reality') {
+      out.tls = { enabled: true, server_name: p.sni || p.host, utls: { enabled: true, fingerprint: p.fp || 'chrome' } };
+    }
+    if (p.type === 'ws') {
+      out.transport = { type: 'ws', path: p.path || '/', headers: { Host: p.hostHeader || p.host } };
+    }
+    return out;
+  });
+  outbounds.push({ type: 'direct', tag: 'direct' });
+  const anyIr = entries.some(({ s }) => s.irBypass);
+  return {
+    log: { level: 'info' },
+    dns: { servers: [{ tag: 'dns-remote', address: entries[0]?.s.dns || '1.1.1.1' }] },
+    inbounds: [{ type: 'mixed', tag: 'mixed-in', listen: '127.0.0.1', listen_port: 10808 }],
+    outbounds,
+    route: {
+      rules: anyIr
+        ? [{ geoip: ['private', 'ir'], outbound: 'direct' }, { geosite: ['category-ir'], outbound: 'direct' }]
+        : [{ geoip: ['private'], outbound: 'direct' }]
+    }
+  };
 }
 
 function buildAmneziaWG(p, s) {
- const awg = s.awg || { jc:5, jmin:50, jmax:100, s1:0, s2:0, h1:1, h2:2, h3:3, h4:4 };
- return `[Interface]
+  const awg = s.awg || { jc: 5, jmin: 50, jmax: 100, s1: 0, s2: 0, h1: 1, h2: 2, h3: 3, h4: 4 };
+  return `[Interface]
 PrivateKey = ${p.privateKey}
 Address = ${p.addresses.join(', ')}
 DNS = ${s.dns}
@@ -774,297 +727,354 @@ Endpoint = ${p.endpoint}
 PersistentKeepalive = ${p.keepalive || 25}${p.presharedKey ? `\nPresharedKey = ${p.presharedKey}` : ''}`;
 }
 
-// ===================== UI =====================
-
+// ===================== UI LOGIC =====================
 function defaultSettings() {
- return {
- irBypass: $('irBypass').checked,
- noise: $('useNoise').checked,
- noiseCount: parseInt($('noiseCount').value) || 5,
- fragment: $('useFragment').checked,
- fragPackets: $('fragPackets').value || 'tlshello',
- fragLength: $('fragLength').value.trim() || '100-200',
- fragDelay: $('fragDelay').value.trim() || '1',
- dns: $('dns').value.trim() || '1.1.1.1',
- mtu: parseInt($('mtu').value) || 1280,
- awg: null
- };
+  return {
+    irBypass: $('irBypass').checked,
+    noise: $('useNoise').checked,
+    noiseCount: parseInt($('noiseCount').value) || 5,
+    fragment: $('useFragment').checked,
+    fragPackets: $('fragPackets').value || 'tlshello',
+    fragLength: $('fragLength').value.trim() || '100-200',
+    fragDelay: $('fragDelay').value.trim() || '1',
+    dns: $('dns').value.trim() || '1.1.1.1',
+    mtu: parseInt($('mtu').value) || 1280,
+    awg: null
+  };
 }
 
 function renderList() {
- const container = $('configList');
- container.innerHTML = '';
- $('configCountText').innerText = `Parsed ${parsedProxiesGlobal.length} Config(s)`;
+  const container = $('configList');
+  container.innerHTML = '';
+  $('configCountText').innerText = `Parsed ${parsedProxiesGlobal.length} Config(s)`;
 
- parsedProxiesGlobal.forEach((item, i) => {
- const div = document.createElement('div');
- div.className = 'config-item';
- let badge = 'badge-vless';
- if (item.protocol === 'trojan') badge = 'badge-trojan';
- if (item.protocol === 'vmess') badge = 'badge-vmess';
- if (item.protocol === 'wireguard') badge = 'badge-wireguard';
- if (item.isFromJson) badge = 'badge-json';
+  parsedProxiesGlobal.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'config-item';
+    let badge = 'badge-vless';
+    if (item.protocol === 'trojan') badge = 'badge-trojan';
+    if (item.protocol === 'vmess') badge = 'badge-vmess';
+    if (item.protocol === 'wireguard') badge = 'badge-wireguard';
+    if (item.isFromJson) badge = 'badge-json';
+    if (item.limited) badge = 'badge-limited';
 
- const badges = [];
- if (item.settings.irBypass) badges.push('<span class="badge badge-applied">IR</span>');
- if (item.settings.fragment) badges.push('<span class="badge badge-applied">FRAG</span>');
- if (item.settings.noise) badges.push('<span class="badge badge-applied">NOISE</span>');
+    const badges = [];
+    if (item.settings.irBypass) badges.push('<span class="badge badge-applied">IR</span>');
+    if (item.settings.fragment) badges.push('<span class="badge badge-applied">FRAG</span>');
+    if (item.settings.noise) badges.push('<span class="badge badge-applied">NOISE</span>');
+    if (item.settings.awg) badges.push('<span class="badge badge-applied">AWG</span>');
+    if (item.limited) badges.push('<span class="badge badge-limited">LIMITED</span>');
 
- div.innerHTML = `
- <div class="config-summary" onclick="toggleDetails(${i})">
- <div class="config-info">
- <span class="badge ${badge}">${item.protocol}</span>
- <span class="config-title">${escapeHtml(item.name)}</span>
- ${badges.join('')}
- </div>
- <button class="secondary" style="padding:3px 8px;font-size:11px;" onclick="event.stopPropagation();copySingleLink(${i})">Copy</button>
- </div>
- <div class="config-details" id="details-${i}">
- <div class="item-toolbar">
- <button class="${item.settings.irBypass ? 'warn-btn' : ''}" onclick="toggleIrBypass(${i})">${item.settings.irBypass ? 'Remove IR' : 'Apply IR Bypass'}</button>
- ${item.protocol !== 'wireguard' ? `
- <button class="${item.settings.fragment ? 'warn-btn' : ''}" onclick="toggleFragment(${i})">${item.settings.fragment ? 'Remove Fragment' : 'Apply Fragment'}</button>
- <button class="${item.settings.noise ? 'warn-btn' : ''}" onclick="toggleNoise(${i})">${item.settings.noise ? 'Remove Noise' : 'Apply Noise'}</button>
- ` : `<button onclick="applyAwg(${i})">Apply Amnezia</button>`}
- <select id="fmt-${i}" onchange="generateIndividual(${i})">
- <option value="xray">Xray JSON</option>
- <option value="clash">Clash YAML</option>
- <option value="singbox">Sing-Box</option>
- ${item.protocol === 'wireguard' ? '<option value="amnezia">AmneziaWG</option>' : ''}
- </select>
- <button class="secondary" onclick="generateIndividual(${i})">Generate</button>
- <button class="success-btn" onclick="copyIndividualOutput(${i})">Copy This</button>
- </div>
- <div class="item-status" id="itemstatus-${i}"></div>
- <textarea class="item-output" id="itemoutput-${i}" readonly></textarea>
- </div>
- `;
- container.appendChild(div);
- });
+    div.innerHTML = `
+      <div class="config-summary" onclick="toggleDetails(${i})">
+        <div class="config-info">
+          <span class="badge ${badge}">${item.protocol}</span>
+          <span class="config-title">${escapeHtml(item.name)}</span>
+          ${badges.join('')}
+        </div>
+        <button class="secondary" style="padding:3px 8px;font-size:11px;" onclick="event.stopPropagation();copySingleLink(${i})">Copy</button>
+      </div>
+      <div class="config-details" id="details-${i}">
+        <div class="item-toolbar">
+          <button class="${item.settings.irBypass ? 'warn-btn' : ''}" onclick="toggleIrBypass(${i})">${item.settings.irBypass ? 'Remove IR' : 'Apply IR'}</button>
+          ${item.protocol !== 'wireguard' && !item.limited ? `
+            <button class="${item.settings.fragment ? 'warn-btn' : ''}" onclick="toggleFragment(${i})">${item.settings.fragment ? 'Remove Frag' : 'Apply Fragment'}</button>
+            <button class="${item.settings.noise ? 'warn-btn' : ''}" onclick="toggleNoise(${i})">${item.settings.noise ? 'Remove Noise' : 'Apply Noise'}</button>
+          ` : ''}
+          ${item.protocol === 'wireguard' ? `<button onclick="applyAwg(${i})">Apply Amnezia</button>` : ''}
+          <select id="fmt-${i}" onchange="generateIndividual(${i})">
+            <option value="xray">Xray JSON</option>
+            <option value="clash">Clash YAML</option>
+            <option value="singbox">Sing-Box</option>
+            ${item.protocol === 'wireguard' ? '<option value="amnezia">AmneziaWG</option>' : ''}
+          </select>
+          <button class="secondary" onclick="generateIndividual(${i})">Generate</button>
+          <button class="success-btn" onclick="copyIndividualOutput(${i})">Copy</button>
+          <button class="secondary" onclick="downloadIndividual(${i})">Download</button>
+        </div>
+        <div class="item-status" id="itemstatus-${i}"></div>
+        <textarea class="item-output" id="itemoutput-${i}" readonly></textarea>
+      </div>
+    `;
+    container.appendChild(div);
+  });
 }
 
 function itemMsg(i, cls, msg) {
- const el = $(`itemstatus-${i}`);
- if (el) { el.className = `item-status ${cls}`; el.innerText = msg; }
+  const el = $(`itemstatus-${i}`);
+  if (el) { el.className = `item-status ${cls}`; el.innerText = msg; }
 }
 
 function toggleIrBypass(i) {
- const item = parsedProxiesGlobal[i];
- item.settings.irBypass = !item.settings.irBypass;
- itemMsg(i, item.settings.irBypass ? 'success' : 'warn', item.settings.irBypass ? 'IR Bypass applied' : 'IR Bypass removed');
- renderList();
- $(`details-${i}`)?.classList.add('open');
- generateIndividual(i);
+  const item = parsedProxiesGlobal[i];
+  item.settings.irBypass = !item.settings.irBypass;
+  itemMsg(i, item.settings.irBypass ? 'success' : 'warn', item.settings.irBypass ? 'IR Bypass ON' : 'IR Bypass OFF');
+  renderList();
+  $(`details-${i}`)?.classList.add('open');
+  generateIndividual(i);
+  buildCombinedExport();
 }
 
 function toggleFragment(i) {
- const item = parsedProxiesGlobal[i];
- item.settings.fragPackets = $('fragPackets').value;
- item.settings.fragLength = $('fragLength').value.trim() || '100-200';
- item.settings.fragDelay = $('fragDelay').value.trim() || '1';
- item.settings.fragment = !item.settings.fragment;
- itemMsg(i, item.settings.fragment ? 'success' : 'warn', item.settings.fragment ? `Fragment ON` : 'Fragment removed');
- renderList();
- $(`details-${i}`)?.classList.add('open');
- generateIndividual(i);
+  const item = parsedProxiesGlobal[i];
+  const length = $('fragLength').value.trim();
+  const delay = $('fragDelay').value.trim();
+  if (!isValidRange(length) || !isValidRange(delay)) {
+    itemMsg(i, 'error', 'Invalid fragment length/delay');
+    return;
+  }
+  item.settings.fragPackets = $('fragPackets').value;
+  item.settings.fragLength = length;
+  item.settings.fragDelay = delay;
+  item.settings.fragment = !item.settings.fragment;
+  itemMsg(i, item.settings.fragment ? 'success' : 'warn', item.settings.fragment ? 'Fragment ON' : 'Fragment OFF');
+  renderList();
+  $(`details-${i}`)?.classList.add('open');
+  generateIndividual(i);
+  buildCombinedExport();
 }
 
 function toggleNoise(i) {
- const item = parsedProxiesGlobal[i];
- item.settings.noiseCount = parseInt($('noiseCount').value) || 5;
- item.settings.noise = !item.settings.noise;
- itemMsg(i, item.settings.noise ? 'success' : 'warn', item.settings.noise ? 'Noise ON' : 'Noise removed');
- renderList();
- $(`details-${i}`)?.classList.add('open');
- generateIndividual(i);
+  const item = parsedProxiesGlobal[i];
+  item.settings.noiseCount = parseInt($('noiseCount').value) || 5;
+  item.settings.noise = !item.settings.noise;
+  itemMsg(i, item.settings.noise ? 'success' : 'warn', item.settings.noise ? 'Noise ON' : 'Noise OFF');
+  renderList();
+  $(`details-${i}`)?.classList.add('open');
+  generateIndividual(i);
+  buildCombinedExport();
 }
 
 function applyAwg(i) {
- const item = parsedProxiesGlobal[i];
- item.settings.awg = {
- jc: +$('jc').value, jmin: +$('jmin').value, jmax: +$('jmax').value,
- s1: +$('s1').value, s2: +$('s2').value,
- h1: +$('h1').value, h2: +$('h2').value, h3: +$('h3').value, h4: +$('h4').value
- };
- itemMsg(i, 'success', 'Amnezia applied');
- renderList();
- $(`details-${i}`)?.classList.add('open');
- generateIndividual(i);
+  const item = parsedProxiesGlobal[i];
+  item.settings.awg = {
+    jc: +$('jc').value, jmin: +$('jmin').value, jmax: +$('jmax').value,
+    s1: +$('s1').value, s2: +$('s2').value,
+    h1: +$('h1').value, h2: +$('h2').value, h3: +$('h3').value, h4: +$('h4').value
+  };
+  itemMsg(i, 'success', 'Amnezia applied');
+  renderList();
+  $(`details-${i}`)?.classList.add('open');
+  generateIndividual(i);
+  buildCombinedExport();
 }
 
 function generateIndividual(i) {
- const item = parsedProxiesGlobal[i];
- const fmt = $(`fmt-${i}`)?.value || 'xray';
- const out = $(`itemoutput-${i}`);
- if (!out) return;
- const entry = { p: item, s: item.settings };
- let text = '';
- if (fmt === 'xray') text = JSON.stringify(buildXrayConfig([entry]), null, 2);
- else if (fmt === 'clash') text = buildClashConfig([entry]);
- else if (fmt === 'singbox') text = JSON.stringify(buildSingBoxConfig([entry]), null, 2);
- else if (fmt === 'amnezia') text = item.protocol === 'wireguard' ? buildAmneziaWG(item, item.settings) : '# Only WireGuard';
- out.value = text;
+  const item = parsedProxiesGlobal[i];
+  const fmt = $(`fmt-${i}`)?.value || 'xray';
+  const out = $(`itemoutput-${i}`);
+  if (!out) return;
+  const entry = { p: item, s: item.settings };
+  let text = '';
+  if (fmt === 'xray') text = JSON.stringify(buildXrayConfig([entry]), null, 2);
+  else if (fmt === 'clash') text = buildClashConfig([entry]);
+  else if (fmt === 'singbox') text = JSON.stringify(buildSingBoxConfig([entry]), null, 2);
+  else if (fmt === 'amnezia') text = item.protocol === 'wireguard' ? buildAmneziaWG(item, item.settings) : '# Only for WireGuard';
+  out.value = text;
 }
 
 function toggleDetails(i) {
- const el = $(`details-${i}`);
- if (el) {
- el.classList.toggle('open');
- if (el.classList.contains('open') && !$(`itemoutput-${i}`).value) generateIndividual(i);
- }
+  const el = $(`details-${i}`);
+  if (el) {
+    el.classList.toggle('open');
+    if (el.classList.contains('open') && !$(`itemoutput-${i}`).value) generateIndividual(i);
+  }
 }
 
 function toggleExpandAll() {
- allExpanded = !allExpanded;
- parsedProxiesGlobal.forEach((_, i) => {
- const el = $(`details-${i}`);
- if (el) {
- if (allExpanded) {
- el.classList.add('open');
- if (!$(`itemoutput-${i}`).value) generateIndividual(i);
- } else el.classList.remove('open');
- }
- });
+  allExpanded = !allExpanded;
+  parsedProxiesGlobal.forEach((_, i) => {
+    const el = $(`details-${i}`);
+    if (el) {
+      if (allExpanded) {
+        el.classList.add('open');
+        if (!$(`itemoutput-${i}`).value) generateIndividual(i);
+      } else el.classList.remove('open');
+    }
+  });
 }
 
-function copySingleLink(i) {
- const item = parsedProxiesGlobal[i];
- const text = item.rawUri || `${item.protocol}://${item.host}:${item.port}`;
- navigator.clipboard.writeText(text);
- showStatus(true, [], [`Copied ${item.name}`]);
+async function copySingleLink(i) {
+  const item = parsedProxiesGlobal[i];
+  const text = item.rawUri || `${item.protocol}://${item.host}:${item.port}`;
+  if (await copyText(text)) showStatus(true, [], [`Copied ${item.name}`]);
+  else showStatus(false, ['Clipboard failed'], []);
 }
 
-function copyIndividualOutput(i) {
- if (!$(`itemoutput-${i}`).value) generateIndividual(i);
- navigator.clipboard.writeText($(`itemoutput-${i}`).value);
- itemMsg(i, 'success', 'Copied!');
+async function copyIndividualOutput(i) {
+  if (!$(`itemoutput-${i}`).value) generateIndividual(i);
+  if (await copyText($(`itemoutput-${i}`).value)) itemMsg(i, 'success', 'Copied!');
+  else itemMsg(i, 'error', 'Clipboard failed');
 }
 
-function copyAllLinks() {
- const text = parsedProxiesGlobal.map(p => p.rawUri || `${p.protocol}://${p.host}:${p.port}`).join('\n');
- navigator.clipboard.writeText(text);
- showStatus(true, [], [`Copied ${parsedProxiesGlobal.length} links`]);
+function downloadIndividual(i) {
+  if (!$(`itemoutput-${i}`).value) generateIndividual(i);
+  const item = parsedProxiesGlobal[i];
+  const fmt = $(`fmt-${i}`)?.value || 'xray';
+  const extMap = { xray: 'json', clash: 'yaml', singbox: 'json', amnezia: 'conf' };
+  const ext = extMap[fmt] || 'txt';
+  const filename = `${(item.name || 'config').replace(/[^\w\-]+/g, '_')}.${ext}`;
+  downloadFile($(`itemoutput-${i}`).value, filename);
+  itemMsg(i, 'success', 'Downloaded!');
+}
+
+async function copyAllLinks() {
+  const text = parsedProxiesGlobal.map(p => p.rawUri || `${p.protocol}://${p.host}:${p.port}`).join('\n');
+  if (await copyText(text)) showStatus(true, [], [`Copied ${parsedProxiesGlobal.length} links`]);
+  else showStatus(false, ['Clipboard failed'], []);
 }
 
 function buildCombinedExport() {
- if (!parsedProxiesGlobal.length) { $('result').value = ''; return; }
- const entries = parsedProxiesGlobal.map(p => ({ p, s: p.settings }));
- let result = '';
- if (currentTab === 'json') result = JSON.stringify(buildXrayConfig(entries), null, 2);
- else if (currentTab === 'clash') result = buildClashConfig(entries);
- else if (currentTab === 'singbox') result = JSON.stringify(buildSingBoxConfig(entries), null, 2);
- else if (currentTab === 'amnezia') {
- const wg = parsedProxiesGlobal.find(p => p.protocol === 'wireguard');
- result = wg ? buildAmneziaWG(wg, wg.settings) : '# No WireGuard found';
- }
- $('result').value = result;
+  if (!parsedProxiesGlobal.length) { $('result').value = ''; return; }
+  const entries = parsedProxiesGlobal.map(p => ({ p, s: p.settings }));
+  let result = '';
+  if (currentTab === 'json') result = JSON.stringify(buildXrayConfig(entries), null, 2);
+  else if (currentTab === 'clash') result = buildClashConfig(entries);
+  else if (currentTab === 'singbox') result = JSON.stringify(buildSingBoxConfig(entries), null, 2);
+  else if (currentTab === 'amnezia') {
+    const wg = parsedProxiesGlobal.find(p => p.protocol === 'wireguard');
+    result = wg ? buildAmneziaWG(wg, wg.settings) : '# No WireGuard found';
+  }
+  $('result').value = result;
 }
 
 function convert() {
- const name = $('name').value.trim() || 'Config-1';
- parsedProxiesGlobal = [];
+  const name = $('name').value.trim() || 'Config-1';
+  parsedProxiesGlobal = [];
 
- if (currentMode === 'paste') {
- let input = $('inputData').value.trim();
- if (!input) return showStatus(false, ['Paste something first'], []);
- input = decodeBase64Safe(input);
+  if (!isValidMtu($('mtu').value)) {
+    return showStatus(false, ['MTU must be between 576 and 9000'], []);
+  }
 
- // 1. Full Xray JSON
- const jsonItems = parseFullXrayJSON(input);
- if (jsonItems) {
- jsonItems.forEach(item => {
- item.settings = defaultSettings();
- parsedProxiesGlobal.push(item);
- });
- } else {
- // 2. URI links
- const lines = input.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
- let idx = 0;
- for (const line of lines) {
- if (line.includes('://')) {
- const parsed = parseUniversalLink(line, name, idx++);
- if (parsed) {
- parsed.settings = defaultSettings();
- parsedProxiesGlobal.push(parsed);
- }
- }
- }
- // 3. WireGuard INI
- if (!parsedProxiesGlobal.length) {
- const wg = parseWireGuard(input);
- if (wg.privateKey && wg.publicKey) {
- parsedProxiesGlobal.push({ protocol: 'wireguard', name, ...wg, settings: defaultSettings() });
- }
- }
- }
- } else {
- const ipv4 = $('manualAddress').value.trim() || '10.2.0.2/32';
- const ipv6 = $('manualIPv6').value.trim();
- parsedProxiesGlobal.push({
- protocol: 'wireguard', name,
- privateKey: $('manualPrivate').value.trim(),
- publicKey: $('manualPublic').value.trim(),
- endpoint: $('manualEndpoint').value.trim(),
- addresses: ipv6 ? [ipv4, ipv6] : [ipv4],
- presharedKey: $('manualPSK').value.trim(),
- allowedIPs: $('manualAllowed').value.trim().split(',').map(s => s.trim()),
- keepalive: 25,
- settings: defaultSettings()
- });
- }
+  if (currentMode === 'paste') {
+    let input = $('inputData').value.trim();
+    if (!input) return showStatus(false, ['Paste something first'], []);
+    input = decodeBase64Safe(input);
 
- if (!parsedProxiesGlobal.length) {
- showStatus(false, ['Could not parse any valid config'], []);
- renderList();
- return;
- }
+    const jsonItems = parseFullXrayJSON(input);
+    if (jsonItems) {
+      jsonItems.forEach(item => {
+        item.settings = defaultSettings();
+        parsedProxiesGlobal.push(item);
+      });
+    } else {
+      const lines = input.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      let idx = 0;
+      for (const line of lines) {
+        if (line.includes('://')) {
+          const parsed = parseUniversalLink(line, name, idx++);
+          if (parsed) {
+            parsed.settings = defaultSettings();
+            parsedProxiesGlobal.push(parsed);
+          }
+        }
+      }
+      if (!parsedProxiesGlobal.length) {
+        const wg = parseWireGuard(input);
+        if (wg.privateKey && wg.publicKey) {
+          parsedProxiesGlobal.push({ protocol: 'wireguard', name, ...wg, settings: defaultSettings() });
+        }
+      }
+    }
+  } else {
+    const ipv4 = $('manualAddress').value.trim() || '10.2.0.2/32';
+    const ipv6 = $('manualIPv6').value.trim();
+    parsedProxiesGlobal.push({
+      protocol: 'wireguard', name,
+      privateKey: $('manualPrivate').value.trim(),
+      publicKey: $('manualPublic').value.trim(),
+      endpoint: $('manualEndpoint').value.trim(),
+      addresses: ipv6 ? [ipv4, ipv6] : [ipv4],
+      presharedKey: $('manualPSK').value.trim(),
+      allowedIPs: $('manualAllowed').value.trim().split(',').map(s => s.trim()),
+      keepalive: 25,
+      settings: defaultSettings()
+    });
+  }
 
- renderList();
- buildCombinedExport();
- showStatus(true, [], [`Successfully processed ${parsedProxiesGlobal.length} profile(s)`]);
+  if (!parsedProxiesGlobal.length) {
+    showStatus(false, ['Could not parse any valid configuration'], []);
+    renderList();
+    return;
+  }
+
+  renderList();
+  buildCombinedExport();
+  showStatus(true, [], [`Successfully processed ${parsedProxiesGlobal.length} profile(s)`]);
 }
 
 function showStatus(ok, errors, warnings) {
- const s = $('status');
- if (!ok) {
- s.className = 'status error';
- s.innerHTML = '❌ ' + errors.join('<br>');
- return;
- }
- s.className = 'status success';
- s.innerHTML = '✅ Ready' + (warnings.length ? '<br>⚠️ ' + warnings.join('<br>') : '');
+  const s = $('status');
+  if (!ok) {
+    s.className = 'status error';
+    s.innerHTML = '❌ ' + errors.join('<br>');
+    return;
+  }
+  s.className = 'status success';
+  s.innerHTML = '✅ Ready' + (warnings.length ? '<br>⚠️ ' + warnings.join('<br>') : '');
 }
 
-function copyResult() {
- if (!$('result').value) return;
- navigator.clipboard.writeText($('result').value);
- showStatus(true, [], ['Copied combined export']);
+async function copyResult() {
+  if (!$('result').value) return;
+  if (await copyText($('result').value)) showStatus(true, [], ['Copied combined export']);
+  else showStatus(false, ['Clipboard failed'], []);
 }
 
 function downloadResult() {
- const content = $('result').value;
- if (!content) return;
- const name = ($('name').value.trim() || 'config').replace(/[^\w\-]+/g, '_');
- const extMap = { json: 'json', clash: 'yaml', singbox: 'json', amnezia: 'conf' };
- const ext = extMap[currentTab] || 'txt';
- const a = document.createElement('a');
- a.href = URL.createObjectURL(new Blob([content], { type: 'text/plain;charset=utf-8' }));
- a.download = `${name}.${ext}`; // ← fixed, no extra .txt
- a.click();
+  const content = $('result').value;
+  if (!content) return;
+  const name = ($('name').value.trim() || 'config').replace(/[^\w\-]+/g, '_');
+  const extMap = { json: 'json', clash: 'yaml', singbox: 'json', amnezia: 'conf' };
+  const ext = extMap[currentTab] || 'txt';
+  downloadFile(content, `${name}.${ext}`);
 }
 
 function clearAll() {
- $('inputData').value = '';
- $('result').value = '';
- $('status').textContent = '';
- $('fetchLog').innerHTML = '';
- $('name').value = 'Config-1';
- parsedProxiesGlobal = [];
- renderList();
+  $('inputData').value = '';
+  $('manualPrivate').value = '';
+  $('manualPublic').value = '';
+  $('manualEndpoint').value = '';
+  $('manualIPv6').value = '';
+  $('manualPSK').value = '';
+  $('manualAddress').value = '10.2.0.2/32';
+  $('manualAllowed').value = '0.0.0.0/0, ::/0';
+  $('result').value = '';
+  $('status').textContent = '';
+  $('fetchLog').innerHTML = '';
+  $('name').value = 'Config-1';
+  parsedProxiesGlobal = [];
+  renderList();
 }
 
-function escapeHtml(str) {
- return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+async function fetchSubscription() {
+  const url = $('inputData').value.trim().split('#')[0];
+  if (!url.startsWith('http')) return showStatus(false, ['Enter a valid URL'], []);
+  $('fetchLog').innerHTML = '';
+  showStatus(true, [], ['Fetching...']);
+
+  const proxies = [
+    { l: 'direct', b: u => u },
+    { l: 'allorigins', b: u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}` },
+    { l: 'codetabs', b: u => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}` }
+  ];
+
+  for (const p of proxies) {
+    try {
+      const div = document.createElement('div');
+      div.textContent = `Trying ${p.l}...`;
+      $('fetchLog').appendChild(div);
+      const res = await fetch(p.b(url));
+      if (res.ok) {
+        const t = await res.text();
+        if (t && t.length > 20 && !t.trim().startsWith('<!')) {
+          $('inputData').value = decodeBase64Safe(t.trim());
+          convert();
+          return;
+        }
+      }
+    } catch (e) {}
+  }
+  showStatus(false, ['All fetch methods failed'], []);
 }
 
 // Init
