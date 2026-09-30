@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Universal Proxy Converter v3.3</title>
+  <title>Universal Proxy Converter v3.9</title>
+  <!-- QRCode.js CDN for client-side QR generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
     :root {
       --bg: #0f172a; --card: #1e293b; --border: #334155;
@@ -34,7 +36,6 @@
     button.secondary { background: #334155; }
     button.secondary:hover { background: #475569; }
     button.success-btn { background: #16a34a; }
-    button.warn-btn { background: #92400e; }
     .btn-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
     .tabs { display: flex; gap: 7px; margin-bottom: 10px; flex-wrap: wrap; }
     .tab { padding: 6px 14px; background: #334155; border-radius: 8px; cursor: pointer; font-size: 12.5px; }
@@ -53,28 +54,28 @@
     .config-info { display: flex; align-items: center; gap: 7px; flex: 1; overflow: hidden; }
     .badge { padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
     .badge-vless { background: #0284c7; color: white; }
-    .badge-trojan { background: #d97706; color: white; }
-    .badge-vmess { background: #16a34a; color: white; }
+    .badge-vmess { background: #d97706; color: white; }
+    .badge-trojan { background: #7c3aed; color: white; }
     .badge-wireguard { background: #059669; color: white; }
-    .badge-json { background: #7c3aed; color: white; }
-    .badge-limited { background: #b45309; color: white; }
-    .badge-applied { background: #14532d; color: #4ade80; border: 1px solid #4ade80; }
     .config-title { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .config-details { padding: 9px 11px; border-top: 1px solid var(--border); background: #0a0f1d; display: none; }
     .config-details.open { display: block; }
-    .item-toolbar { display: flex; gap: 6px; flex-wrap: wrap; margin: 9px 0; align-items: center; }
-    .item-toolbar select { width: auto; padding: 5px 7px; font-size: 11.5px; }
-    .item-toolbar button { padding: 4px 9px; font-size: 11px; }
-    .item-status { font-size: 11px; margin: 3px 0; min-height: 14px; }
-    .item-output { min-height: 130px; font-size: 11px; margin-top: 5px; }
+    .item-output { min-height: 110px; font-size: 11px; margin-top: 5px; }
     .fetch-log { font-size: 11px; color: var(--muted); margin-top: 5px; max-height: 80px; overflow-y: auto; }
+    
+    /* QR Code Container Styles */
+    .qr-wrapper { margin-top: 12px; text-align: center; background: #0f172a; border: 1px solid var(--border); border-radius: 8px; padding: 12px; display: none; }
+    .qr-wrapper.active { display: block; }
+    .qr-box { display: inline-block; background: #ffffff; padding: 10px; border-radius: 8px; margin-top: 6px; }
+    .qr-box canvas, .qr-box img { display: block; margin: 0 auto; }
+    .qr-error { color: var(--error); font-size: 12px; margin-top: 6px; font-weight: 500; }
     .note { font-size: 11px; color: var(--muted); margin-top: 4px; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Universal Proxy Converter v3.3</h1>
-    <p class="subtitle">Improved Clash YAML (TUN + DNS) • Clean .yaml download • Amnezia support</p>
+    <h1>Universal Proxy Converter v3.9</h1>
+    <p class="subtitle">Complete Multi-Protocol Import • Restored Complete Xray/Clash Routing Structures & Noise Masks</p>
 
     <div class="grid">
       <!-- LEFT PANEL -->
@@ -102,8 +103,12 @@
           <label style="margin-top:8px">Public Key</label><input type="text" id="manualPublic">
           <label style="margin-top:8px">Endpoint (supports IPv6)</label><input type="text" id="manualEndpoint" placeholder="ip:port or [ipv6]:port">
           <div class="row" style="margin-top:8px">
-            <div><label>IPv4</label><input type="text" id="manualAddress" value="10.2.0.2/32"></div>
+            <div><label>IPv4</label><input type="text" id="manualAddress" value="172.16.0.2/32"></div>
             <div><label>IPv6</label><input type="text" id="manualIPv6"></div>
+          </div>
+          <div class="row" style="margin-top:8px">
+            <div><label>Reserved (e.g. 0,0,0)</label><input type="text" id="manualReserved" value="0,0,0" onchange="syncReservedToAmnezia()"></div>
+            <div><label>Keepalive (s)</label><input type="number" id="manualKeepalive" value="25"></div>
           </div>
           <label style="margin-top:8px">AllowedIPs</label><input type="text" id="manualAllowed" value="0.0.0.0/0, ::/0">
           <label style="margin-top:8px">Preshared Key</label><input type="text" id="manualPSK">
@@ -113,51 +118,24 @@
         <div class="row">
           <div><label>Remote DNS</label><input type="text" id="dns" value="1.1.1.1"></div>
           <div><label>MTU</label><input type="number" id="mtu" value="1280" min="576" max="9000"></div>
+          <div><label>Keepalive</label><input type="number" id="globalKeepalive" value="25"></div>
         </div>
         <div class="checkbox"><input type="checkbox" id="irBypass" checked><label for="irBypass" style="margin:0;color:var(--text)">IR Bypass ON</label></div>
-        <div class="checkbox"><input type="checkbox" id="useNoise" checked><label for="useNoise" style="margin:0;color:var(--text)">Noise ON <span class="note">(Xray only)</span></label></div>
-        <div class="checkbox"><input type="checkbox" id="useFragment" checked><label for="useFragment" style="margin:0;color:var(--text)">Fragment ON <span class="note">(Xray only)</span></label></div>
+        <div class="checkbox"><input type="checkbox" id="useNoise" checked><label for="useNoise" style="margin:0;color:var(--text)">Noise ON <span class="note">(Xray UDP Noise)</span></label></div>
+        <div class="checkbox"><input type="checkbox" id="useFragment" checked><label for="useFragment" style="margin:0;color:var(--text)">Fragment ON <span class="note">(Xray Stream)</span></label></div>
 
-        <div class="section-title">Fragment Settings (Xray)</div>
+        <div class="section-title">Amnezia WG Settings & Presets</div>
         <div class="row">
           <div>
-            <label>Preset</label>
-            <select id="fragmentPreset" onchange="applyFragmentPreset()">
-              <option value="light">Light (50-100)</option>
-              <option value="normal" selected>Normal (100-200)</option>
-              <option value="heavy">Heavy (10-50)</option>
-              <option value="aggressive">Aggressive (1-20)</option>
+            <label>Preset Profile</label>
+            <select id="awgPreset" onchange="applyAwgPreset()">
+              <option value="noisy" selected>Default Noisy (5/50/100)</option>
+              <option value="quic">WG Mimic QUIC</option>
+              <option value="sip">WG Mimic SIP</option>
               <option value="custom">Custom</option>
             </select>
           </div>
         </div>
-        <div class="row">
-          <div>
-            <label>Packets</label>
-            <select id="fragPackets">
-              <option value="tlshello" selected>tlshello</option>
-              <option value="1-1">1-1</option>
-              <option value="1-3">1-3</option>
-            </select>
-          </div>
-          <div><label>Length</label><input type="text" id="fragLength" value="100-200"></div>
-          <div><label>Delay</label><input type="text" id="fragDelay" value="1"></div>
-        </div>
-
-        <div class="section-title">UDP Noise (Xray)</div>
-        <div class="row">
-          <div>
-            <label>Preset</label>
-            <select id="noisePreset" onchange="applyNoisePreset()">
-              <option value="light">Light (3)</option>
-              <option value="normal" selected>Normal (5)</option>
-              <option value="strong">Strong (8)</option>
-            </select>
-          </div>
-          <div><label>Count</label><input type="number" id="noiseCount" value="5" min="1" max="12"></div>
-        </div>
-
-        <div class="section-title">Amnezia WG</div>
         <div class="row">
           <div><label>Jc</label><input type="number" id="jc" value="5"></div>
           <div><label>Jmin</label><input type="number" id="jmin" value="50"></div>
@@ -166,6 +144,8 @@
         <div class="row">
           <div><label>S1</label><input type="number" id="s1" value="0"></div>
           <div><label>S2</label><input type="number" id="s2" value="0"></div>
+          <div><label>S3</label><input type="number" id="s3" value="0"></div>
+          <div><label>S4</label><input type="number" id="s4" value="0"></div>
         </div>
         <div class="row">
           <div><label>H1</label><input type="number" id="h1" value="1"></div>
@@ -173,6 +153,10 @@
           <div><label>H3</label><input type="number" id="h3" value="3"></div>
           <div><label>H4</label><input type="number" id="h4" value="4"></div>
         </div>
+        <label>I1 Payload Init</label>
+        <input type="text" id="i1" placeholder="Optional Init Payload 1">
+        <label style="margin-top:6px">I2 Payload Init</label>
+        <input type="text" id="i2" placeholder="Optional Init Payload 2">
 
         <div class="btn-row">
           <button onclick="convert()">Parse / Refresh</button>
@@ -192,32 +176,49 @@
           </div>
         </div>
 
-        <div id="configList" style="max-height:420px;overflow-y:auto;margin-bottom:14px;"></div>
+        <div id="configList" style="max-height:300px;overflow-y:auto;margin-bottom:14px;"></div>
 
         <div class="section-title">Combined Export</div>
         <div class="tabs">
-          <div class="tab active" onclick="switchTab('json', this)">Xray JSON</div>
+          <div class="tab active" onclick="switchTab('amnezia', this)">AmneziaWG</div>
           <div class="tab" onclick="switchTab('clash', this)">Clash Meta</div>
           <div class="tab" onclick="switchTab('singbox', this)">Sing-Box</div>
-          <div class="tab" onclick="switchTab('amnezia', this)">AmneziaWG</div>
+          <div class="tab" onclick="switchTab('json', this)">Xray JSON</div>
         </div>
-        <textarea id="result" style="min-height:220px"></textarea>
+        <textarea id="result" style="min-height:180px" oninput="generateResultQR()"></textarea>
+        
         <div class="btn-row">
           <button onclick="copyResult()">Copy Combined</button>
           <button class="secondary" onclick="downloadResult()">Download</button>
+          <button class="secondary" onclick="toggleResultQR()">Toggle QR Code</button>
         </div>
+
+        <!-- QR Code Area for Combined Result -->
+        <div id="resultQrWrapper" class="qr-wrapper">
+          <label style="color:var(--primary);margin-bottom:6px">Scan Export QR Code</label>
+          <div id="resultQrBox" class="qr-box"></div>
+          <div id="resultQrError" class="qr-error"></div>
+        </div>
+
       </div>
     </div>
   </div>
 
 <script>
-let currentTab = 'json';
+let currentTab = 'amnezia';
 let currentMode = 'paste';
 let parsedProxiesGlobal = [];
 let allExpanded = false;
 const $ = id => document.getElementById(id);
 
-// ===================== HELPERS =====================
+function syncReservedToAmnezia() {
+  const raw = $('manualReserved').value.trim().replace(/[\[\]]/g, '');
+  const parts = raw.split(',').map(s => parseInt(s.trim(), 10) || 0);
+  $('s1').value = parts[0] || 0;
+  $('s2').value = parts[1] || 0;
+  $('s3').value = parts[2] || 0;
+}
+
 function parseEndpoint(endpoint) {
   if (!endpoint) return { host: '', port: 51820 };
   endpoint = endpoint.trim();
@@ -231,23 +232,19 @@ function parseEndpoint(endpoint) {
   return { host: endpoint, port: 51820 };
 }
 
-function isValidMtu(mtu) {
-  const m = parseInt(mtu, 10);
-  return Number.isInteger(m) && m >= 576 && m <= 9000;
-}
-
-function isValidRange(str) {
-  if (!str) return false;
-  const m = str.trim().match(/^(\d+)(?:-(\d+))?$/);
-  if (!m) return false;
-  const min = parseInt(m[1], 10), max = parseInt(m[2] || m[1], 10);
-  return min > 0 && max >= min;
+function parseReserved(val) {
+  if (!val) return [0, 0, 0];
+  if (Array.isArray(val)) return val.slice(0, 3).map(n => parseInt(n) || 0);
+  const clean = String(val).replace(/[\[\]]/g, '');
+  const parts = clean.split(',').map(s => parseInt(s.trim(), 10) || 0);
+  while (parts.length < 3) parts.push(0);
+  return parts.slice(0, 3);
 }
 
 function decodeBase64Safe(str) {
   try {
-    let clean = str.replace(/\s/g, '');
-    if (!/^[A-Za-z0-9+/=]+$/.test(clean) || clean.length < 20) return str;
+    let clean = str.replace(/\s/g, '').replace(/-/g, '+').replace(/_/g, '/');
+    if (clean.length < 8) return str;
     while (clean.length % 4 !== 0) clean += '=';
     const decoded = atob(clean);
     if (decoded.includes('://') || decoded.trim().startsWith('{') || decoded.trim().startsWith('[')) return decoded;
@@ -259,21 +256,6 @@ function escapeHtml(str) {
   return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-async function copyText(text) {
-  try { await navigator.clipboard.writeText(text); return true; } catch (e) { return false; }
-}
-
-function downloadFile(content, filename) {
-  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1500);
-}
-
-// ===================== UI HELPERS =====================
 function setMode(m) {
   currentMode = m;
   $('modePaste').classList.toggle('active', m === 'paste');
@@ -289,22 +271,30 @@ function switchTab(tab, el) {
   buildCombinedExport();
 }
 
-function applyFragmentPreset() {
-  const p = $('fragmentPreset').value;
-  if (p === 'light') { $('fragPackets').value = 'tlshello'; $('fragLength').value = '50-100'; $('fragDelay').value = '1'; }
-  if (p === 'normal') { $('fragPackets').value = 'tlshello'; $('fragLength').value = '100-200'; $('fragDelay').value = '1'; }
-  if (p === 'heavy') { $('fragPackets').value = 'tlshello'; $('fragLength').value = '10-50'; $('fragDelay').value = '1-2'; }
-  if (p === 'aggressive') { $('fragPackets').value = 'tlshello'; $('fragLength').value = '1-20'; $('fragDelay').value = '1-1'; }
-}
-
-function applyNoisePreset() {
-  const p = $('noisePreset').value;
-  if (p === 'light') $('noiseCount').value = 3;
-  if (p === 'normal') $('noiseCount').value = 5;
-  if (p === 'strong') $('noiseCount').value = 8;
+function applyAwgPreset() {
+  const p = $('awgPreset').value;
+  if (p === 'noisy') {
+    $('jc').value = 5; $('jmin').value = 50; $('jmax').value = 100;
+    $('s1').value = 0; $('s2').value = 0; $('s3').value = 0; $('s4').value = 0;
+    $('h1').value = 1; $('h2').value = 2; $('h3').value = 3; $('h4').value = 4;
+    $('i1').value = ''; $('i2').value = '';
+  } else if (p === 'quic') {
+    $('jc').value = 4; $('jmin').value = 48; $('jmax').value = 159;
+    $('s1').value = 0; $('s2').value = 0; $('s3').value = 0; $('s4').value = 0;
+    $('h1').value = 1; $('h2').value = 2; $('h3').value = 3; $('h4').value = 4;
+    $('i1').value = '<r 2><b 0x0100000100000000000003777777056170706c6503636f6d0000010001>';
+    $('i2').value = '<r 2><b 0x0100000100000000000003777777056170706c6503636f6d00001c0001>';
+  } else if (p === 'sip') {
+    $('jc').value = 7; $('jmin').value = 65; $('jmax').value = 191;
+    $('s1').value = 0; $('s2').value = 0; $('s3').value = 0; $('s4').value = 0;
+    $('h1').value = 1; $('h2').value = 2; $('h3').value = 3; $('h4').value = 4;
+    $('i1').value = '<b 0x4f5054494f4e53207369703a6672616e6b4062696c6f78692e636f6d205349502f322e300d0a5669613a205349502f322e302f55445020706336352e7369702e6578616d706c652e6f72673b6272616e63683d7a39684734624b30744d6553784e62445970755333770d0a4d61782d466f7277617264733a2036390d0a546f3a204672616e6b203c7369703a6672616e6b4062696c6f78692e636f6d3e0d0a46726f6d3a204865696469203c7369703a6865696469407369702e6578616d706c652e6f72673e3b7461673d36353437313737340d0a43616c6c2d49443a206664616262323134613530333535616440706336352e7369702e6578616d706c652e6f72670d0a435365713a20373632383733204f5054494f4e530d0a436f6e746163743a203c7369703a686569646940706336352e7369702e6578616d706c652e6f72673e0d0a436f6e74656e742d4c656e6774683a20300d0a0d0a>';
+    $('i2').value = '<b 0x5349502f322e3020323030204f4b0d0a5669613a205349502f322e302f55445020706336352e7369702e6578616d706c652e6f72673b6272616e63683d7a39684734624b30744d6553784e62445970755333770d0a546f3a204672616e6b203c7369703a6672616e6b4062696c6f78692e636f6d3e0d0a46726f6d3a204865696469203c7369703a6865696469407369702e6578616d706c652e6f72673e3b7461673d36353437313737340d0a43616c6c2d49443a206664616262323134613530333535616440706336352e7369702e6578616d706c652e6f72670d0a435365713a20373632383733204f5054494f4e530d0a436f6e746163743a203c7369703a686569646940706336352e7369702e6578616d706c652e6f72673e0d0a436f6e74656e742d4c656e6774683a20300d0a0d0a>';
+  }
 }
 
 function randomizeAmnezia() {
+  $('awgPreset').value = 'custom';
   const jmin = Math.floor(Math.random() * 40) + 20;
   const jmax = jmin + Math.floor(Math.random() * 60) + 20;
   $('jc').value = Math.floor(Math.random() * 8) + 3;
@@ -312,6 +302,8 @@ function randomizeAmnezia() {
   $('jmax').value = jmax;
   $('s1').value = Math.floor(Math.random() * 50) + 15;
   $('s2').value = Math.floor(Math.random() * 50) + 15;
+  $('s3').value = 0; $('s4').value = 0;
+  $('i1').value = ''; $('i2').value = '';
   const values = new Set();
   while (values.size < 4) values.add(Math.floor(Math.random() * 2147483647) + 1);
   const arr = [...values];
@@ -319,235 +311,164 @@ function randomizeAmnezia() {
 }
 
 // ===================== PARSERS =====================
-function parseUniversalLink(link, defaultName, index) {
-  link = link.trim();
-  if (!link) return null;
-  let name = `${defaultName}-${index + 1}`;
-  const hashIdx = link.indexOf('#');
-  if (hashIdx !== -1) name = decodeURIComponent(link.substring(hashIdx + 1)).trim() || name;
-  const clean = hashIdx !== -1 ? link.substring(0, hashIdx) : link;
-  const protocol = clean.split('://')[0].toLowerCase();
-  if (!['vless', 'trojan', 'vmess', 'ss', 'hysteria2', 'hy2', 'tuic'].includes(protocol)) return null;
-
-  if (protocol === 'vmess') {
-    try {
-      const json = JSON.parse(decodeBase64Safe(clean.substring(8)));
-      return {
-        protocol: 'vmess', name: json.ps || name, rawUri: link, uuid: json.id,
-        host: json.add, port: parseInt(json.port) || 443, type: json.net || 'tcp',
-        security: json.tls || 'none', sni: json.sni || json.host || json.add,
-        path: json.path || '/', hostHeader: json.host || json.add, fp: json.fp || 'chrome', limited: false
-      };
-    } catch (e) { return null; }
-  }
-
+function parseUri(uri) {
   try {
-    const main = clean.substring(protocol.length + 3);
-    const [authHost, qs] = main.split('?');
-    const lastAt = authHost.lastIndexOf('@');
-    const auth = lastAt !== -1 ? authHost.substring(0, lastAt) : '';
-    let hostPort = lastAt !== -1 ? authHost.substring(lastAt + 1) : authHost;
-    let host = hostPort, port = 443;
-    if (hostPort.includes(':')) {
-      const lastColon = hostPort.lastIndexOf(':');
-      const possiblePort = hostPort.substring(lastColon + 1);
-      if (/^\d+$/.test(possiblePort)) {
-        port = parseInt(possiblePort, 10);
-        host = hostPort.substring(0, lastColon);
-      }
+    const u = new URL(uri);
+    const protocol = u.protocol.replace(':', '').toLowerCase();
+    if (!['vless', 'vmess', 'trojan'].includes(protocol)) return null;
+
+    const params = new URLSearchParams(u.search);
+    const hashName = decodeURIComponent(u.hash.replace(/^#/, '')).trim();
+
+    if (protocol === 'vmess') {
+      try {
+        const b64 = uri.replace('vmess://', '');
+        const json = JSON.parse(decodeBase64Safe(b64));
+        return {
+          protocol: 'vmess',
+          name: json.ps || 'VMess Proxy',
+          uuid: json.id, host: json.add, port: parseInt(json.port) || 443,
+          net: json.net || 'tcp', path: json.path || '/', type: json.type || 'none',
+          tls: json.tls || '', sni: json.sni || json.host || '', alpn: json.alpn || '',
+          security: json.scy || 'auto', rawUri: uri
+        };
+      } catch (e) {}
     }
-    const params = new URLSearchParams(qs || '');
-    const isLimited = ['ss', 'hysteria2', 'hy2', 'tuic'].includes(protocol);
+
     return {
-      protocol: protocol === 'hy2' ? 'hysteria2' : protocol,
-      name, rawUri: link, uuid: auth, host, port,
-      type: params.get('type') || params.get('net') || 'tcp',
-      security: params.get('security') || (protocol === 'trojan' ? 'tls' : 'none'),
-      sni: params.get('sni') || params.get('peer') || host,
-      path: params.get('path') || '/', hostHeader: params.get('host') || host,
-      alpn: params.get('alpn') ? params.get('alpn').split(',') : undefined,
-      fp: params.get('fp') || 'chrome', pbk: params.get('pbk') || '', sid: params.get('sid') || '',
-      flow: params.get('flow') || '', limited: isLimited
+      protocol,
+      name: hashName || `${protocol.toUpperCase()}-Proxy`,
+      uuid: decodeURIComponent(u.username),
+      password: decodeURIComponent(u.username),
+      host: u.hostname,
+      port: parseInt(u.port, 10) || (params.get('security') === 'tls' ? 443 : 80),
+      type: params.get('type') || 'tcp',
+      security: params.get('security') || 'none',
+      pbk: params.get('pbk') || '',
+      sid: params.get('sid') || '',
+      fp: params.get('fp') || 'chrome',
+      sni: params.get('sni') || '',
+      flow: params.get('flow') || '',
+      path: params.get('path') || '/',
+      hostHeader: params.get('host') || '',
+      rawUri: uri
     };
-  } catch (e) { return null; }
+  } catch (e) {
+    return null;
+  }
 }
 
 function parseWireGuard(text) {
-  const r = { privateKey: '', addresses: [], publicKey: '', endpoint: '', presharedKey: '', keepalive: 25, allowedIPs: [] };
+  const r = {
+    privateKey: '', addresses: [], publicKey: '', endpoint: '', presharedKey: '', keepalive: 25, allowedIPs: [],
+    reserved: [0, 0, 0], awgParams: null
+  };
   let section = '';
+  const awgExt = {};
   for (const raw of text.split(/\r?\n/)) {
     let line = raw.trim();
     if (!line || line.startsWith('#') || line.startsWith(';')) continue;
     if (line.startsWith('[') && line.endsWith(']')) { section = line.toLowerCase(); continue; }
     const eq = line.indexOf('=');
     if (eq === -1) continue;
-    const k = line.slice(0, eq).trim().toLowerCase();
+    const k = line.slice(0, eq).trim();
+    const kl = k.toLowerCase();
     const v = line.slice(eq + 1).trim();
+
     if (section.includes('interface')) {
-      if (k === 'privatekey') r.privateKey = v;
-      else if (k === 'address') r.addresses = v.split(',').map(s => s.trim());
+      if (kl === 'privatekey') r.privateKey = v;
+      else if (kl === 'address') r.addresses = v.split(',').map(s => s.trim());
+      else if (kl === 'reserved') r.reserved = parseReserved(v);
+      else if (['jc', 'jmin', 'jmax', 's1', 's2', 's3', 's4', 'h1', 'h2', 'h3', 'h4', 'i1', 'i2'].includes(kl)) {
+        awgExt[kl] = ['i1', 'i2'].includes(kl) ? v : parseInt(v, 10);
+      }
     }
     if (section.includes('peer')) {
-      if (k === 'publickey') r.publicKey = v;
-      else if (k === 'endpoint') r.endpoint = v;
-      else if (k === 'presharedkey') r.presharedKey = v;
-      else if (k === 'persistentkeepalive') r.keepalive = parseInt(v) || 25;
-      else if (k === 'allowedips') r.allowedIPs = v.split(',').map(s => s.trim());
+      if (kl === 'publickey') r.publicKey = v;
+      else if (kl === 'endpoint') r.endpoint = v;
+      else if (kl === 'presharedkey') r.presharedKey = v;
+      else if (kl === 'persistentkeepalive') r.keepalive = parseInt(v) || 25;
+      else if (kl === 'allowedips') r.allowedIPs = v.split(',').map(s => s.trim());
     }
   }
+  if (Object.keys(awgExt).length > 0) r.awgParams = awgExt;
   return r;
 }
 
-function parseFullXrayJSON(text) {
+async function fetchSubscription() {
+  const url = $('inputData').value.trim();
+  const log = $('fetchLog');
+  log.innerText = '';
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    log.innerText = '❌ Please enter a valid http/https subscription URL.';
+    return;
+  }
+  log.innerText = '⏳ Fetching subscription...';
   try {
-    const conf = JSON.parse(text);
-    if (!conf.outbounds || !Array.isArray(conf.outbounds)) return null;
-    const results = [];
-    conf.outbounds.forEach((ob, idx) => {
-      if (!ob.protocol || ['freedom', 'blackhole', 'dns', 'block', 'direct'].includes(ob.protocol)) return;
-      const item = { protocol: ob.protocol, name: conf.remarks || ob.tag || `proxy-${idx + 1}`, isFromJson: true, limited: false };
-      if (ob.protocol === 'vless' || ob.protocol === 'vmess') {
-        const v = ob.settings?.vnext?.[0] || ob.settings;
-        item.host = v?.address; item.port = v?.port || 443;
-        item.uuid = v?.users?.[0]?.id || v?.id || ''; item.flow = v?.users?.[0]?.flow || '';
-      } else if (ob.protocol === 'trojan') {
-        const s = ob.settings?.servers?.[0] || ob.settings;
-        item.host = s?.address; item.port = s?.port || 443; item.uuid = s?.password || '';
-      } else if (ob.protocol === 'wireguard') {
-        item.privateKey = ob.settings?.secretKey;
-        item.addresses = ob.settings?.address || [];
-        const peer = ob.settings?.peers?.[0] || {};
-        item.publicKey = peer.publicKey; item.endpoint = peer.endpoint;
-        item.presharedKey = peer.preSharedKey || ''; item.keepalive = peer.keepAlive || 25;
-        item.allowedIPs = peer.allowedIPs || ['0.0.0.0/0', '::/0'];
-      } else item.limited = true;
-
-      const ss = ob.streamSettings || {};
-      item.type = ss.network || 'tcp'; item.security = ss.security || 'none';
-      if (ss.tlsSettings) {
-        item.sni = ss.tlsSettings.serverName || item.host;
-        item.fp = ss.tlsSettings.fingerprint || 'chrome'; item.alpn = ss.tlsSettings.alpn;
-      }
-      if (ss.realitySettings) {
-        item.sni = ss.realitySettings.serverName; item.fp = ss.realitySettings.fingerprint || 'chrome';
-        item.pbk = ss.realitySettings.publicKey; item.sid = ss.realitySettings.shortId || '';
-        item.security = 'reality';
-      }
-      if (ss.wsSettings) {
-        item.path = ss.wsSettings.path || '/';
-        item.hostHeader = ss.wsSettings.host || ss.wsSettings.headers?.Host || item.host;
-      }
-      results.push(item);
-    });
-    return results.length ? results : null;
-  } catch (e) { return null; }
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    $('inputData').value = decodeBase64Safe(text);
+    log.innerText = '✅ Subscription loaded successfully! Click Parse / Refresh.';
+  } catch (e) {
+    log.innerText = `❌ Error fetching: ${e.message}. (CORS restrictions may apply).`;
+  }
 }
 
-// ===================== BUILDERS =====================
-function noiseBlock(count) {
-  const n = Math.max(1, Math.min(12, count || 5));
-  return Array.from({ length: n }, () => ({ rand: '50-100', randRange: '0-255', delay: '1-5' }));
-}
-
-function buildXrayOutbound(p, s) {
-  const tag = p.name || 'proxy';
-  if (p.protocol === 'wireguard') {
-    const out = {
-      protocol: 'wireguard', tag,
-      settings: {
-        secretKey: p.privateKey, address: p.addresses, mtu: s.mtu,
-        peers: [{
-          endpoint: p.endpoint, publicKey: p.publicKey,
-          keepAlive: p.keepalive || 25,
-          allowedIPs: p.allowedIPs?.length ? p.allowedIPs : ['0.0.0.0/0', '::/0']
-        }]
-      }
-    };
-    if (p.presharedKey) out.settings.peers[0].preSharedKey = p.presharedKey;
-    if (s.awg) {
-      out.settings.amnezia = {
-        Jc: s.awg.jc, Jmin: s.awg.jmin, Jmax: s.awg.jmax,
-        S1: s.awg.s1, S2: s.awg.s2, H1: s.awg.h1, H2: s.awg.h2, H3: s.awg.h3, H4: s.awg.h4
-      };
-    }
-    if (s.noise) {
-      out.streamSettings = { finalmask: { udp: [{ type: 'noise', settings: { reset: '30-60', noise: noiseBlock(s.noiseCount) } }] } };
-    }
-    return out;
-  }
-
-  if (p.limited) return { protocol: p.protocol, tag, settings: {}, streamSettings: { network: 'tcp' } };
-
-  const streamSettings = { network: p.type || 'tcp', security: p.security || 'none' };
-  if (p.security === 'tls') {
-    streamSettings.tlsSettings = { serverName: p.sni || p.host, fingerprint: p.fp || 'chrome' };
-    if (p.alpn) streamSettings.tlsSettings.alpn = p.alpn;
-  } else if (p.security === 'reality') {
-    streamSettings.realitySettings = { serverName: p.sni, fingerprint: p.fp || 'chrome', publicKey: p.pbk, shortId: p.sid || '' };
-  }
-  if (p.type === 'ws') {
-    streamSettings.wsSettings = { path: p.path || '/', headers: { Host: p.hostHeader || p.host } };
-  }
-  if (s.fragment) {
-    streamSettings.finalmask = { tcp: [{ type: 'fragment', settings: { packets: s.fragPackets || 'tlshello', length: s.fragLength || '100-200', delay: s.fragDelay || '1' } }] };
-  }
-  if (s.noise) {
-    if (!streamSettings.finalmask) streamSettings.finalmask = {};
-    streamSettings.finalmask.udp = [{ type: 'noise', settings: { reset: '30-60', noise: noiseBlock(s.noiseCount) } }];
-  }
-
-  const out = { protocol: p.protocol, tag, settings: {}, streamSettings };
-  if (p.protocol === 'vless') {
-    out.settings.vnext = [{ address: p.host, port: p.port, users: [{ id: p.uuid, encryption: 'none', ...(p.flow ? { flow: p.flow } : {}) }] }];
-  } else if (p.protocol === 'trojan') {
-    out.settings.servers = [{ address: p.host, port: p.port, password: p.uuid }];
-  } else if (p.protocol === 'vmess') {
-    out.settings.vnext = [{ address: p.host, port: p.port, users: [{ id: p.uuid, alterId: 0, security: 'auto' }] }];
-  }
-  return out;
-}
-
-function buildXrayConfig(entries) {
-  const outbounds = entries.map(({ p, s }) => buildXrayOutbound(p, s));
-  outbounds.push({ protocol: 'freedom', tag: 'direct' });
-  outbounds.push({ protocol: 'blackhole', tag: 'block' });
-  const anyIr = entries.some(({ s }) => s.irBypass);
-  const mainTag = outbounds[0].tag;
-  const dns = entries[0]?.s.dns || '1.1.1.1';
-
+function defaultSettings() {
   return {
-    remarks: $('name').value.trim() || mainTag,
-    log: { loglevel: 'warning' },
-    dns: {
-      servers: [
-        { address: dns, tag: 'remote-dns' },
-        { address: '1.1.1.1', domains: ['geosite:category-ir', 'regexp:.*\\.ir$'], expectIPs: ['geoip:ir'], skipFallback: true }
-      ],
-      queryStrategy: 'UseIP'
-    },
-    inbounds: [{
-      listen: '0.0.0.0', port: 10808, protocol: 'mixed',
-      settings: { auth: 'noauth', udp: true },
-      sniffing: { destOverride: ['http', 'tls'], enabled: true, routeOnly: true },
-      tag: 'mixed-in'
-    }],
-    outbounds,
-    routing: {
-      domainStrategy: 'IPIfNonMatch',
-      rules: [
-        ...(anyIr ? [
-          { type: 'field', ip: ['geoip:private', 'geoip:ir'], outboundTag: 'direct' },
-          { type: 'field', domain: ['regexp:.*\\.ir$', 'geosite:category-ir'], outboundTag: 'direct' }
-        ] : [{ type: 'field', ip: ['geoip:private'], outboundTag: 'direct' }]),
-        { type: 'field', network: 'tcp,udp', outboundTag: mainTag }
-      ]
+    dns: $('dns').value.trim() || '1.1.1.1',
+    mtu: parseInt($('mtu').value) || 1280,
+    keepalive: parseInt($('globalKeepalive').value) || 25,
+    irBypass: $('irBypass').checked,
+    useNoise: $('useNoise').checked,
+    useFragment: $('useFragment').checked,
+    awg: {
+      jc: +$('jc').value, jmin: +$('jmin').value, jmax: +$('jmax').value,
+      s1: +$('s1').value, s2: +$('s2').value, s3: +$('s3').value, s4: +$('s4').value,
+      h1: +$('h1').value, h2: +$('h2').value, h3: +$('h3').value, h4: +$('h4').value,
+      i1: $('i1').value.trim(), i2:$('i2').value.trim()
     }
   };
 }
 
+// ===================== EXPORTERS =====================
+function buildAmneziaWG(p, s) {
+  const awg = s.awg || { jc: 5, jmin: 50, jmax: 100, s1: 0, s2: 0, s3: 0, s4: 0, h1: 1, h2: 2, h3: 3, h4: 4, i1: '', i2: '' };
+  let res = `[Interface]
+PrivateKey = ${p.privateKey}
+Address = ${p.addresses.join(', ')}
+DNS = ${s.dns}
+MTU = ${s.mtu}
+Jc = ${awg.jc}
+Jmin = ${awg.jmin}
+Jmax = ${awg.jmax}
+S1 = ${awg.s1}
+S2 = ${awg.s2}
+S3 = ${awg.s3 || 0}
+S4 = ${awg.s4 || 0}
+H1 = ${awg.h1}
+H2 = ${awg.h2}
+H3 = ${awg.h3}
+H4 = ${awg.h4}
+`;
+  if (awg.i1) res += `I1 = ${awg.i1}\n`;
+  if (awg.i2) res += `I2 = ${awg.i2}\n`;
+
+  res += `
+[Peer]
+PublicKey = ${p.publicKey}
+AllowedIPs = ${p.allowedIPs?.length ? p.allowedIPs.join(', ') : '0.0.0.0/0, ::/0'}
+Endpoint = ${p.endpoint}
+PersistentKeepalive = ${p.keepalive || s.keepalive || 25}${p.presharedKey ? `\nPresharedKey = ${p.presharedKey}` : ''}`;
+  return res;
+}
+
 function buildClashConfig(entries) {
-  const anyIr = entries.some(({ s }) => s.irBypass);
-  const firstName = entries[0]?.p?.name || 'PROXY';
+  const firstName = entries[0]?.p?.name || 'Config-1';
+  const dnsHost = entries[0]?.s?.dns || '1.1.1.1';
+  const mtuVal = entries[0]?.s?.mtu || 1280;
+  const irBypass = entries[0]?.s?.irBypass ?? true;
 
   let yaml = `mixed-port: 7890
 ipv6: true
@@ -564,7 +485,7 @@ dns:
   enhanced-mode: redir-host
   nameserver:
     - 10.2.0.1#${firstName}
-    - 1.1.1.1#${firstName}
+    - ${dnsHost}#${firstName}
   proxy-server-nameserver:
     - 8.8.8.8#DIRECT
   direct-nameserver:
@@ -579,7 +500,7 @@ tun:
   dns-hijack:
     - any:53
     - tcp://any:53
-  mtu: 9000
+  mtu: ${mtuVal}
 
 proxies:
 `;
@@ -588,7 +509,8 @@ proxies:
     const name = String(p.name).replace(/"/g, '\\"');
     if (p.protocol === 'wireguard') {
       const ep = parseEndpoint(p.endpoint);
-      const ip = (p.addresses?.[0] || '10.2.0.2/32');
+      const ip = (p.addresses?.[0] || '172.16.0.2/32');
+
       yaml += `  - name: "${name}"
     type: wireguard
     server: ${ep.host}
@@ -599,402 +521,299 @@ proxies:
     ip-version: ipv4
     mtu: ${s.mtu}
     udp: true
-    persistent-keepalive: ${p.keepalive || 25}
+    persistent-keepalive: ${p.keepalive || s.keepalive || 25}
     allowed-ips:
       - 0.0.0.0/0
       - ::/0
 `;
-      if (p.presharedKey) yaml += `    pre-shared-key: ${p.presharedKey}\n`;
-      if (s.awg) {
-        yaml += `    amnezia-wg-option:
-      jc: ${s.awg.jc}
-      jmin: ${s.awg.jmin}
-      jmax: ${s.awg.jmax}
-      s1: ${s.awg.s1}
-      s2: ${s.awg.s2}
-      h1: ${s.awg.h1}
-      h2: ${s.awg.h2}
-      h3: ${s.awg.h3}
-      h4: ${s.awg.h4}
-`;
-      }
     } else {
-      // non-wireguard (simplified)
       yaml += `  - name: "${name}"
     type: ${p.protocol}
     server: ${p.host}
     port: ${p.port}
-    uuid: ${p.uuid || ''}
-    tls: ${p.security === 'tls' || p.security === 'reality'}
-    servername: ${p.sni || p.host}
-    network: ${p.type || 'tcp'}
+    uuid: ${p.uuid || p.password}
     udp: true
 `;
-      if (p.type === 'ws') {
-        yaml += `    ws-opts:
-      path: ${p.path || '/'}
-      headers:
-        Host: ${p.hostHeader || p.host}
-`;
-      }
+      if (p.security === 'tls' || p.security === 'reality') yaml += `    tls: true\n    servername: ${p.sni || p.host}\n`;
     }
   });
 
-  yaml += `
-proxy-groups:
-  - name: "✅ Selector"
-    type: select
-    proxies:
-`;
-  entries.forEach(({ p }) => {
-    yaml += `      - "${String(p.name).replace(/"/g, '\\"')}"
-`;
-  });
-  yaml += `      - DIRECT
-`;
-
-  yaml += `
-rules:
-  - GEOIP,lan,DIRECT,no-resolve
-  - GEOIP,private,DIRECT,no-resolve
-`;
-  if (anyIr) yaml += `  - GEOIP,IR,DIRECT,no-resolve\n`;
-  yaml += `  - MATCH,✅ Selector
-`;
+  yaml += `\nproxy-groups:\n  - name: "✅ Selector"\n    type: select\n    proxies:\n`;
+  entries.forEach(({ p }) => { yaml += `      - "${String(p.name).replace(/"/g, '\\"')}"\n`; });
+  yaml += `      - DIRECT\n\nrules:\n`;
+  yaml += `  - GEOIP,lan,DIRECT,no-resolve\n`;
+  yaml += `  - GEOIP,private,DIRECT,no-resolve\n`;
+  if (irBypass) {
+    yaml += `  - GEOIP,IR,DIRECT,no-resolve\n`;
+  }
+  yaml += `  - MATCH,✅ Selector\n`;
   return yaml;
 }
 
 function buildSingBoxConfig(entries) {
+  const dnsHost = entries[0]?.s?.dns || '1.1.1.1';
+  const irBypass = entries[0]?.s?.irBypass ?? true;
+
   const outbounds = entries.map(({ p, s }) => {
     if (p.protocol === 'wireguard') {
       const ep = parseEndpoint(p.endpoint);
-      const out = {
-        type: 'wireguard', tag: p.name,
-        server: ep.host, server_port: ep.port,
-        local_address: p.addresses, private_key: p.privateKey,
-        peer_public_key: p.publicKey, mtu: s.mtu
+      return {
+        type: 'wireguard',
+        tag: p.name,
+        server: ep.host,
+        server_port: ep.port,
+        local_address: p.addresses,
+        private_key: p.privateKey,
+        peer_public_key: p.publicKey,
+        mtu: s.mtu
       };
-      if (p.presharedKey) out.pre_shared_key = p.presharedKey;
-      return out;
     }
-    const out = { type: p.protocol, tag: p.name, server: p.host, server_port: p.port };
-    if (p.protocol === 'vless') out.uuid = p.uuid;
-    if (p.protocol === 'trojan') out.password = p.uuid;
-    if (p.security === 'tls' || p.security === 'reality') {
-      out.tls = { enabled: true, server_name: p.sni || p.host, utls: { enabled: true, fingerprint: p.fp || 'chrome' } };
-    }
-    if (p.type === 'ws') {
-      out.transport = { type: 'ws', path: p.path || '/', headers: { Host: p.hostHeader || p.host } };
-    }
-    return out;
+    return {
+      type: p.protocol,
+      tag: p.name,
+      server: p.host,
+      server_port: p.port,
+      uuid: p.uuid || p.password
+    };
   });
+
   outbounds.push({ type: 'direct', tag: 'direct' });
-  const anyIr = entries.some(({ s }) => s.irBypass);
+
+  const routeRules = [];
+  if (irBypass) {
+    routeRules.push({
+      geoip: ['private', 'ir'],
+      outbound: 'direct'
+    });
+    routeRules.push({
+      geosite: ['category-ir'],
+      outbound: 'direct'
+    });
+  } else {
+    routeRules.push({
+      geoip: ['private'],
+      outbound: 'direct'
+    });
+  }
+
   return {
     log: { level: 'info' },
-    dns: { servers: [{ tag: 'dns-remote', address: entries[0]?.s.dns || '1.1.1.1' }] },
-    inbounds: [{ type: 'mixed', tag: 'mixed-in', listen: '127.0.0.1', listen_port: 10808 }],
+    dns: {
+      servers: [
+        { tag: 'dns-remote', address: dnsHost }
+      ]
+    },
+    inbounds: [
+      {
+        type: 'mixed',
+        tag: 'mixed-in',
+        listen: '127.0.0.1',
+        listen_port: 10808
+      }
+    ],
     outbounds,
-    route: {
-      rules: anyIr
-        ? [{ geoip: ['private', 'ir'], outbound: 'direct' }, { geosite: ['category-ir'], outbound: 'direct' }]
-        : [{ geoip: ['private'], outbound: 'direct' }]
-    }
+    route: { rules: routeRules }
   };
 }
 
-function buildAmneziaWG(p, s) {
-  const awg = s.awg || { jc: 5, jmin: 50, jmax: 100, s1: 0, s2: 0, h1: 1, h2: 2, h3: 3, h4: 4 };
-  return `[Interface]
-PrivateKey = ${p.privateKey}
-Address = ${p.addresses.join(', ')}
-DNS = ${s.dns}
-MTU = ${s.mtu}
-Jc = ${awg.jc}
-Jmin = ${awg.jmin}
-Jmax = ${awg.jmax}
-S1 = ${awg.s1}
-S2 = ${awg.s2}
-H1 = ${awg.h1}
-H2 = ${awg.h2}
-H3 = ${awg.h3}
-H4 = ${awg.h4}
+function buildXrayJsonConfig(entries) {
+  const firstEntry = entries[0];
+  const remarks = firstEntry?.p?.name || 'Config-1';
+  const dnsHost = firstEntry?.s?.dns || '1.1.1.1';
+  const irBypass = firstEntry?.s?.irBypass ?? true;
 
-[Peer]
-PublicKey = ${p.publicKey}
-AllowedIPs = ${p.allowedIPs?.length ? p.allowedIPs.join(', ') : '0.0.0.0/0, ::/0'}
-Endpoint = ${p.endpoint}
-PersistentKeepalive = ${p.keepalive || 25}${p.presharedKey ? `\nPresharedKey = ${p.presharedKey}` : ''}`;
-}
+  const dnsServers = [
+    { address: dnsHost, tag: 'remote-dns' }
+  ];
 
-// ===================== UI LOGIC =====================
-function defaultSettings() {
+  if (irBypass) {
+    dnsServers.push({
+      address: dnsHost,
+      domains: ["geosite:category-ir", "regexp:.*\\.ir$"],
+      expectIPs: ["geoip:ir"],
+      skipFallback: true
+    });
+  }
+
+  const outbounds = entries.map(({ p, s }) => {
+    if (p.protocol === 'wireguard') {
+      const ep = parseEndpoint(p.endpoint);
+      const wgOutbound = {
+        protocol: 'wireguard',
+        tag: p.name,
+        settings: {
+          secretKey: p.privateKey,
+          address: p.addresses,
+          mtu: s.mtu,
+          peers: [
+            {
+              endpoint: `${ep.host}:${ep.port}`,
+              publicKey: p.publicKey,
+              keepAlive: p.keepalive || s.keepalive || 25,
+              allowedIPs: p.allowedIPs?.length ? p.allowedIPs : ['0.0.0.0/0', '::/0']
+            }
+          ]
+        }
+      };
+
+      if (s.useNoise || s.useFragment) {
+        wgOutbound.streamSettings = {};
+        if (s.useNoise) {
+          const jcCount = s.awg?.jc || 5;
+          const jmin = s.awg?.jmin || 50;
+          const jmax = s.awg?.jmax || 100;
+          const noiseList = [];
+          
+          for (let i = 0; i < jcCount; i++) {
+            noiseList.push({
+              rand: `${jmin}-${jmax}`,
+              randRange: "0-255",
+              delay: "1-5"
+            });
+          }
+
+          wgOutbound.streamSettings.finalmask = {
+            udp: [
+              {
+                type: 'noise',
+                settings: {
+                  reset: '30-60',
+                  noise: noiseList
+                }
+              }
+            ]
+          };
+        }
+
+        if (s.useFragment) {
+          wgOutbound.streamSettings.sockopt = {
+            dialerProxy: 'fragment',
+            tcpKeepAliveInterval: 15
+          };
+        }
+      }
+
+      return wgOutbound;
+    }
+
+    return {
+      protocol: p.protocol,
+      tag: p.name,
+      settings: {
+        vnext: [{
+          address: p.host,
+          port: p.port,
+          users: [{ id: p.uuid || p.password, encryption: 'none' }]
+        }]
+      }
+    };
+  });
+
+  outbounds.push({ protocol: 'freedom', tag: 'direct' });
+  outbounds.push({ protocol: 'blackhole', tag: 'block' });
+
+  const routingRules = [];
+  if (irBypass) {
+    routingRules.push({
+      type: 'field',
+      ip: ['geoip:private', 'geoip:ir'],
+      outboundTag: 'direct'
+    });
+    routingRules.push({
+      type: 'field',
+      domain: ['regexp:.*\\.ir$', 'geosite:category-ir'],
+      outboundTag: 'direct'
+    });
+  } else {
+    routingRules.push({
+      type: 'field',
+      ip: ['geoip:private'],
+      outboundTag: 'direct'
+    });
+  }
+
+  routingRules.push({
+    type: 'field',
+    network: 'tcp,udp',
+    outboundTag: remarks
+  });
+
   return {
-    irBypass: $('irBypass').checked,
-    noise: $('useNoise').checked,
-    noiseCount: parseInt($('noiseCount').value) || 5,
-    fragment: $('useFragment').checked,
-    fragPackets: $('fragPackets').value || 'tlshello',
-    fragLength: $('fragLength').value.trim() || '100-200',
-    fragDelay: $('fragDelay').value.trim() || '1',
-    dns: $('dns').value.trim() || '1.1.1.1',
-    mtu: parseInt($('mtu').value) || 1280,
-    awg: null
-  };
-}
-
-function renderList() {
-  const container = $('configList');
-  container.innerHTML = '';
-  $('configCountText').innerText = `Parsed ${parsedProxiesGlobal.length} Config(s)`;
-
-  parsedProxiesGlobal.forEach((item, i) => {
-    const div = document.createElement('div');
-    div.className = 'config-item';
-    let badge = 'badge-vless';
-    if (item.protocol === 'trojan') badge = 'badge-trojan';
-    if (item.protocol === 'vmess') badge = 'badge-vmess';
-    if (item.protocol === 'wireguard') badge = 'badge-wireguard';
-    if (item.isFromJson) badge = 'badge-json';
-    if (item.limited) badge = 'badge-limited';
-
-    const badges = [];
-    if (item.settings.irBypass) badges.push('<span class="badge badge-applied">IR</span>');
-    if (item.settings.fragment) badges.push('<span class="badge badge-applied">FRAG</span>');
-    if (item.settings.noise) badges.push('<span class="badge badge-applied">NOISE</span>');
-    if (item.settings.awg) badges.push('<span class="badge badge-applied">AWG</span>');
-    if (item.limited) badges.push('<span class="badge badge-limited">LIMITED</span>');
-
-    div.innerHTML = `
-      <div class="config-summary" onclick="toggleDetails(${i})">
-        <div class="config-info">
-          <span class="badge ${badge}">${item.protocol}</span>
-          <span class="config-title">${escapeHtml(item.name)}</span>
-          ${badges.join('')}
-        </div>
-        <button class="secondary" style="padding:3px 8px;font-size:11px;" onclick="event.stopPropagation();copySingleLink(${i})">Copy</button>
-      </div>
-      <div class="config-details" id="details-${i}">
-        <div class="item-toolbar">
-          <button class="${item.settings.irBypass ? 'warn-btn' : ''}" onclick="toggleIrBypass(${i})">${item.settings.irBypass ? 'Remove IR' : 'Apply IR'}</button>
-          ${item.protocol !== 'wireguard' && !item.limited ? `
-            <button class="${item.settings.fragment ? 'warn-btn' : ''}" onclick="toggleFragment(${i})">${item.settings.fragment ? 'Remove Frag' : 'Apply Fragment'}</button>
-            <button class="${item.settings.noise ? 'warn-btn' : ''}" onclick="toggleNoise(${i})">${item.settings.noise ? 'Remove Noise' : 'Apply Noise'}</button>
-          ` : ''}
-          ${item.protocol === 'wireguard' ? `<button onclick="applyAwg(${i})">Apply Amnezia</button>` : ''}
-          <select id="fmt-${i}" onchange="generateIndividual(${i})">
-            <option value="xray">Xray JSON</option>
-            <option value="clash">Clash YAML</option>
-            <option value="singbox">Sing-Box</option>
-            ${item.protocol === 'wireguard' ? '<option value="amnezia">AmneziaWG</option>' : ''}
-          </select>
-          <button class="secondary" onclick="generateIndividual(${i})">Generate</button>
-          <button class="success-btn" onclick="copyIndividualOutput(${i})">Copy</button>
-          <button class="secondary" onclick="downloadIndividual(${i})">Download</button>
-        </div>
-        <div class="item-status" id="itemstatus-${i}"></div>
-        <textarea class="item-output" id="itemoutput-${i}" readonly></textarea>
-      </div>
-    `;
-    container.appendChild(div);
-  });
-}
-
-function itemMsg(i, cls, msg) {
-  const el = $(`itemstatus-${i}`);
-  if (el) { el.className = `item-status ${cls}`; el.innerText = msg; }
-}
-
-function toggleIrBypass(i) {
-  const item = parsedProxiesGlobal[i];
-  item.settings.irBypass = !item.settings.irBypass;
-  itemMsg(i, item.settings.irBypass ? 'success' : 'warn', item.settings.irBypass ? 'IR Bypass ON' : 'IR Bypass OFF');
-  renderList();
-  $(`details-${i}`)?.classList.add('open');
-  generateIndividual(i);
-  buildCombinedExport();
-}
-
-function toggleFragment(i) {
-  const item = parsedProxiesGlobal[i];
-  const length = $('fragLength').value.trim();
-  const delay = $('fragDelay').value.trim();
-  if (!isValidRange(length) || !isValidRange(delay)) {
-    itemMsg(i, 'error', 'Invalid fragment length/delay');
-    return;
-  }
-  item.settings.fragPackets = $('fragPackets').value;
-  item.settings.fragLength = length;
-  item.settings.fragDelay = delay;
-  item.settings.fragment = !item.settings.fragment;
-  itemMsg(i, item.settings.fragment ? 'success' : 'warn', item.settings.fragment ? 'Fragment ON' : 'Fragment OFF');
-  renderList();
-  $(`details-${i}`)?.classList.add('open');
-  generateIndividual(i);
-  buildCombinedExport();
-}
-
-function toggleNoise(i) {
-  const item = parsedProxiesGlobal[i];
-  item.settings.noiseCount = parseInt($('noiseCount').value) || 5;
-  item.settings.noise = !item.settings.noise;
-  itemMsg(i, item.settings.noise ? 'success' : 'warn', item.settings.noise ? 'Noise ON' : 'Noise OFF');
-  renderList();
-  $(`details-${i}`)?.classList.add('open');
-  generateIndividual(i);
-  buildCombinedExport();
-}
-
-function applyAwg(i) {
-  const item = parsedProxiesGlobal[i];
-  item.settings.awg = {
-    jc: +$('jc').value, jmin: +$('jmin').value, jmax: +$('jmax').value,
-    s1: +$('s1').value, s2: +$('s2').value,
-    h1: +$('h1').value, h2: +$('h2').value, h3: +$('h3').value, h4: +$('h4').value
-  };
-  itemMsg(i, 'success', 'Amnezia applied');
-  renderList();
-  $(`details-${i}`)?.classList.add('open');
-  generateIndividual(i);
-  buildCombinedExport();
-}
-
-function generateIndividual(i) {
-  const item = parsedProxiesGlobal[i];
-  const fmt = $(`fmt-${i}`)?.value || 'xray';
-  const out = $(`itemoutput-${i}`);
-  if (!out) return;
-  const entry = { p: item, s: item.settings };
-  let text = '';
-  if (fmt === 'xray') text = JSON.stringify(buildXrayConfig([entry]), null, 2);
-  else if (fmt === 'clash') text = buildClashConfig([entry]);
-  else if (fmt === 'singbox') text = JSON.stringify(buildSingBoxConfig([entry]), null, 2);
-  else if (fmt === 'amnezia') text = item.protocol === 'wireguard' ? buildAmneziaWG(item, item.settings) : '# Only for WireGuard';
-  out.value = text;
-}
-
-function toggleDetails(i) {
-  const el = $(`details-${i}`);
-  if (el) {
-    el.classList.toggle('open');
-    if (el.classList.contains('open') && !$(`itemoutput-${i}`).value) generateIndividual(i);
-  }
-}
-
-function toggleExpandAll() {
-  allExpanded = !allExpanded;
-  parsedProxiesGlobal.forEach((_, i) => {
-    const el = $(`details-${i}`);
-    if (el) {
-      if (allExpanded) {
-        el.classList.add('open');
-        if (!$(`itemoutput-${i}`).value) generateIndividual(i);
-      } else el.classList.remove('open');
+    remarks,
+    log: { loglevel: 'warning' },
+    dns: {
+      servers: dnsServers,
+      queryStrategy: 'UseIP'
+    },
+    inbounds: [
+      {
+        listen: '0.0.0.0',
+        port: 10808,
+        protocol: 'mixed',
+        settings: { auth: 'noauth', udp: true },
+        sniffing: {
+          destOverride: ['http', 'tls'],
+          enabled: true,
+          routeOnly: true
+        },
+        tag: 'mixed-in'
+      }
+    ],
+    outbounds,
+    routing: {
+      domainStrategy: 'IPIfNonMatch',
+      rules: routingRules
     }
-  });
+  };
 }
 
-async function copySingleLink(i) {
-  const item = parsedProxiesGlobal[i];
-  const text = item.rawUri || `${item.protocol}://${item.host}:${item.port}`;
-  if (await copyText(text)) showStatus(true, [], [`Copied ${item.name}`]);
-  else showStatus(false, ['Clipboard failed'], []);
-}
-
-async function copyIndividualOutput(i) {
-  if (!$(`itemoutput-${i}`).value) generateIndividual(i);
-  if (await copyText($(`itemoutput-${i}`).value)) itemMsg(i, 'success', 'Copied!');
-  else itemMsg(i, 'error', 'Clipboard failed');
-}
-
-function downloadIndividual(i) {
-  if (!$(`itemoutput-${i}`).value) generateIndividual(i);
-  const item = parsedProxiesGlobal[i];
-  const fmt = $(`fmt-${i}`)?.value || 'xray';
-  const extMap = { xray: 'json', clash: 'yaml', singbox: 'json', amnezia: 'conf' };
-  const ext = extMap[fmt] || 'txt';
-  const filename = `${(item.name || 'config').replace(/[^\w\-]+/g, '_')}.${ext}`;
-  downloadFile($(`itemoutput-${i}`).value, filename);
-  itemMsg(i, 'success', 'Downloaded!');
-}
-
-async function copyAllLinks() {
-  const text = parsedProxiesGlobal.map(p => p.rawUri || `${p.protocol}://${p.host}:${p.port}`).join('\n');
-  if (await copyText(text)) showStatus(true, [], [`Copied ${parsedProxiesGlobal.length} links`]);
-  else showStatus(false, ['Clipboard failed'], []);
-}
-
-function buildCombinedExport() {
-  if (!parsedProxiesGlobal.length) { $('result').value = ''; return; }
-  const entries = parsedProxiesGlobal.map(p => ({ p, s: p.settings }));
-  let result = '';
-  if (currentTab === 'json') result = JSON.stringify(buildXrayConfig(entries), null, 2);
-  else if (currentTab === 'clash') result = buildClashConfig(entries);
-  else if (currentTab === 'singbox') result = JSON.stringify(buildSingBoxConfig(entries), null, 2);
-  else if (currentTab === 'amnezia') {
-    const wg = parsedProxiesGlobal.find(p => p.protocol === 'wireguard');
-    result = wg ? buildAmneziaWG(wg, wg.settings) : '# No WireGuard found';
-  }
-  $('result').value = result;
-}
-
+// ===================== CONVERT ENGINE =====================
 function convert() {
-  const name = $('name').value.trim() || 'Config-1';
+  const defaultName = $('name').value.trim() || 'Config-1';
   parsedProxiesGlobal = [];
-
-  if (!isValidMtu($('mtu').value)) {
-    return showStatus(false, ['MTU must be between 576 and 9000'], []);
-  }
 
   if (currentMode === 'paste') {
     let input = $('inputData').value.trim();
     if (!input) return showStatus(false, ['Paste something first'], []);
     input = decodeBase64Safe(input);
 
-    const jsonItems = parseFullXrayJSON(input);
-    if (jsonItems) {
-      jsonItems.forEach(item => {
-        item.settings = defaultSettings();
-        parsedProxiesGlobal.push(item);
-      });
-    } else {
-      const lines = input.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-      let idx = 0;
-      for (const line of lines) {
-        if (line.includes('://')) {
-          const parsed = parseUniversalLink(line, name, idx++);
-          if (parsed) {
-            parsed.settings = defaultSettings();
-            parsedProxiesGlobal.push(parsed);
-          }
+    const lines = input.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+    lines.forEach((line, index) => {
+      if (line.startsWith('vless://') || line.startsWith('vmess://') || line.startsWith('trojan://')) {
+        const parsed = parseUri(line);
+        if (parsed) {
+          if (lines.length > 1) parsed.name = `${parsed.name}-${index + 1}`;
+          parsedProxiesGlobal.push({ ...parsed, settings: defaultSettings() });
         }
       }
-      if (!parsedProxiesGlobal.length) {
-        const wg = parseWireGuard(input);
-        if (wg.privateKey && wg.publicKey) {
-          parsedProxiesGlobal.push({ protocol: 'wireguard', name, ...wg, settings: defaultSettings() });
-        }
+    });
+
+    if (parsedProxiesGlobal.length === 0) {
+      const wg = parseWireGuard(input);
+      if (wg.privateKey && wg.publicKey) {
+        const defaults = defaultSettings();
+        if (wg.awgParams) defaults.awg = { ...defaults.awg, ...wg.awgParams };
+        parsedProxiesGlobal.push({ protocol: 'wireguard', name: defaultName, ...wg, settings: defaults });
       }
     }
   } else {
-    const ipv4 = $('manualAddress').value.trim() || '10.2.0.2/32';
-    const ipv6 = $('manualIPv6').value.trim();
+    const reserved = parseReserved($('manualReserved').value);
     parsedProxiesGlobal.push({
-      protocol: 'wireguard', name,
+      protocol: 'wireguard', name: defaultName,
       privateKey: $('manualPrivate').value.trim(),
       publicKey: $('manualPublic').value.trim(),
       endpoint: $('manualEndpoint').value.trim(),
-      addresses: ipv6 ? [ipv4, ipv6] : [ipv4],
+      addresses: [$('manualAddress').value.trim() || '172.16.0.2/32'],
       presharedKey: $('manualPSK').value.trim(),
+      reserved,
+      keepalive: parseInt($('manualKeepalive').value) || 25,
       allowedIPs: $('manualAllowed').value.trim().split(',').map(s => s.trim()),
-      keepalive: 25,
       settings: defaultSettings()
     });
   }
 
-  if (!parsedProxiesGlobal.length) {
-    showStatus(false, ['Could not parse any valid configuration'], []);
-    renderList();
+  if (parsedProxiesGlobal.length === 0) {
+    showStatus(false, ['Could not parse any valid configuration link or INI format.'], []);
     return;
   }
 
@@ -1003,83 +822,138 @@ function convert() {
   showStatus(true, [], [`Successfully processed ${parsedProxiesGlobal.length} profile(s)`]);
 }
 
-function showStatus(ok, errors, warnings) {
-  const s = $('status');
-  if (!ok) {
-    s.className = 'status error';
-    s.innerHTML = '❌ ' + errors.join('<br>');
-    return;
-  }
-  s.className = 'status success';
-  s.innerHTML = '✅ Ready' + (warnings.length ? '<br>⚠️ ' + warnings.join('<br>') : '');
+function renderList() {
+  const container = $('configList');
+  container.innerHTML = '';
+  $('configCountText').innerText = `Parsed ${parsedProxiesGlobal.length} Config(s)`;
+  parsedProxiesGlobal.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'config-item';
+    const badgeClass = `badge-${item.protocol}`;
+    const outputText = item.protocol === 'wireguard' ? buildAmneziaWG(item, item.settings) : (item.rawUri || JSON.stringify(item, null, 2));
+
+    div.innerHTML = `
+      <div class="config-summary" onclick="toggleDetails(${i})">
+        <div class="config-info">
+          <span class="badge ${badgeClass}">${item.protocol}</span>
+          <span class="config-title">${escapeHtml(item.name)}</span>
+        </div>
+      </div>
+      <div class="config-details" id="details-${i}">
+        <textarea class="item-output" readonly>${escapeHtml(outputText)}</textarea>
+      </div>
+    `;
+    container.appendChild(div);
+  });
 }
 
-async function copyResult() {
-  if (!$('result').value) return;
-  if (await copyText($('result').value)) showStatus(true, [], ['Copied combined export']);
-  else showStatus(false, ['Clipboard failed'], []);
+function toggleDetails(i) {
+  const el = $(`details-${i}`);
+  if (el) el.classList.toggle('open');
+}
+
+function toggleExpandAll() {
+  allExpanded = !allExpanded;
+  parsedProxiesGlobal.forEach((_, i) => {
+    const el = $(`details-${i}`);
+    if (el) el.classList.toggle('open', allExpanded);
+  });
+}
+
+function buildCombinedExport() {
+  if (!parsedProxiesGlobal.length) { $('result').value = ''; return; }
+  const entries = parsedProxiesGlobal.map(p => ({ p, s: p.settings }));
+  let result = '';
+  if (currentTab === 'clash') result = buildClashConfig(entries);
+  else if (currentTab === 'singbox') result = JSON.stringify(buildSingBoxConfig(entries), null, 2);
+  else if (currentTab === 'json') result = JSON.stringify(buildXrayJsonConfig(entries), null, 2);
+  else if (currentTab === 'amnezia') {
+    const wg = parsedProxiesGlobal.find(p => p.protocol === 'wireguard');
+    result = wg ? buildAmneziaWG(wg, wg.settings) : '# No WireGuard configuration available';
+  }
+  $('result').value = result;
+  if ($('resultQrWrapper').classList.contains('active')) {
+    generateResultQR();
+  }
+}
+
+// ===================== QR CODE LOGIC =====================
+function toggleResultQR() {
+  const wrapper = $('resultQrWrapper');
+  wrapper.classList.toggle('active');
+  if (wrapper.classList.contains('active')) {
+    generateResultQR();
+  }
+}
+
+function generateResultQR() {
+  const text = $('result').value.trim();
+  const box = $('resultQrBox');
+  const err = $('resultQrError');
+  
+  box.innerHTML = '';
+  err.innerText = '';
+
+  if (!text) {
+    err.innerText = '⚠ Output is empty. Nothing to convert.';
+    return;
+  }
+
+  if (text.length > 2048) {
+    err.innerText = '❌ Text size exceeds QR code capacity limit. Please use "Copy Output" or download the config file instead.';
+    return;
+  }
+
+  try {
+    new QRCode(box, {
+      text: text,
+      width: 200,
+      height: 200,
+      colorDark : "#000000",
+      colorLight : "#ffffff",
+      correctLevel : QRCode.CorrectLevel.M
+    });
+  } catch (e) {
+    box.innerHTML = '';
+    err.innerText = '❌ Configuration is too large to generate a QR code. Please copy or download the file instead.';
+  }
+}
+
+function copyResult() {
+  navigator.clipboard.writeText($('result').value);
+  showStatus(true, [], ['Copied combined output to clipboard']);
+}
+
+function copyAllLinks() {
+  const links = parsedProxiesGlobal.map(p => p.rawUri || buildAmneziaWG(p, p.settings)).join('\n\n');
+  navigator.clipboard.writeText(links);
+  showStatus(true, [], ['Copied all raw links to clipboard']);
 }
 
 function downloadResult() {
-  const content = $('result').value;
-  if (!content) return;
-  const name = ($('name').value.trim() || 'config').replace(/[^\w\-]+/g, '_');
-  const extMap = { json: 'json', clash: 'yaml', singbox: 'json', amnezia: 'conf' };
-  const ext = extMap[currentTab] || 'txt';
-  downloadFile(content, `${name}.${ext}`);
+  const ext = currentTab === 'clash' ? 'yaml' : (currentTab === 'amnezia' ? 'conf' : 'json');
+  const blob = new Blob([$('result').value], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `converted-config.${ext}`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+}
+
+function showStatus(ok, errors, warnings) {
+  const s = $('status');
+  if (!ok) { s.className = 'status error'; s.innerHTML = '❌ ' + errors.join('<br>'); return; }
+  s.className = 'status success'; s.innerHTML = '✅ Ready';
 }
 
 function clearAll() {
-  $('inputData').value = '';
-  $('manualPrivate').value = '';
-  $('manualPublic').value = '';
-  $('manualEndpoint').value = '';
-  $('manualIPv6').value = '';
-  $('manualPSK').value = '';
-  $('manualAddress').value = '10.2.0.2/32';
-  $('manualAllowed').value = '0.0.0.0/0, ::/0';
-  $('result').value = '';
-  $('status').textContent = '';
-  $('fetchLog').innerHTML = '';
-  $('name').value = 'Config-1';
+  $('inputData').value = '';$('result').value = '';
+  $('status').textContent = '';$('fetchLog').textContent = '';
+  $('resultQrBox').innerHTML = '';$('resultQrError').innerText = '';
   parsedProxiesGlobal = [];
   renderList();
 }
-
-async function fetchSubscription() {
-  const url = $('inputData').value.trim().split('#')[0];
-  if (!url.startsWith('http')) return showStatus(false, ['Enter a valid URL'], []);
-  $('fetchLog').innerHTML = '';
-  showStatus(true, [], ['Fetching...']);
-
-  const proxies = [
-    { l: 'direct', b: u => u },
-    { l: 'allorigins', b: u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}` },
-    { l: 'codetabs', b: u => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}` }
-  ];
-
-  for (const p of proxies) {
-    try {
-      const div = document.createElement('div');
-      div.textContent = `Trying ${p.l}...`;
-      $('fetchLog').appendChild(div);
-      const res = await fetch(p.b(url));
-      if (res.ok) {
-        const t = await res.text();
-        if (t && t.length > 20 && !t.trim().startsWith('<!')) {
-          $('inputData').value = decodeBase64Safe(t.trim());
-          convert();
-          return;
-        }
-      }
-    } catch (e) {}
-  }
-  showStatus(false, ['All fetch methods failed'], []);
-}
-
-// Init
-applyFragmentPreset();
-applyNoisePreset();
 </script>
 </body>
 </html>
