@@ -289,7 +289,26 @@ export class App {
     });
 
     store.setConfigs(parsedConfigs);
-
+    // Sync Amnezia params (including I1/I2) from parsed config into the UI
+const wgConfig = parsedConfigs.find(c => c.protocol === 'wireguard');
+if (wgConfig && wgConfig.amnezia && this.dom.i1 && this.dom.i2) {
+  const a = wgConfig.amnezia;
+  this.dom.jc.value = a.jc ?? 5;
+  this.dom.jmin.value = a.jmin ?? 50;
+  this.dom.jmax.value = a.jmax ?? 100;
+  this.dom.s1.value = a.s1 ?? 0;
+  this.dom.s2.value = a.s2 ?? 0;
+  this.dom.s3.value = a.s3 ?? 0;
+  this.dom.s4.value = a.s4 ?? 0;
+  this.dom.h1.value = a.h1 ?? 1;
+  this.dom.h2.value = a.h2 ?? 2;
+  this.dom.h3.value = a.h3 ?? 3;
+  this.dom.h4.value = a.h4 ?? 4;
+  this.dom.i1.value = a.i1 || '';
+  this.dom.i2.value = a.i2 || '';
+  if (this.dom.awgPreset) this.dom.awgPreset.value = 'custom';
+  this.syncSettingsFromDom();
+}
     this.recalculateReport(parsedConfigs, parsingErrors.length + parsedConfigs.length);
 
     if (validationErrors.length > 0) {
