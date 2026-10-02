@@ -1,36 +1,40 @@
 /**
- * Responsive Viewport Rules
+ * Neumorphism Responsive Viewport Rules
  */
 
 @media (max-width: 1120px) {
   .workspace-grid {
     grid-template-columns: 1fr;
-    gap: 18px;
+    gap: 24px;
   }
 }
 
 @media (max-width: 768px) {
   body {
-    padding: 16px 12px;
+    padding: 20px 14px;
   }
 
   .app-title {
-    font-size: 21px;
+    font-size: 26px;
+  }
+
+  .app-subtitle {
+    font-size: 13.5px;
   }
 
   .card-bezel {
+    border-radius: 24px;
     padding: 4px;
-    border-radius: 14px;
   }
 
   .card-core {
-    padding: 14px 12px;
-    border-radius: 10px;
+    padding: 16px 14px;
+    border-radius: 20px;
   }
 
   .row {
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
   }
 
   .row > div {
@@ -43,6 +47,7 @@
 
   .btn-row button {
     width: 100%;
+    min-height: 46px; /* 44px+ touch-friendly target */
     justify-content: center;
   }
 
@@ -53,9 +58,22 @@
   .tab-btn {
     text-align: center;
     width: 100%;
+    min-height: 44px;
+  }
+
+  .mode-switch {
+    flex-direction: column;
+  }
+
+  .mode-tab-btn {
+    min-height: 44px;
   }
 
   .report-stats {
-    gap: 10px;
+    gap: 8px;
+  }
+
+  .report-stat-item {
+    flex: 1 1 calc(50% - 8px);
   }
 }

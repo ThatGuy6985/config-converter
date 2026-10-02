@@ -1,52 +1,58 @@
 /**
- * Design System Tokens & Typography
- * OLED Dark Mode Palette, Precision Hairline Rings, and Kinetic Transitions
+ * Neumorphism (Soft UI) Design System Tokens
+ * Cool Monochromatic Clay Palette (#E0E5EC), Dual Opposing Shadows, and Ergonomic Geometry
  */
 
 :root {
-  /* Color Palette - Precision Dark Slate & OLED */
-  --bg-deep: #06090e;
-  --bg-surface: #0b111a;
-  --bg-card: #0f1724;
-  --bg-card-inner: #090e17;
-  --bg-elevated: #141f30;
-  --bg-input: #070b12;
+  /* Color Palette - Cool Monochromatic Clay */
+  --bg-surface: #E0E5EC;
+  --bg-card: #E0E5EC;
+  --bg-card-inner: #E0E5EC;
+  --bg-input: #E0E5EC;
 
-  --border-subtle: rgba(255, 255, 255, 0.07);
-  --border-focus: #38bdf8;
-  --border-card: rgba(56, 189, 248, 0.12);
+  --text-main: #3D4852;       /* 7.5:1 ratio - WCAG AAA */
+  --text-secondary: #6B7280;  /* 4.6:1 ratio - WCAG AA */
+  --text-muted: #8492A6;
+  --text-placeholder: #A0AEC0;
 
-  --primary: #38bdf8;
-  --primary-hover: #0284c7;
-  --primary-glow: rgba(56, 189, 248, 0.22);
-  --primary-gradient: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+  --accent: #6C63FF;          /* Soft violet for CTAs and focus */
+  --accent-light: #8B84FF;
+  --accent-secondary: #38B2AC;/* Teal for success states */
+  --accent-error: #E53E3E;    /* Soft red */
+  --accent-warn: #D69E2E;     /* Soft amber */
+  --accent-glow: rgba(108, 99, 255, 0.25);
 
-  --text-main: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  --border: transparent;      /* Neumorphism never uses hard borders; shadows define all depth */
 
-  --accent-cyan: #06b6d4;
-  --accent-emerald: #10b981;
-  --accent-amber: #f59e0b;
-  --accent-rose: #f43f5e;
-  --accent-violet: #8b5cf6;
+  /* Dual Opposing Shadows (The Physics) */
+  --shadow-light: rgba(255, 255, 255, 0.55);
+  --shadow-dark: rgb(163, 177, 198, 0.65);
 
-  --status-success: #34d399;
-  --status-warn: #fbbf24;
-  --status-error: #f87171;
-  --status-info: #38bdf8;
+  /* Extruded (Raised / Convex) */
+  --shadow-extruded: 9px 9px 16px rgb(163, 177, 198, 0.6), -9px -9px 16px rgba(255, 255, 255, 0.5);
+  --shadow-extruded-hover: 12px 12px 20px rgb(163, 177, 198, 0.7), -12px -12px 20px rgba(255, 255, 255, 0.6);
+  --shadow-extruded-sm: 5px 5px 10px rgb(163, 177, 198, 0.6), -5px -5px 10px rgba(255, 255, 255, 0.5);
+
+  /* Inset (Pressed / Concave Wells) */
+  --shadow-inset: inset 6px 6px 10px rgb(163, 177, 198, 0.6), inset -6px -6px 10px rgba(255, 255, 255, 0.5);
+  --shadow-inset-deep: inset 10px 10px 20px rgb(163, 177, 198, 0.7), inset -10px -10px 20px rgba(255, 255, 255, 0.6);
+  --shadow-inset-sm: inset 3px 3px 6px rgb(163, 177, 198, 0.6), inset -3px -3px 6px rgba(255, 255, 255, 0.5);
+
+  /* Primary Button Colored Inset */
+  --shadow-btn-primary-active: inset 4px 4px 8px rgba(0, 0, 0, 0.25), inset -4px -4px 8px rgba(255, 255, 255, 0.2);
 
   /* Typography */
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Plus Jakarta Sans", sans-serif;
+  --font-display: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-body: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
 
-  /* Elevation Shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.6), 0 2px 6px -1px rgba(0, 0, 0, 0.4);
-  --shadow-inner-glow: inset 0 1px 1px rgba(255, 255, 255, 0.08);
+  /* Border Radii (Soft & Hyper-Rounded) */
+  --radius-card: 32px;
+  --radius-btn: 16px;
+  --radius-input: 16px;
+  --radius-pill: 9999px;
 
-  /* Transitions */
-  --transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
-  --transition-fast: 150ms var(--transition-smooth);
-  --transition-normal: 250ms var(--transition-smooth);
+  /* Motion & Transitions */
+  --transition-smooth: 300ms ease-out;
+  --transition-deep: 500ms ease-out;
 }

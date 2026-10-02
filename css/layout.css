@@ -1,5 +1,5 @@
 /**
- * Layout and Grid System
+ * Neumorphism Layout & Container Architecture
  */
 
 * {
@@ -8,101 +8,130 @@
   padding: 0;
 }
 
+html {
+  background-color: var(--bg-surface);
+  scroll-behavior: smooth;
+}
+
 body {
-  font-family: var(--font-sans);
-  background-color: var(--bg-deep);
+  font-family: var(--font-body);
+  background-color: var(--bg-surface);
   color: var(--text-main);
-  line-height: 1.55;
-  padding: 24px 20px;
+  line-height: 1.6;
+  padding: 36px 24px;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .container {
-  max-width: 1520px;
+  max-width: 1480px;
   margin: 0 auto;
 }
 
 /* Header Area */
 .app-header {
   text-align: center;
-  margin-bottom: 24px;
+  margin-bottom: 32px;
 }
 
 .app-eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 12px;
-  border-radius: 9999px;
-  background: rgba(56, 189, 248, 0.08);
-  border: 1px solid rgba(56, 189, 248, 0.2);
-  color: var(--primary);
-  font-size: 11px;
-  font-weight: 600;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-extruded-sm);
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-size: 11.5px;
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  margin-bottom: 10px;
+  margin-bottom: 14px;
+  transition: transform var(--transition-smooth), box-shadow var(--transition-smooth);
+}
+
+.app-eyebrow:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-extruded);
 }
 
 .app-title {
-  font-size: 26px;
-  font-weight: 700;
-  color: #ffffff;
-  letter-spacing: -0.02em;
-  margin-bottom: 6px;
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.03em;
+  margin-bottom: 8px;
 }
 
 .app-title span {
-  background: var(--primary-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--accent);
+  display: inline-block;
 }
 
 .app-subtitle {
   color: var(--text-secondary);
-  font-size: 13.5px;
-  max-width: 720px;
+  font-size: 14.5px;
+  max-width: 760px;
   margin: 0 auto;
+  font-weight: 400;
 }
 
 /* Two-Column Responsive Split Layout */
 .workspace-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 22px;
+  gap: 28px;
   align-items: start;
 }
 
-/* Double-Bezel Card Outer Shell */
+/* Neumorphic Raised Card Container */
 .card-bezel {
   background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: 18px;
-  padding: 8px;
-  box-shadow: var(--shadow-md);
+  border-radius: var(--radius-card);
+  padding: 6px;
+  box-shadow: var(--shadow-extruded);
+  transition: transform var(--transition-smooth), box-shadow var(--transition-smooth);
+}
+
+.card-bezel:hover {
+  box-shadow: var(--shadow-extruded-hover);
 }
 
 .card-core {
-  background: var(--bg-card);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: var(--shadow-inner-glow);
+  background: var(--bg-surface);
+  border-radius: calc(var(--radius-card) - 6px);
+  padding: 24px;
 }
 
 .section-title {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 13px;
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-size: 12.5px;
+  font-weight: 700;
   color: var(--text-main);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin: 20px 0 12px 0;
-  padding-bottom: 6px;
-  border-bottom: 1px solid var(--border-subtle);
+  letter-spacing: 0.06em;
+  margin: 22px 0 14px 0;
+  padding-bottom: 8px;
+  position: relative;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-inset-sm);
+  border-radius: 9999px;
 }
 
 .section-title:first-child {
@@ -111,8 +140,8 @@ body {
 
 .row {
   display: flex;
-  gap: 12px;
-  margin-bottom: 12px;
+  gap: 14px;
+  margin-bottom: 14px;
   flex-wrap: wrap;
 }
 
