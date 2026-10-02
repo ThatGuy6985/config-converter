@@ -3,6 +3,7 @@
  */
 
 import { escapeHtml } from '../utils/escaping.js';
+import { renderIcon } from '../utils/icons.js';
 
 export function renderConversionReport(containerEl, report) {
   if (!containerEl) return;
@@ -60,16 +61,20 @@ export function renderConversionReport(containerEl, report) {
   if (unsupported.length > 0 || warnings.length > 0 || preserved.length > 0) {
     html += '<ul class="report-detail-list">';
 
+    const iconError = renderIcon('x-circle', { size: 14 });
+    const iconWarn = renderIcon('alert-triangle', { size: 14 });
+    const iconSuccess = renderIcon('check-circle-2', { size: 14 });
+
     unsupported.forEach(item => {
-      html += `<li class="report-detail-item" style="color:var(--status-error);"><span>✕</span><span><strong>Unsupported:</strong> ${escapeHtml(item)}</span></li>`;
+      html += `<li class="report-detail-item" style="color:var(--status-error);">${iconError}<span><strong>Unsupported:</strong> ${escapeHtml(item)}</span></li>`;
     });
 
     warnings.forEach(item => {
-      html += `<li class="report-detail-item" style="color:var(--status-warn);"><span>⚠</span><span>${escapeHtml(item)}</span></li>`;
+      html += `<li class="report-detail-item" style="color:var(--status-warn);">${iconWarn}<span>${escapeHtml(item)}</span></li>`;
     });
 
     if (preserved.length > 0) {
-      html += `<li class="report-detail-item" style="color:var(--status-success);"><span>✓</span><span><strong>Preserved:</strong> ${escapeHtml(preserved.slice(0, 8).join(', '))}${preserved.length > 8 ? ` (+${preserved.length - 8} more)` : ''}</span></li>`;
+      html += `<li class="report-detail-item" style="color:var(--status-success);">${iconSuccess}<span><strong>Preserved:</strong> ${escapeHtml(preserved.slice(0, 8).join(', '))}${preserved.length > 8 ? ` (+${preserved.length - 8} more)` : ''}</span></li>`;
     }
 
     html += '</ul>';

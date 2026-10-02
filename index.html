@@ -1,9 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="description" content="Professional client-side multi-protocol proxy configuration converter for VLESS, VMess, Trojan, WireGuard, and AmneziaWG."/>
+  <!-- Instant Pre-render Theme Initialization to Prevent Flash of Unstyled/Incorrect Theme -->
+  <script>
+    (function() {
+      try {
+        var saved = localStorage.getItem('theme');
+        var theme = saved ? saved : 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -14,16 +26,95 @@
 
 /* === css/variables.css === */
 /**
- * Neumorphism (Soft UI) Design System Tokens
- * Cool Monochromatic Clay Palette (#E0E5EC), Dual Opposing Shadows, and Ergonomic Geometry
+ * Neumorphism (Soft UI) Dual-Theme Design Tokens
+ * Dark Mode by default, with complete Light Mode support.
+ * Layered surfaces, dual opposing tactile shadows, and WCAG AAA / AA contrast compliance.
  */
 
-:root {
+:root,
+html[data-theme="dark"] {
+  --color-scheme: dark;
+
+  /* Layered Dark Elevation Surfaces */
+  --bg-primary: #0D121B;       /* Deep slate foundation */
+  --bg-surface: #141B26;       /* Primary application canvas & cards */
+  --bg-card: #141B26;
+  --bg-card-inner: #192230;    /* Elevated inner panels & floating modules */
+  --bg-input: #0F151E;         /* Sunken inset inputs & code areas */
+  --bg-elevated: #1E293B;
+
+  /* High-Contrast Typography */
+  --text-main: #F1F5F9;        /* 15:1 contrast against surface - WCAG AAA */
+  --text-secondary: #94A3B8;   /* 5.2:1 contrast - WCAG AA */
+  --text-muted: #64748B;       /* Helper & secondary details */
+  --text-placeholder: #475569;
+
+  /* Accents & Brand Identity */
+  --accent: #7C73FF;           /* Soft electric violet for CTAs and focus */
+  --accent-light: #9B94FF;
+  --accent-secondary: #2DD4BF; /* Luminous teal */
+  --accent-error: #F87171;     /* Soft high-visibility coral */
+  --accent-warn: #FBBF24;      /* Warm amber */
+  --accent-glow: rgba(124, 115, 255, 0.28);
+
+  /* Subtle Borders for Structural Crispness in Dark Mode */
+  --border: rgba(255, 255, 255, 0.05);
+  --border-strong: rgba(255, 255, 255, 0.12);
+
+  /* Tactile Dark Neumorphic Shadows (Physics: top-left ambient light + bottom-right deep shade) */
+  --shadow-extruded: 8px 8px 18px rgba(0, 0, 0, 0.55), -6px -6px 14px rgba(255, 255, 255, 0.035);
+  --shadow-extruded-hover: 11px 11px 22px rgba(0, 0, 0, 0.65), -8px -8px 18px rgba(255, 255, 255, 0.05);
+  --shadow-extruded-sm: 4px 4px 10px rgba(0, 0, 0, 0.45), -3px -3px 8px rgba(255, 255, 255, 0.03);
+
+  /* Inset Wells (Pressed / Concave) */
+  --shadow-inset: inset 5px 5px 10px rgba(0, 0, 0, 0.6), inset -4px -4px 8px rgba(255, 255, 255, 0.025);
+  --shadow-inset-deep: inset 8px 8px 16px rgba(0, 0, 0, 0.75), inset -6px -6px 12px rgba(255, 255, 255, 0.03);
+  --shadow-inset-sm: inset 3px 3px 6px rgba(0, 0, 0, 0.5), inset -2px -2px 5px rgba(255, 255, 255, 0.02);
+
+  /* Primary Button Colored Inset */
+  --shadow-btn-primary-active: inset 4px 4px 8px rgba(0, 0, 0, 0.5), inset -4px -4px 8px rgba(255, 255, 255, 0.1);
+
+  /* Status Colors */
+  --status-success: #34D399;
+  --status-warn: #FBBF24;
+  --status-error: #F87171;
+  --status-info: #60A5FA;
+
+  /* Interactive Feedback */
+  --selection-bg: rgba(124, 115, 255, 0.35);
+  --selection-text: #FFFFFF;
+  --focus-ring: #7C73FF;
+
+  /* Scrollbar */
+  --scrollbar-thumb: #283446;
+  --scrollbar-track: #0F151E;
+
+  /* Typography Fonts */
+  --font-display: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-body: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+
+  /* Border Radii (Soft & Hyper-Rounded) */
+  --radius-card: 32px;
+  --radius-btn: 16px;
+  --radius-input: 16px;
+  --radius-pill: 9999px;
+
+  /* Transitions */
+  --transition-smooth: 220ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-deep: 400ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html[data-theme="light"] {
+  --color-scheme: light;
+
   /* Color Palette - Cool Monochromatic Clay */
+  --bg-primary: #DCE2E9;
   --bg-surface: #E0E5EC;
   --bg-card: #E0E5EC;
   --bg-card-inner: #E0E5EC;
   --bg-input: #E0E5EC;
+  --bg-elevated: #E8EDF4;
 
   --text-main: #3D4852;       /* 7.5:1 ratio - WCAG AAA */
   --text-secondary: #6B7280;  /* 4.6:1 ratio - WCAG AA */
@@ -37,9 +128,10 @@
   --accent-warn: #D69E2E;     /* Soft amber */
   --accent-glow: rgba(108, 99, 255, 0.25);
 
-  --border: transparent;      /* Neumorphism never uses hard borders; shadows define all depth */
+  --border: transparent;
+  --border-strong: rgba(163, 177, 198, 0.45);
 
-  /* Dual Opposing Shadows (The Physics) */
+  /* Dual Opposing Shadows (Cool Clay Physics) */
   --shadow-light: rgba(255, 255, 255, 0.55);
   --shadow-dark: rgb(163, 177, 198, 0.65);
 
@@ -56,25 +148,26 @@
   /* Primary Button Colored Inset */
   --shadow-btn-primary-active: inset 4px 4px 8px rgba(0, 0, 0, 0.25), inset -4px -4px 8px rgba(255, 255, 255, 0.2);
 
-  /* Typography */
-  --font-display: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-body: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  /* Status Colors */
+  --status-success: #2E7D32;
+  --status-warn: #B7791F;
+  --status-error: #C53030;
+  --status-info: #2B6CB0;
 
-  /* Border Radii (Soft & Hyper-Rounded) */
-  --radius-card: 32px;
-  --radius-btn: 16px;
-  --radius-input: 16px;
-  --radius-pill: 9999px;
+  /* Interactive Feedback */
+  --selection-bg: rgba(108, 99, 255, 0.25);
+  --selection-text: #2D3748;
+  --focus-ring: #6C63FF;
 
-  /* Motion & Transitions */
-  --transition-smooth: 300ms ease-out;
-  --transition-deep: 500ms ease-out;
+  /* Scrollbar */
+  --scrollbar-thumb: #CBD5E1;
+  --scrollbar-track: #E0E5EC;
 }
 
 /* === css/layout.css === */
 /**
  * Neumorphism Layout & Container Architecture
+ * Dual-theme foundation, responsive spacing, and accessibility
  */
 
 * {
@@ -86,6 +179,8 @@
 html {
   background-color: var(--bg-surface);
   scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 }
 
 body {
@@ -97,6 +192,38 @@ body {
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color var(--transition-smooth), color var(--transition-smooth);
+}
+
+::selection {
+  background-color: var(--selection-bg);
+  color: var(--selection-text);
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* WebKit Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 4px;
+  border: 2px solid var(--scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
 }
 
 .container {
@@ -108,6 +235,22 @@ body {
 .app-header {
   text-align: center;
   margin-bottom: 32px;
+  position: relative;
+}
+
+.header-top-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 14px;
+  position: relative;
+}
+
+.theme-toggle-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .app-eyebrow {
@@ -124,13 +267,16 @@ body {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  margin-bottom: 14px;
-  transition: transform var(--transition-smooth), box-shadow var(--transition-smooth);
+  transition: transform var(--transition-smooth), box-shadow var(--transition-smooth), color var(--transition-smooth);
 }
 
 .app-eyebrow:hover {
   transform: translateY(-1px);
   box-shadow: var(--shadow-extruded);
+}
+
+.app-eyebrow svg {
+  color: currentColor;
 }
 
 .app-title {
@@ -140,11 +286,13 @@ body {
   color: var(--text-main);
   letter-spacing: -0.03em;
   margin-bottom: 8px;
+  transition: color var(--transition-smooth);
 }
 
 .app-title span {
   color: var(--accent);
   display: inline-block;
+  transition: color var(--transition-smooth);
 }
 
 .app-subtitle {
@@ -153,6 +301,7 @@ body {
   max-width: 760px;
   margin: 0 auto;
   font-weight: 400;
+  transition: color var(--transition-smooth);
 }
 
 /* Two-Column Responsive Split Layout */
@@ -169,7 +318,8 @@ body {
   border-radius: var(--radius-card);
   padding: 6px;
   box-shadow: var(--shadow-extruded);
-  transition: transform var(--transition-smooth), box-shadow var(--transition-smooth);
+  border: 1px solid var(--border);
+  transition: transform var(--transition-smooth), box-shadow var(--transition-smooth), background-color var(--transition-smooth), border-color var(--transition-smooth);
 }
 
 .card-bezel:hover {
@@ -180,6 +330,7 @@ body {
   background: var(--bg-surface);
   border-radius: calc(var(--radius-card) - 6px);
   padding: 24px;
+  transition: background-color var(--transition-smooth);
 }
 
 .section-title {
@@ -195,6 +346,7 @@ body {
   margin: 22px 0 14px 0;
   padding-bottom: 8px;
   position: relative;
+  transition: color var(--transition-smooth);
 }
 
 .section-title::after {
@@ -207,6 +359,7 @@ body {
   background: var(--bg-surface);
   box-shadow: var(--shadow-inset-sm);
   border-radius: 9999px;
+  transition: background-color var(--transition-smooth), box-shadow var(--transition-smooth);
 }
 
 .section-title:first-child {
@@ -225,6 +378,16 @@ body {
   min-width: 120px;
 }
 
+/* Motion Preferences */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* === css/components.css === */
 /**
  * Neumorphism (Soft UI) Components CSS
@@ -240,19 +403,20 @@ label {
   margin-bottom: 6px;
   font-weight: 600;
   letter-spacing: 0.02em;
+  transition: color var(--transition-smooth);
 }
 
 input, textarea, select {
   width: 100%;
-  background-color: var(--bg-surface);
-  border: none;
+  background-color: var(--bg-input);
+  border: 1px solid var(--border);
   border-radius: var(--radius-input);
   color: var(--text-main);
   padding: 12px 14px;
   font-family: var(--font-mono);
   font-size: 13px;
   box-shadow: var(--shadow-inset);
-  transition: box-shadow var(--transition-smooth), transform var(--transition-smooth);
+  transition: box-shadow var(--transition-smooth), transform var(--transition-smooth), background-color var(--transition-smooth), color var(--transition-smooth), border-color var(--transition-smooth);
 }
 
 input::placeholder, textarea::placeholder {
@@ -263,6 +427,7 @@ input::placeholder, textarea::placeholder {
 input:focus, textarea:focus, select:focus {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+  border-color: var(--accent);
   box-shadow: var(--shadow-inset-deep);
 }
 
@@ -275,11 +440,15 @@ textarea {
 select {
   cursor: pointer;
   appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233D4852' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
   background-repeat: no-repeat;
   background-position: right 14px center;
   background-size: 16px;
   padding-right: 40px;
+}
+
+html[data-theme="light"] select {
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233D4852' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
 }
 
 /* Secret Input with Show/Hide Toggle */
@@ -297,7 +466,7 @@ select {
   position: absolute;
   right: 8px;
   background: var(--bg-surface);
-  border: none;
+  border: 1px solid var(--border);
   color: var(--text-muted);
   width: 32px;
   height: 32px;
@@ -307,7 +476,7 @@ select {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform var(--transition-smooth), box-shadow var(--transition-smooth), color var(--transition-smooth);
+  transition: transform var(--transition-smooth), box-shadow var(--transition-smooth), color var(--transition-smooth), background-color var(--transition-smooth);
 }
 
 .secret-toggle-btn:hover {
@@ -321,36 +490,62 @@ select {
   box-shadow: var(--shadow-inset-sm);
 }
 
+.secret-toggle-btn svg {
+  color: currentColor;
+}
+
 /* Checkbox Custom Styling */
 .checkbox-field {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 10px 0;
   cursor: pointer;
   user-select: none;
 }
 
 .checkbox-field input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
   border-radius: 6px;
   box-shadow: var(--shadow-inset-sm);
-  accent-color: var(--accent);
   cursor: pointer;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  transition: all var(--transition-smooth);
+  flex-shrink: 0;
+}
+
+.checkbox-field input[type="checkbox"]:checked {
+  background: var(--accent);
+  box-shadow: var(--shadow-extruded-sm);
+  border-color: var(--accent);
+}
+
+.checkbox-field input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 7px;
+  width: 5px;
+  height: 10px;
+  border: solid #ffffff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
 }
 
 .checkbox-field label {
-  margin: 0;
-  color: var(--text-main);
-  font-family: var(--font-body);
-  font-size: 13px;
-  font-weight: 500;
+  margin-bottom: 0;
   cursor: pointer;
+  font-size: 13px;
+  color: var(--text-main);
 }
 
 .field-note {
-  font-size: 11.5px;
+  font-size: 11px;
   color: var(--text-muted);
   font-weight: normal;
 }
@@ -361,6 +556,7 @@ select {
   background: var(--bg-surface);
   padding: 6px;
   border-radius: var(--radius-btn);
+  border: 1px solid var(--border);
   box-shadow: var(--shadow-inset);
   margin-bottom: 20px;
   gap: 6px;
@@ -389,6 +585,7 @@ select {
   background: var(--bg-surface);
   color: var(--accent);
   box-shadow: var(--shadow-extruded-sm);
+  border: 1px solid var(--border);
 }
 
 /* Export Target Tabs */
@@ -397,6 +594,7 @@ select {
   background: var(--bg-surface);
   padding: 6px;
   border-radius: var(--radius-btn);
+  border: 1px solid var(--border);
   box-shadow: var(--shadow-inset-sm);
   gap: 8px;
   margin-bottom: 14px;
@@ -425,6 +623,12 @@ select {
   background: var(--bg-surface);
   color: var(--accent);
   box-shadow: var(--shadow-extruded-sm);
+  border: 1px solid var(--border);
+}
+
+.tab-btn:focus-visible, .mode-tab-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 /* Tactile Buttons */
@@ -440,9 +644,18 @@ button {
   font-size: 13px;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   box-shadow: var(--shadow-extruded-sm);
-  transition: transform var(--transition-smooth), box-shadow var(--transition-smooth), background-color var(--transition-smooth);
+  transition: transform var(--transition-smooth), box-shadow var(--transition-smooth), background-color var(--transition-smooth), color var(--transition-smooth);
+}
+
+button svg {
+  display: inline-block;
+  vertical-align: middle;
+  color: currentColor;
+  stroke: currentColor;
+  flex-shrink: 0;
 }
 
 button:hover {
@@ -457,13 +670,14 @@ button:active {
 }
 
 button:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
 button.secondary {
   background: var(--bg-surface);
   color: var(--text-main);
+  border: 1px solid var(--border);
   box-shadow: var(--shadow-extruded-sm);
 }
 
@@ -511,8 +725,10 @@ button.success-btn:active {
   font-size: 13px;
   display: none;
   background: var(--bg-surface);
+  border: 1px solid var(--border);
   box-shadow: var(--shadow-extruded-sm);
   position: relative;
+  transition: all var(--transition-smooth);
 }
 
 .status-banner.visible {
@@ -520,23 +736,28 @@ button.success-btn:active {
 }
 
 .status-banner.success {
-  box-shadow: var(--shadow-extruded-sm), inset 3px 0 0 var(--accent-secondary);
-  color: #234E52;
+  box-shadow: var(--shadow-extruded-sm), inset 4px 0 0 var(--status-success);
+  color: var(--status-success);
 }
 
 .status-banner.error {
-  box-shadow: var(--shadow-extruded-sm), inset 3px 0 0 var(--accent-error);
-  color: #742A2A;
+  box-shadow: var(--shadow-extruded-sm), inset 4px 0 0 var(--status-error);
+  color: var(--status-error);
 }
 
 .status-banner.warn {
-  box-shadow: var(--shadow-extruded-sm), inset 3px 0 0 var(--accent-warn);
-  color: #744210;
+  box-shadow: var(--shadow-extruded-sm), inset 4px 0 0 var(--status-warn);
+  color: var(--status-warn);
 }
 
 .status-banner.info {
-  box-shadow: var(--shadow-extruded-sm), inset 3px 0 0 var(--accent);
-  color: #3730A3;
+  box-shadow: var(--shadow-extruded-sm), inset 4px 0 0 var(--status-info);
+  color: var(--status-info);
+}
+
+.status-banner svg {
+  flex-shrink: 0;
+  stroke: currentColor;
 }
 
 /* Parsed Config Items List (Extruded Cards) */
@@ -545,8 +766,9 @@ button.success-btn:active {
   border-radius: 18px;
   margin-bottom: 12px;
   overflow: hidden;
+  border: 1px solid var(--border);
   box-shadow: var(--shadow-extruded-sm);
-  transition: transform var(--transition-smooth), box-shadow var(--transition-smooth);
+  transition: transform var(--transition-smooth), box-shadow var(--transition-smooth), background-color var(--transition-smooth);
 }
 
 .config-item:hover {
@@ -618,12 +840,16 @@ button.success-btn:active {
   letter-spacing: 0.05em;
   background: var(--bg-surface);
   box-shadow: var(--shadow-extruded-sm);
+  border: 1px solid var(--border);
 }
 
-.badge-vless { color: #3182CE; }
-.badge-vmess { color: #DD6B20; }
+.badge-vless { color: #60A5FA; }
+.badge-vmess { color: #FB923C; }
 .badge-trojan { color: var(--accent); }
 .badge-wireguard { color: var(--accent-secondary); }
+
+html[data-theme="light"] .badge-vless { color: #2B6CB0; }
+html[data-theme="light"] .badge-vmess { color: #C05621; }
 
 /* Compatibility Level Badges */
 .level-badge {
@@ -634,13 +860,16 @@ button.success-btn:active {
   font-weight: 800;
   text-transform: uppercase;
   background: var(--bg-surface);
+  border: 1px solid var(--border);
   box-shadow: var(--shadow-inset-sm);
 }
 
 .level-exact { color: var(--accent-secondary); }
-.level-compatible { color: #3182CE; }
+.level-compatible { color: #60A5FA; }
 .level-partial { color: var(--accent-warn); }
 .level-unsupported { color: var(--accent-error); }
+
+html[data-theme="light"] .level-compatible { color: #2B6CB0; }
 
 /* Conversion Report Box (Deep Inset Well) */
 .conversion-report {
@@ -649,6 +878,7 @@ button.success-btn:active {
   padding: 16px 18px;
   margin-top: 16px;
   margin-bottom: 16px;
+  border: 1px solid var(--border);
   box-shadow: var(--shadow-inset);
   font-size: 12.5px;
 }
@@ -676,6 +906,7 @@ button.success-btn:active {
   background: var(--bg-surface);
   padding: 8px 14px;
   border-radius: 12px;
+  border: 1px solid var(--border);
   box-shadow: var(--shadow-extruded-sm);
   min-width: 70px;
 }
@@ -716,10 +947,16 @@ button.success-btn:active {
 
 .report-detail-item {
   font-size: 12px;
-  margin: 5px 0;
+  margin: 6px 0;
   display: flex;
   align-items: flex-start;
   gap: 8px;
+}
+
+.report-detail-item svg {
+  flex-shrink: 0;
+  stroke: currentColor;
+  margin-top: 2px;
 }
 
 /* QR Code Container (Deep Inset Well) */
@@ -728,6 +965,7 @@ button.success-btn:active {
   text-align: center;
   background: var(--bg-surface);
   border-radius: 24px;
+  border: 1px solid var(--border);
   box-shadow: var(--shadow-inset);
   padding: 20px;
   display: none;
@@ -760,6 +998,196 @@ button.success-btn:active {
 
 .hidden {
   display: none !important;
+}
+
+/* Keyframe animations */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+/* ========================================================
+   Sky Toggle (Animated Day/Night Theme Switcher)
+   ======================================================== */
+.theme-switch {
+  --toggle-size: 13px;
+  --container-width: 5.625em;
+  --container-height: 2.5em;
+  --container-radius: 6.25em;
+  --container-light-bg: #3D7EAE;
+  --container-night-bg: #1D1F2C;
+  --circle-container-diameter: 3.375em;
+  --sun-moon-diameter: 2.125em;
+  --sun-bg: #ECCA2F;
+  --moon-bg: #C4C9D1;
+  --spot-color: #959DB1;
+  --circle-container-offset: calc((var(--circle-container-diameter) - var(--container-height)) / 2 * -1);
+  --stars-color: #ffffff;
+  --clouds-color: #F3FDFF;
+  --back-clouds-color: #AACADF;
+  --transition: .5s cubic-bezier(0, -0.02, 0.4, 1.25);
+  --circle-transition: .3s cubic-bezier(0, -0.02, 0.35, 1.17);
+  display: inline-block;
+  cursor: pointer;
+  user-select: none;
+}
+
+.theme-switch, .theme-switch *, .theme-switch *::before, .theme-switch *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-size: var(--toggle-size);
+}
+
+.theme-switch__container {
+  width: var(--container-width);
+  height: var(--container-height);
+  background-color: var(--container-light-bg);
+  border-radius: var(--container-radius);
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0em -0.062em 0.062em rgba(0, 0, 0, 0.25), 0em 0.062em 0.125em rgba(255, 255, 255, 0.94);
+  transition: var(--transition);
+  position: relative;
+  display: block;
+}
+
+.theme-switch__container::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  box-shadow: 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset, 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset;
+  border-radius: var(--container-radius);
+}
+
+.theme-switch__checkbox {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.theme-switch__circle-container {
+  width: var(--circle-container-diameter);
+  height: var(--circle-container-diameter);
+  background-color: rgba(255, 255, 255, 0.1);
+  position: absolute;
+  left: var(--circle-container-offset);
+  top: var(--circle-container-offset);
+  border-radius: var(--container-radius);
+  box-shadow: inset 0 0 0 3.375em rgba(255, 255, 255, 0.1), inset 0 0 0 3.375em rgba(255, 255, 255, 0.1), 0 0 0 0.625em rgba(255, 255, 255, 0.1), 0 0 0 1.25em rgba(255, 255, 255, 0.1);
+  display: flex;
+  transition: var(--circle-transition);
+  pointer-events: none;
+}
+
+.theme-switch__sun-moon-container {
+  pointer-events: auto;
+  position: relative;
+  z-index: 2;
+  width: var(--sun-moon-diameter);
+  height: var(--sun-moon-diameter);
+  margin: auto;
+  border-radius: var(--container-radius);
+  background-color: var(--sun-bg);
+  box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset, 0em -0.062em 0.062em 0em #a1872a inset;
+  filter: drop-shadow(0.062em 0.125em 0.125em rgba(0, 0, 0, 0.25)) drop-shadow(0em 0.062em 0.125em rgba(0, 0, 0, 0.25));
+  overflow: hidden;
+  transition: var(--transition);
+}
+
+.theme-switch__moon {
+  transform: translateX(100%);
+  width: 100%;
+  height: 100%;
+  background-color: var(--moon-bg);
+  border-radius: inherit;
+  box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset, 0em -0.062em 0.062em 0em #969696 inset;
+  transition: var(--transition);
+  position: relative;
+}
+
+.theme-switch__spot {
+  position: absolute;
+  top: 0.75em;
+  left: 0.312em;
+  width: 0.75em;
+  height: 0.75em;
+  border-radius: var(--container-radius);
+  background-color: var(--spot-color);
+  box-shadow: 0em 0.0312em 0.062em rgba(0, 0, 0, 0.25) inset;
+}
+
+.theme-switch__spot:nth-of-type(2) {
+  width: 0.375em;
+  height: 0.375em;
+  top: 0.937em;
+  left: 1.375em;
+}
+
+.theme-switch__spot:nth-last-of-type(3) {
+  width: 0.25em;
+  height: 0.25em;
+  top: 0.312em;
+  left: 0.812em;
+}
+
+.theme-switch__clouds {
+  width: 1.25em;
+  height: 1.25em;
+  background-color: var(--clouds-color);
+  border-radius: var(--container-radius);
+  position: absolute;
+  bottom: -0.625em;
+  left: 0.312em;
+  box-shadow: 0.937em 0.312em var(--clouds-color), -0.312em -0.312em var(--back-clouds-color), 1.437em 0.375em var(--clouds-color), 0.5em -0.125em var(--back-clouds-color), 2.187em 0 var(--clouds-color), 1.25em -0.062em var(--back-clouds-color), 2.937em 0.312em var(--clouds-color), 2em -0.312em var(--back-clouds-color), 3.625em -0.062em var(--clouds-color), 2.625em 0em var(--back-clouds-color), 4.5em -0.312em var(--clouds-color), 3.375em -0.437em var(--back-clouds-color), 4.625em -1.75em 0 0.437em var(--clouds-color), 4em -0.625em var(--back-clouds-color), 4.125em -2.125em 0 0.437em var(--back-clouds-color);
+  transition: 0.5s cubic-bezier(0, -0.02, 0.4, 1.25);
+}
+
+.theme-switch__stars-container {
+  position: absolute;
+  color: var(--stars-color);
+  top: -100%;
+  left: 0.312em;
+  width: 2.75em;
+  height: auto;
+  transition: var(--transition);
+}
+
+/* Checked (Dark Mode) State */
+.theme-switch__checkbox:checked + .theme-switch__container {
+  background-color: var(--container-night-bg);
+}
+
+.theme-switch__checkbox:checked + .theme-switch__container .theme-switch__circle-container {
+  left: calc(100% - var(--circle-container-offset) - var(--circle-container-diameter));
+}
+
+.theme-switch__checkbox:checked + .theme-switch__container .theme-switch__circle-container:hover {
+  left: calc(100% - var(--circle-container-offset) - var(--circle-container-diameter) - 0.187em);
+}
+
+.theme-switch__circle-container:hover {
+  left: calc(var(--circle-container-offset) + 0.187em);
+}
+
+.theme-switch__checkbox:checked + .theme-switch__container .theme-switch__moon {
+  transform: translate(0);
+}
+
+.theme-switch__checkbox:checked + .theme-switch__container .theme-switch__clouds {
+  bottom: -4.062em;
+}
+
+.theme-switch__checkbox:checked + .theme-switch__container .theme-switch__stars-container {
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 /* === css/responsive.css === */
@@ -848,8 +1276,33 @@ button.success-btn:active {
 <body>
   <main class="container">
     <header class="app-header">
-      <div class="app-eyebrow">
-        <span>⚡</span> Enterprise Multi-Protocol Converter v4.0
+      <div class="header-top-row">
+        <div class="app-eyebrow">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-zap" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+          Enterprise Multi-Protocol Converter v4.0
+        </div>
+        <div class="theme-toggle-wrapper" title="Switch Theme (Dark / Light)">
+          <label class="theme-switch" aria-label="Toggle dark and light mode">
+            <input type="checkbox" class="theme-switch__checkbox" checked aria-label="Dark mode toggle switch" />
+            <div class="theme-switch__container">
+              <div class="theme-switch__clouds"></div>
+              <div class="theme-switch__stars-container">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 144 55" fill="none" aria-hidden="true">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M135.831 3.00688C135.055 3.85027 134.111 4.29946 133 4.35447C134.111 4.40947 135.055 4.85867 135.831 5.71123C136.607 6.55462 136.996 7.56303 136.996 8.72727C136.996 7.95722 137.172 7.25134 137.525 6.59129C137.886 5.93124 138.372 5.39954 138.98 5.00535C139.598 4.60199 140.268 4.39114 141 4.35447C139.88 4.2903 138.936 3.85027 138.16 3.00688C137.384 2.16348 136.996 1.16425 136.996 0C136.996 1.16425 136.607 2.16348 135.831 3.00688ZM31 23.3545C32.1114 23.2995 33.0551 22.8503 33.8313 22.0069C34.6075 21.1635 34.9956 20.1642 34.9956 19C34.9956 20.1642 35.3837 21.1635 36.1599 22.0069C36.9361 22.8503 37.8798 23.2903 39 23.3545C38.2679 23.3911 37.5976 23.602 36.9802 24.0053C36.3716 24.3995 35.8864 24.9312 35.5248 25.5913C35.172 26.2513 34.9956 26.9572 34.9956 27.7273C34.9956 26.563 34.6075 25.5546 33.8313 24.7112C33.0551 23.8587 32.1114 23.4095 31 23.3545ZM0 36.3545C1.11136 36.2995 2.05513 35.8503 2.83131 35.0069C3.6075 34.1635 3.99559 33.1642 3.99559 32C3.99559 33.1642 4.38368 34.1635 5.15987 35.0069C5.93605 35.8503 6.87982 36.2903 8 36.3545C7.26792 36.3911 6.59757 36.602 5.98015 37.0053C5.37155 37.3995 4.88644 37.9312 4.52481 38.5913C4.172 39.2513 3.99559 39.9572 3.99559 40.7273C3.99559 39.563 3.6075 38.5546 2.83131 37.7112C2.05513 36.8587 1.11136 36.4095 0 36.3545ZM56.8313 24.0069C56.0551 24.8503 55.1114 25.2995 54 25.3545C55.1114 25.4095 56.0551 25.8587 56.8313 26.7112C57.6075 27.5546 57.9956 28.563 57.9956 29.7273C57.9956 28.9572 58.172 28.2513 58.5248 27.5913C58.8864 26.9312 59.3716 26.3995 59.9802 26.0053C60.5976 25.602 61.2679 25.3911 62 25.3545C60.8798 25.2903 59.9361 24.8503 59.1599 24.0069C58.3837 23.1635 57.9956 22.1642 57.9956 21C57.9956 22.1642 57.6075 23.1635 56.8313 24.0069ZM81 25.3545C82.1114 25.2995 83.0551 24.8503 83.8313 24.0069C84.6075 23.1635 84.9956 22.1642 84.9956 21C84.9956 22.1642 85.3837 23.1635 86.1599 24.0069C86.9361 24.8503 87.8798 25.2903 89 25.3545C88.2679 25.3911 87.5976 25.602 86.9802 26.0053C86.3716 26.3995 85.8864 26.9312 85.5248 27.5913C85.172 28.2513 84.9956 28.9572 84.9956 29.7273C84.9956 28.563 84.6075 27.5546 83.8313 26.7112C83.0551 25.8587 82.1114 25.4095 81 25.3545ZM136 36.3545C137.111 36.2995 138.055 35.8503 138.831 35.0069C139.607 34.1635 139.996 33.1642 139.996 32C139.996 33.1642 140.384 34.1635 141.16 35.0069C141.936 35.8503 142.88 36.2903 144 36.3545C143.268 36.3911 142.598 36.602 141.98 37.0053C141.372 37.3995 140.886 37.9312 140.525 38.5913C140.172 39.2513 139.996 39.9572 139.996 40.7273C139.996 39.563 139.607 38.5546 138.831 37.7112C138.055 36.8587 137.111 36.4095 136 36.3545ZM101.831 49.0069C101.055 49.8503 100.111 50.2995 99 50.3545C100.111 50.4095 101.055 50.8587 101.831 51.7112C102.607 52.5546 102.996 53.563 102.996 54.7273C102.996 53.9572 103.172 53.2513 103.525 52.5913C103.886 51.9312 104.372 51.3995 104.98 51.0053C105.598 50.602 106.268 50.3911 107 50.3545C105.88 50.2903 104.936 49.8503 104.16 49.0069C103.384 48.1635 102.996 47.1642 102.996 46C102.996 47.1642 102.607 48.1635 101.831 49.0069Z" fill="currentColor" />
+                </svg>
+              </div>
+              <div class="theme-switch__circle-container">
+                <div class="theme-switch__sun-moon-container">
+                  <div class="theme-switch__moon">
+                    <div class="theme-switch__spot"></div>
+                    <div class="theme-switch__spot"></div>
+                    <div class="theme-switch__spot"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </label>
+        </div>
       </div>
       <h1 class="app-title">Universal <span>Proxy Converter</span></h1>
       <p class="app-subtitle">
@@ -883,6 +1336,7 @@ button.success-btn:active {
             
             <div style="margin-top:8px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
               <button type="button" class="secondary" id="btnFetchSub" style="padding:6px 14px; font-size:12px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg>
                 Fetch Subscription URL
               </button>
               <span class="field-note">Direct browser fetch (CORS policies apply)</span>
@@ -901,7 +1355,7 @@ button.success-btn:active {
             <div class="secret-input-wrapper" style="margin-bottom:10px;">
               <input type="password" id="manualPrivate" placeholder="Base64 32-byte private key" autocomplete="off" spellcheck="false" />
               <button type="button" class="secret-toggle-btn" data-target="manualPrivate" aria-label="Toggle private key visibility">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="lucide lucide-eye"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
               </button>
             </div>
 
@@ -940,12 +1394,12 @@ button.success-btn:active {
             <div class="secret-input-wrapper">
               <input type="password" id="manualPSK" placeholder="Optional Base64 preshared key" autocomplete="off" spellcheck="false" />
               <button type="button" class="secret-toggle-btn" data-target="manualPSK" aria-label="Toggle PSK visibility">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="lucide lucide-eye"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
               </button>
             </div>
           </div>
 
-          <!-- GLOBAL DEFAULTS & SECURITY -->
+          <!-- GLOBAL DEFAULTS & ROUTING -->
           <div class="section-title">
             <span>Global Defaults & Routing</span>
           </div>
@@ -1037,12 +1491,15 @@ button.success-btn:active {
           <!-- PRIMARY ACTION BUTTONS -->
           <div class="btn-row">
             <button type="button" id="btnConvert">
-              <span>⚡</span> Parse / Refresh
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-zap" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+              Parse / Refresh
             </button>
             <button type="button" class="secondary" id="btnRandomize">
-              <span>🎲</span> Randomize AWG
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-dices" aria-hidden="true"><rect width="12" height="12" x="2" y="10" rx="2" ry="2"></rect><path d="m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3.18l-5.74-5.74a2.24 2.24 0 0 0-3.18 0L9 5.08"></path><path d="M6 14h.01"></path><path d="M10 18h.01"></path><path d="M14 14h.01"></path><path d="M10 14h.01"></path><path d="m15 9 1-1"></path><path d="m12 6 1-1"></path></svg>
+              Randomize AWG
             </button>
             <button type="button" class="secondary" id="btnClear">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2" aria-hidden="true"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path><line x1="10" x2="10" y1="11" y2="17"></line><line x1="14" x2="14" y1="11" y2="17"></line></svg>
               Clear All
             </button>
           </div>
@@ -1056,12 +1513,14 @@ button.success-btn:active {
       <section class="card-bezel" aria-label="Output and Export">
         <div class="card-core">
           <div class="action-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
-            <div style="font-weight:700;color:var(--primary);font-size:14px;" id="configCountText">Parsed Configs</div>
+            <div style="font-weight:700;color:var(--accent);font-size:14px;" id="configCountText">Parsed Configs</div>
             <div style="display:flex;gap:8px;">
               <button type="button" class="success-btn" id="btnCopyAllLinks" style="padding:6px 14px;font-size:12px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
                 Copy Links
               </button>
               <button type="button" class="secondary" id="btnToggleExpandAll" style="padding:6px 14px;font-size:12px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevrons-up-down" aria-hidden="true"><path d="m7 15 5 5 5-5"></path><path d="m7 9 5-5 5 5"></path></svg>
                 Expand All
               </button>
             </div>
@@ -1098,19 +1557,22 @@ button.success-btn:active {
 
           <div class="btn-row">
             <button type="button" id="btnCopyResult">
-              <span>📋</span> Copy Combined
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>
+              Copy Combined
             </button>
             <button type="button" class="secondary" id="btnDownload">
-              <span>💾</span> Download Config
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg>
+              Download Config
             </button>
             <button type="button" class="secondary" id="btnToggleQr">
-              <span>📱</span> Toggle QR Code
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-qr-code" aria-hidden="true"><rect width="5" height="5" x="3" y="3" rx="1"></rect><rect width="5" height="5" x="16" y="3" rx="1"></rect><rect width="5" height="5" x="3" y="16" rx="1"></rect><path d="M21 16h-3a2 2 0 0 0-2 2v3"></path><path d="M21 21v.01"></path><path d="M12 7v3a2 2 0 0 1-2 2H7"></path><path d="M3 12h.01"></path><path d="M12 3h.01"></path><path d="M12 16v.01"></path><path d="M16 12h1"></path><path d="M21 12v.01"></path><path d="M12 21v-1"></path></svg>
+              Toggle QR Code
             </button>
           </div>
 
           <!-- QR Code Wrapper Area -->
           <div id="qrWrapper" class="qr-wrapper" aria-live="polite">
-            <label style="color:var(--primary);margin-bottom:6px;font-weight:600;">Scan Export QR Code</label>
+            <label style="color:var(--text-main);margin-bottom:6px;font-weight:600;">Scan Export QR Code</label>
             <div id="qrBox" class="qr-box"></div>
             <div id="qrError" class="qr-error"></div>
           </div>
@@ -1734,6 +2196,47 @@ function renderQrCode(containerEl, errorEl, text, options = {}) {
     if (errorEl) errorEl.textContent = msg;
     return { success: false, error: err.message };
   }
+}
+
+
+/* ==================== js/utils/icons.js ==================== */
+/**
+ * Lucide SVG Icons Utility
+ * Zero-dependency SVG renderer using stroke="currentColor"
+ * Automatically adapts icon colors across Dark and Light modes.
+ */
+
+const ICONS = {
+  zap: `<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>`,
+  dices: `<rect width="12" height="12" x="2" y="10" rx="2" ry="2"></rect><path d="m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3.18l-5.74-5.74a2.24 2.24 0 0 0-3.18 0L9 5.08"></path><path d="M6 14h.01"></path><path d="M10 18h.01"></path><path d="M14 14h.01"></path><path d="M10 14h.01"></path><path d="m15 9 1-1"></path><path d="m12 6 1-1"></path>`,
+  copy: `<rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>`,
+  download: `<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line>`,
+  'qr-code': `<rect width="5" height="5" x="3" y="3" rx="1"></rect><rect width="5" height="5" x="16" y="3" rx="1"></rect><rect width="5" height="5" x="3" y="16" rx="1"></rect><path d="M21 16h-3a2 2 0 0 0-2 2v3"></path><path d="M21 21v.01"></path><path d="M12 7v3a2 2 0 0 1-2 2H7"></path><path d="M3 12h.01"></path><path d="M12 3h.01"></path><path d="M12 16v.01"></path><path d="M16 12h1"></path><path d="M21 12v.01"></path><path d="M12 21v-1"></path>`,
+  'check-circle-2': `<circle cx="12" cy="12" r="10"></circle><path d="m9 12 2 2 4-4"></path>`,
+  'alert-triangle': `<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" x2="12" y1="9" y2="13"></line><line x1="12" x2="12.01" y1="17" y2="17"></line>`,
+  'x-circle': `<circle cx="12" cy="12" r="10"></circle><line x1="15" x2="9" y1="9" y2="15"></line><line x1="9" x2="15" y1="9" y2="15"></line>`,
+  info: `<circle cx="12" cy="12" r="10"></circle><line x1="12" x2="12" y1="16" y2="12"></line><line x1="12" x2="12.01" y1="8" y2="8"></line>`,
+  'trash-2': `<path d="3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path><line x1="10" x2="10" y1="11" y2="17"></line><line x1="14" x2="14" y1="11" y2="17"></line>`,
+  eye: `<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle>`,
+  'eye-off': `<path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path><line x1="2" x2="22" y1="2" y2="22"></line>`,
+  sun: `<circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path>`,
+  moon: `<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>`,
+  link: `<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>`,
+  'refresh-cw': `<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><path d="M8 16H3v5"></path>`,
+  'chevrons-up-down': `<path d="m7 15 5 5 5-5"></path><path d="m7 9 5-5 5 5"></path>`
+};
+
+/**
+ * Render Lucide icon as SVG string
+ * @param {string} name
+ * @param {object} options
+ * @returns {string} SVG HTML markup
+ */
+function renderIcon(name, options = {}) {
+  const size = options.size || 16;
+  const className = options.className || '';
+  const innerSvg = ICONS[name] || ICONS['info'];
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-${name} ${className}" aria-hidden="true">${innerSvg}</svg>`;
 }
 
 
@@ -3258,7 +3761,7 @@ function buildClashConfig(configs, settings = {}) {
 
   const policy = createRoutingPolicy({
     irBypass: settings.irBypass ?? true,
-    proxyTag: '✅ Selector'
+    proxyTag: 'Selector'
   });
   const rules = translateRoutingToClash(policy);
 
@@ -3366,7 +3869,7 @@ proxies:
     }
   });
 
-  yaml += `\nproxy-groups:\n  - name: "✅ Selector"\n    type: select\n    proxies:\n`;
+  yaml += `\nproxy-groups:\n  - name: "Selector"\n    type: select\n    proxies:\n`;
   proxies.forEach(p => { yaml += `      - ${escapeYamlString(p.name)}\n`; });
   yaml += `      - DIRECT\n\nrules:\n`;
   rules.forEach(r => { yaml += `  - ${r}\n`; });
@@ -4150,6 +4653,7 @@ function renderConfigList(containerEl, configs, options = {}) {
  */
 
 
+
 function renderStatus(bannerEl, statusState) {
   if (!bannerEl) return;
 
@@ -4162,15 +4666,15 @@ function renderStatus(bannerEl, statusState) {
   const { type, message, details } = statusState;
   bannerEl.className = `status-banner visible ${type}`;
 
-  const iconMap = {
-    success: '✓',
-    warn: '⚠',
-    error: '✕',
-    info: 'ℹ'
+  const iconNameMap = {
+    success: 'check-circle-2',
+    warn: 'alert-triangle',
+    error: 'x-circle',
+    info: 'info'
   };
 
-  const icon = iconMap[type] || 'ℹ';
-  let html = `<div style="font-weight:600;display:flex;align-items:center;gap:6px;"><span>${icon}</span><span>${escapeHtml(message)}</span></div>`;
+  const iconSvg = renderIcon(iconNameMap[type] || 'info', { size: 16 });
+  let html = `<div style="font-weight:600;display:flex;align-items:center;gap:8px;">${iconSvg}<span>${escapeHtml(message)}</span></div>`;
 
   if (Array.isArray(details) && details.length > 0) {
     html += '<ul style="margin-top:6px;padding-left:18px;font-size:12px;list-style:disc;">';
@@ -4188,6 +4692,7 @@ function renderStatus(bannerEl, statusState) {
 /**
  * Conversion Report UI Component
  */
+
 
 
 function renderConversionReport(containerEl, report) {
@@ -4246,16 +4751,20 @@ function renderConversionReport(containerEl, report) {
   if (unsupported.length > 0 || warnings.length > 0 || preserved.length > 0) {
     html += '<ul class="report-detail-list">';
 
+    const iconError = renderIcon('x-circle', { size: 14 });
+    const iconWarn = renderIcon('alert-triangle', { size: 14 });
+    const iconSuccess = renderIcon('check-circle-2', { size: 14 });
+
     unsupported.forEach(item => {
-      html += `<li class="report-detail-item" style="color:var(--status-error);"><span>✕</span><span><strong>Unsupported:</strong> ${escapeHtml(item)}</span></li>`;
+      html += `<li class="report-detail-item" style="color:var(--status-error);">${iconError}<span><strong>Unsupported:</strong> ${escapeHtml(item)}</span></li>`;
     });
 
     warnings.forEach(item => {
-      html += `<li class="report-detail-item" style="color:var(--status-warn);"><span>⚠</span><span>${escapeHtml(item)}</span></li>`;
+      html += `<li class="report-detail-item" style="color:var(--status-warn);">${iconWarn}<span>${escapeHtml(item)}</span></li>`;
     });
 
     if (preserved.length > 0) {
-      html += `<li class="report-detail-item" style="color:var(--status-success);"><span>✓</span><span><strong>Preserved:</strong> ${escapeHtml(preserved.slice(0, 8).join(', '))}${preserved.length > 8 ? ` (+${preserved.length - 8} more)` : ''}</span></li>`;
+      html += `<li class="report-detail-item" style="color:var(--status-success);">${iconSuccess}<span><strong>Preserved:</strong> ${escapeHtml(preserved.slice(0, 8).join(', '))}${preserved.length > 8 ? ` (+${preserved.length - 8} more)` : ''}</span></li>`;
     }
 
     html += '</ul>';
@@ -4269,6 +4778,7 @@ function renderConversionReport(containerEl, report) {
 /**
  * Universal Proxy Converter Application Coordinator
  */
+
 
 
 
@@ -4740,20 +5250,20 @@ class App {
   async handleFetchSubscription() {
     const url = this.dom.inputData.value.trim();
     const log = this.dom.fetchLog;
-    log.textContent = '';
+    log.innerHTML = '';
 
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
-      log.textContent = '❌ Please enter a valid HTTP or HTTPS subscription URL.';
+      log.innerHTML = `<span style="color:var(--status-error);display:inline-flex;align-items:center;gap:4px;">${renderIcon('alert-triangle', { size: 14 })} Please enter a valid HTTP or HTTPS subscription URL.</span>`;
       return;
     }
 
     // SSRF & loopback protection notice
     if (/^https?:\/\/(localhost|127\.0\.0\.1|0\.0\.0\.0|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|192\.168\.|169\.254\.)/i.test(url)) {
-      log.textContent = '❌ Fetching from localhost, private, or link-local IP addresses is blocked for security.';
+      log.innerHTML = `<span style="color:var(--status-error);display:inline-flex;align-items:center;gap:4px;">${renderIcon('alert-triangle', { size: 14 })} Fetching from localhost, private, or link-local IP addresses is blocked for security.</span>`;
       return;
     }
 
-    log.textContent = '⏳ Fetching subscription... (CORS policy applies)';
+    log.innerHTML = `<span style="color:var(--text-muted);display:inline-flex;align-items:center;gap:4px;">${renderIcon('refresh-cw', { size: 14, className: 'spin' })} Fetching subscription... (CORS policy applies)</span>`;
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 12000);
@@ -4770,11 +5280,11 @@ class App {
       }
 
       this.dom.inputData.value = text;
-      log.textContent = '✓ Subscription fetched successfully! Click "Parse / Refresh" below.';
+      log.innerHTML = `<span style="color:var(--status-success);display:inline-flex;align-items:center;gap:4px;">${renderIcon('check-circle-2', { size: 14 })} Subscription fetched successfully! Click "Parse / Refresh" below.</span>`;
       store.setStatus('success', 'Subscription loaded into input. Click "Parse / Refresh" to process.');
     } catch (err) {
       const msg = err.name === 'AbortError' ? 'Request timed out after 12s' : err.message;
-      log.textContent = `❌ Fetch failed: ${msg}. (Note: Browser-side CORS restrictions block servers that do not send Access-Control-Allow-Origin).`;
+      log.innerHTML = `<span style="color:var(--status-error);display:inline-flex;align-items:center;gap:4px;">${renderIcon('x-circle', { size: 14 })} Fetch failed: ${msg}. (Note: Browser-side CORS restrictions block servers that do not send Access-Control-Allow-Origin).</span>`;
     }
   }
 
@@ -4791,8 +5301,57 @@ class App {
 }
 
 
+// ==================== Centralized Theme Manager ====================
+const ThemeManager = {
+  getTheme: function() {
+    return document.documentElement.getAttribute('data-theme') || 'dark';
+  },
+  setTheme: function(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    try {
+      localStorage.setItem('theme', theme);
+    } catch (e) {}
+    const toggle = document.querySelector('.theme-switch__checkbox');
+    if (toggle) {
+      toggle.checked = theme === 'dark';
+    }
+  },
+  toggle: function() {
+    const next = this.getTheme() === 'dark' ? 'light' : 'dark';
+    this.setTheme(next);
+  },
+  init: function() {
+    let theme = 'dark';
+    try {
+      const saved = localStorage.getItem('theme');
+      if (saved) {
+        theme = saved;
+      }
+    } catch (e) {}
+    this.setTheme(theme);
+
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (!localStorage.getItem('theme')) {
+          this.setTheme(e.matches ? 'dark' : 'light');
+        }
+      });
+    }
+
+    const toggle = document.querySelector('.theme-switch__checkbox');
+    if (toggle) {
+      toggle.checked = theme === 'dark';
+      toggle.addEventListener('change', (e) => {
+        this.setTheme(e.target.checked ? 'dark' : 'light');
+      });
+    }
+  }
+};
+
 // ==================== Application Bootstrap ====================
 document.addEventListener('DOMContentLoaded', () => {
+  ThemeManager.init();
+
   const domElements = {
     modePasteBtn: document.getElementById('modePaste'),
     modeManualBtn: document.getElementById('modeManual'),

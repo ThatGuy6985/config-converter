@@ -19,6 +19,7 @@ import { renderConfigList } from './ui/configs.js';
 import { renderStatus } from './ui/status.js';
 import { renderConversionReport } from './ui/report.js';
 import { setupAccessibleTabs } from './ui/tabs.js';
+import { renderIcon } from './utils/icons.js';
 
 export class App {
   constructor(domElements) {
@@ -473,20 +474,20 @@ export class App {
   async handleFetchSubscription() {
     const url = this.dom.inputData.value.trim();
     const log = this.dom.fetchLog;
-    log.textContent = '';
+    log.innerHTML = '';
 
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
-      log.textContent = '❌ Please enter a valid HTTP or HTTPS subscription URL.';
+      log.innerHTML = `<span style="color:var(--status-error);display:inline-flex;align-items:center;gap:4px;">${renderIcon('alert-triangle', { size: 14 })} Please enter a valid HTTP or HTTPS subscription URL.</span>`;
       return;
     }
 
     // SSRF & loopback protection notice
     if (/^https?:\/\/(localhost|127\.0\.0\.1|0\.0\.0\.0|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|192\.168\.|169\.254\.)/i.test(url)) {
-      log.textContent = '❌ Fetching from localhost, private, or link-local IP addresses is blocked for security.';
+      log.innerHTML = `<span style="color:var(--status-error);display:inline-flex;align-items:center;gap:4px;">${renderIcon('alert-triangle', { size: 14 })} Fetching from localhost, private, or link-local IP addresses is blocked for security.</span>`;
       return;
     }
 
-    log.textContent = '⏳ Fetching subscription... (CORS policy applies)';
+    log.innerHTML = `<span style="color:var(--text-muted);display:inline-flex;align-items:center;gap:4px;">${renderIcon('refresh-cw', { size: 14, className: 'spin' })} Fetching subscription... (CORS policy applies)</span>`;
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 12000);
@@ -503,11 +504,11 @@ export class App {
       }
 
       this.dom.inputData.value = text;
-      log.textContent = '✓ Subscription fetched successfully! Click "Parse / Refresh" below.';
+      log.innerHTML = `<span style="color:var(--status-success);display:inline-flex;align-items:center;gap:4px;">${renderIcon('check-circle-2', { size: 14 })} Subscription fetched successfully! Click "Parse / Refresh" below.</span>`;
       store.setStatus('success', 'Subscription loaded into input. Click "Parse / Refresh" to process.');
     } catch (err) {
       const msg = err.name === 'AbortError' ? 'Request timed out after 12s' : err.message;
-      log.textContent = `❌ Fetch failed: ${msg}. (Note: Browser-side CORS restrictions block servers that do not send Access-Control-Allow-Origin).`;
+      log.innerHTML = `<span style="color:var(--status-error);display:inline-flex;align-items:center;gap:4px;">${renderIcon('x-circle', { size: 14 })} Fetch failed: ${msg}. (Note: Browser-side CORS restrictions block servers that do not send Access-Control-Allow-Origin).</span>`;
     }
   }
 

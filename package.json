@@ -18,5 +18,14 @@
     "xray"
   ],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "styled-components": "^6.1.13"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.11",
+    "@types/styled-components": "^5.1.34",
+    "lucide-react": "^0.453.0",
+    "typescript": "^5.6.3"
+  }
 }

@@ -1,5 +1,6 @@
 /**
  * Neumorphism Layout & Container Architecture
+ * Dual-theme foundation, responsive spacing, and accessibility
  */
 
 * {
@@ -11,6 +12,8 @@
 html {
   background-color: var(--bg-surface);
   scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 }
 
 body {
@@ -22,6 +25,38 @@ body {
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color var(--transition-smooth), color var(--transition-smooth);
+}
+
+::selection {
+  background-color: var(--selection-bg);
+  color: var(--selection-text);
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* WebKit Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 4px;
+  border: 2px solid var(--scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
 }
 
 .container {
@@ -33,6 +68,22 @@ body {
 .app-header {
   text-align: center;
   margin-bottom: 32px;
+  position: relative;
+}
+
+.header-top-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 14px;
+  position: relative;
+}
+
+.theme-toggle-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .app-eyebrow {
@@ -49,13 +100,16 @@ body {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  margin-bottom: 14px;
-  transition: transform var(--transition-smooth), box-shadow var(--transition-smooth);
+  transition: transform var(--transition-smooth), box-shadow var(--transition-smooth), color var(--transition-smooth);
 }
 
 .app-eyebrow:hover {
   transform: translateY(-1px);
   box-shadow: var(--shadow-extruded);
+}
+
+.app-eyebrow svg {
+  color: currentColor;
 }
 
 .app-title {
@@ -65,11 +119,13 @@ body {
   color: var(--text-main);
   letter-spacing: -0.03em;
   margin-bottom: 8px;
+  transition: color var(--transition-smooth);
 }
 
 .app-title span {
   color: var(--accent);
   display: inline-block;
+  transition: color var(--transition-smooth);
 }
 
 .app-subtitle {
@@ -78,6 +134,7 @@ body {
   max-width: 760px;
   margin: 0 auto;
   font-weight: 400;
+  transition: color var(--transition-smooth);
 }
 
 /* Two-Column Responsive Split Layout */
@@ -94,7 +151,8 @@ body {
   border-radius: var(--radius-card);
   padding: 6px;
   box-shadow: var(--shadow-extruded);
-  transition: transform var(--transition-smooth), box-shadow var(--transition-smooth);
+  border: 1px solid var(--border);
+  transition: transform var(--transition-smooth), box-shadow var(--transition-smooth), background-color var(--transition-smooth), border-color var(--transition-smooth);
 }
 
 .card-bezel:hover {
@@ -105,6 +163,7 @@ body {
   background: var(--bg-surface);
   border-radius: calc(var(--radius-card) - 6px);
   padding: 24px;
+  transition: background-color var(--transition-smooth);
 }
 
 .section-title {
@@ -120,6 +179,7 @@ body {
   margin: 22px 0 14px 0;
   padding-bottom: 8px;
   position: relative;
+  transition: color var(--transition-smooth);
 }
 
 .section-title::after {
@@ -132,6 +192,7 @@ body {
   background: var(--bg-surface);
   box-shadow: var(--shadow-inset-sm);
   border-radius: 9999px;
+  transition: background-color var(--transition-smooth), box-shadow var(--transition-smooth);
 }
 
 .section-title:first-child {
@@ -148,4 +209,14 @@ body {
 .row > div {
   flex: 1;
   min-width: 120px;
+}
+
+/* Motion Preferences */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

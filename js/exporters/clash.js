@@ -196,7 +196,7 @@ export function buildClashConfig(configs, settings = {}) {
 
   const policy = createRoutingPolicy({
     irBypass: settings.irBypass ?? true,
-    proxyTag: '✅ Selector'
+    proxyTag: 'Selector'
   });
   const rules = translateRoutingToClash(policy);
 
@@ -304,7 +304,7 @@ proxies:
     }
   });
 
-  yaml += `\nproxy-groups:\n  - name: "✅ Selector"\n    type: select\n    proxies:\n`;
+  yaml += `\nproxy-groups:\n  - name: "Selector"\n    type: select\n    proxies:\n`;
   proxies.forEach(p => { yaml += `      - ${escapeYamlString(p.name)}\n`; });
   yaml += `      - DIRECT\n\nrules:\n`;
   rules.forEach(r => { yaml += `  - ${r}\n`; });
