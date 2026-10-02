@@ -3956,12 +3956,23 @@ function buildAmneziaWG(config, settings = {}) {
     return '# AmneziaWG export is only available for WireGuard configurations.\n';
   }
 
-  const awg = config.amnezia || settings.awg || {
-    jc: 5, jmin: 50, jmax: 100,
-    s1: 0, s2: 0, s3: 0, s4: 0,
-    h1: 1, h2: 2, h3: 3, h4: 4,
-    i1: '', i2: ''
-  };
+  const defaults = {
+  jc: 5, jmin: 50, jmax: 100,
+  s1: 0, s2: 0, s3: 0, s4: 0,
+  h1: 1, h2: 2, h3: 3, h4: 4,
+  i1: '', i2: ''
+};
+
+const fromConfig = config.amnezia || {};
+const fromSettings = settings.awg || {};
+
+const awg = {
+  ...defaults,
+  ...fromConfig,
+  ...fromSettings,
+  i1: (fromSettings.i1 && fromSettings.i1.trim()) || fromConfig.i1 || '',
+  i2: (fromSettings.i2 && fromSettings.i2.trim()) || fromConfig.i2 || ''
+};
 
   const dns = settings.dns || config.interface?.dns?.join(', ') || '1.1.1.1';
   const mtu = settings.mtu || config.interface?.mtu || 1280;
@@ -5947,7 +5958,25 @@ class App {
     });
 
     store.setConfigs(parsedConfigs);
-
+    const wgConfig = parsedConfigs.find(c => c.protocol === 'wireguard');
+if (wgConfig && wgConfig.amnezia && this.dom.i1 && this.dom.i2) {
+  const a = wgConfig.amnezia;
+  this.dom.jc.value = a.jc ?? 5;
+  this.dom.jmin.value = a.jmin ?? 50;
+  this.dom.jmax.value = a.jmax ?? 100;
+  this.dom.s1.value = a.s1 ?? 0;
+  this.dom.s2.value = a.s2 ?? 0;
+  this.dom.s3.value = a.s3 ?? 0;
+  this.dom.s4.value = a.s4 ?? 0;
+  this.dom.h1.value = a.h1 ?? 1;
+  this.dom.h2.value = a.h2 ?? 2;
+  this.dom.h3.value = a.h3 ?? 3;
+  this.dom.h4.value = a.h4 ?? 4;
+  this.dom.i1.value = a.i1 || '';
+  this.dom.i2.value = a.i2 || '';
+  if (this.dom.awgPreset) this.dom.awgPreset.value = 'custom';
+  this.syncSettingsFromDom();
+}
     this.recalculateReport(parsedConfigs, parsingErrors.length + parsedConfigs.length);
 
     if (validationErrors.length > 0) {
