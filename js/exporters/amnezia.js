@@ -94,12 +94,24 @@ export function buildAmneziaWG(config, settings = {}) {
     return '# AmneziaWG export is only available for WireGuard configurations.\n';
   }
 
-  const awg = config.amnezia || settings.awg || {
-    jc: 5, jmin: 50, jmax: 100,
-    s1: 0, s2: 0, s3: 0, s4: 0,
-    h1: 1, h2: 2, h3: 3, h4: 4,
-    i1: '', i2: ''
-  };
+  const defaults = {
+  jc: 5, jmin: 50, jmax: 100,
+  s1: 0, s2: 0, s3: 0, s4: 0,
+  h1: 1, h2: 2, h3: 3, h4: 4,
+  i1: '', i2: ''
+};
+
+const fromConfig = config.amnezia || {};
+const fromSettings = settings.awg || {};
+
+const awg = {
+  ...defaults,
+  ...fromConfig,
+  ...fromSettings,
+  // Keep parsed I1/I2 if the UI fields are empty
+  i1: (fromSettings.i1 && fromSettings.i1.trim()) || fromConfig.i1 || '',
+  i2: (fromSettings.i2 && fromSettings.i2.trim()) || fromConfig.i2 || ''
+};
 
   const dns = settings.dns || config.interface?.dns?.join(', ') || '1.1.1.1';
   const mtu = settings.mtu || config.interface?.mtu || 1280;
