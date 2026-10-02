@@ -88,11 +88,6 @@
     flex-wrap: wrap;
   }
 
-  .app-eyebrow {
-    font-size: 10.5px;
-    padding: 6px 12px;
-    gap: 6px;
-  }
 
   .github-star-btn {
     font-size: 11px;
