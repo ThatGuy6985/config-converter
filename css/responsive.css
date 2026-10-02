@@ -81,14 +81,21 @@
 @media (max-width: 640px) {
   .header-top-row {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     width: 100%;
     gap: 10px;
+    flex-wrap: wrap;
   }
 
   .app-eyebrow {
     font-size: 10.5px;
+    padding: 6px 12px;
+    gap: 6px;
+  }
+
+  .github-star-btn {
+    font-size: 11px;
     padding: 6px 12px;
     gap: 6px;
   }

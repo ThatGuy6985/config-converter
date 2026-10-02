@@ -388,7 +388,7 @@ const PARTICLE_DRIFT_SOURCE = `<!doctype html>
         });
     </script>
 </body>
-</html>\`;
+</html>`;
 
 const PARTICLE_DRIFT_DEFINITION: EffectDefinition = {
   title: "Particle Drift",
@@ -423,11 +423,11 @@ const PARTICLE_DRIFT_DEFINITION: EffectDefinition = {
         "b.y -= b.speed;",
         "b.y -= b.speed * ((window.__SF_CONTROLS&&window.__SF_CONTROLS.speed)||1);",
       )
-      .replace("if(d < 120) {", \`if(d < \${link}) {\`)
-      .replace("0.15 * (1 - d/120)", \`\${proximityAlpha} * (1 - d/\${link})\`)
+      .replace("if(d < 120) {", `if(d < \${link}) {`)
+      .replace("0.15 * (1 - d/120)", `\${proximityAlpha} * (1 - d/\${link})`)
       .replace(
         "ctx.lineWidth = 1.5;",
-        \`ctx.lineWidth = \${Number((1.5 * size).toFixed(2))};\`,
+        `ctx.lineWidth = \${Number((1.5 * size).toFixed(2))};`,
       );
     if (mode === "light") {
       next = next
@@ -475,19 +475,19 @@ function buildFocusedDocument(
         mode,
       })
     : definition.source;
-  const focusStyle = \`<style data-threeui-focus>
-html, body { width: 100% !important; height: 100% !important; min-height: 0 !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important; background: \${background} !important; }
+  const focusStyle = `<style data-threeui-focus>
+html, body { width: 100% !important; height: 100% !important; min-height: 0 !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important; background: ${background} !important; }
 body { position: relative !important; display: flex !important; align-items: center !important; justify-content: center !important; }
 body > * { visibility: hidden !important; }
 body[data-threeui-ready] > [data-threeui-role] { visibility: visible !important; }
 [data-threeui-residual] { display: none !important; }
 [data-threeui-role="background"] { position: fixed !important; inset: 0 !important; width: 100% !important; height: 100% !important; max-width: none !important; max-height: none !important; z-index: 0 !important; opacity: 1 !important; pointer-events: none !important; }
 [data-threeui-role="ui"] { position: relative !important; z-index: 1 !important; width: min(calc(100% - 32px), var(--threeui-target-width, 1040px)) !important; max-width: none !important; max-height: calc(100% - 32px) !important; margin: auto !important; overflow: auto !important; opacity: 1 !important; transform: none !important; filter: none !important; flex: none !important; box-sizing: border-box !important; }
-\${definition.focusCss ?? ""}
-</style>\`;
-  const controlScript = \`<script data-threeui-controls>
+${definition.focusCss ?? ""}
+</style>`;
+  const controlScript = `<script data-threeui-controls>
 (function () {
-  var controls = \${controlsJson};
+  var controls = ${controlsJson};
   window.__SF_CONTROLS = controls;
   var origin = performance.now();
   var virtual = 0;
@@ -529,13 +529,13 @@ body[data-threeui-ready] > [data-threeui-role] { visibility: visible !important;
   });
   window.__SF_APPLY_CONTROLS = applyVisual;
 })();
-</script>\`;
-  const focusScript = \`<script data-threeui-focus>
+</script>`;
+  const focusScript = `<script data-threeui-focus>
 (function () {
   var isolated = false;
   function isolate() {
     if (isolated) return;
-    var specs = \${targetJson};
+    var specs = ${targetJson};
     var roots = [];
     specs.forEach(function (spec) {
       var element = document.querySelector(spec.selector);
@@ -562,10 +562,10 @@ body[data-threeui-ready] > [data-threeui-role] { visibility: visible !important;
   else scheduleIsolation();
   window.addEventListener("load", isolate, { once: true });
 })();
-</script>\`;
+</script>`;
   return patchedSource
-    .replace(/<head([^>]*)>/i, \`<head$1>\${controlScript}\${focusStyle}\`)
-    .replace(/<\\/body>/i, \`\${focusScript}</body>\`);
+    .replace(/<head([^>]*)>/i, `<head$1>${controlScript}${focusStyle}`)
+    .replace(/<\/body>/i, `${focusScript}</body>`);
 }
 
 export default function ParticleDrift({
