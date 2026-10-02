@@ -52,6 +52,7 @@ const jsFiles = [
   'js/exporters/singbox.js',
   'js/exporters/xray.js',
   'js/state.js',
+  'js/ui/stepper.js',
   'js/ui/tabs.js',
   'js/ui/configs.js',
   'js/ui/status.js',
@@ -132,6 +133,7 @@ const ThemeManager = {
 // ==================== Application Bootstrap ====================
 document.addEventListener('DOMContentLoaded', () => {
   ThemeManager.init();
+  setupNumberSteppers();
 
   const domElements = {
     modePasteBtn: document.getElementById('modePaste'),
@@ -202,7 +204,26 @@ document.addEventListener('DOMContentLoaded', () => {
 })();
 `;
 
-// 3. Assemble HTML Template
+// 3. Helper to render number input with custom tactile steppers
+function renderNumberControl(id, value, min, max, label) {
+  const minAttr = min !== undefined ? ` min="${min}"` : '';
+  const maxAttr = max !== undefined ? ` max="${max}"` : '';
+  const ariaLabelUp = label ? `Increase ${label}` : 'Increase';
+  const ariaLabelDown = label ? `Decrease ${label}` : 'Decrease';
+  return `<div class="number-control">
+    <input type="number" id="${id}" value="${value}"${minAttr}${maxAttr} autocomplete="off" />
+    <div class="number-steppers">
+      <button type="button" class="stepper-btn" data-step="up" data-target="${id}" aria-label="${ariaLabelUp}" tabindex="-1">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg>
+      </button>
+      <button type="button" class="stepper-btn" data-step="down" data-target="${id}" aria-label="${ariaLabelDown}" tabindex="-1">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+    </div>
+  </div>`;
+}
+
+// 4. Assemble HTML Template
 const htmlTemplate = `<!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
@@ -341,7 +362,7 @@ ${bundledCss}
               </div>
               <div>
                 <label for="manualKeepalive">Keepalive (seconds)</label>
-                <input type="number" id="manualKeepalive" value="25" min="0" max="3600" />
+                ${renderNumberControl('manualKeepalive', 25, 0, 3600, 'Keepalive')}
               </div>
             </div>
 
@@ -361,18 +382,18 @@ ${bundledCss}
           <div class="section-title">
             <span>Global Defaults & Routing</span>
           </div>
-          <div class="row">
+          <div class="row row-cols-3">
             <div>
               <label for="dns">Remote DNS</label>
               <input type="text" id="dns" value="1.1.1.1" autocomplete="off" />
             </div>
             <div>
               <label for="mtu">MTU</label>
-              <input type="number" id="mtu" value="1280" min="576" max="9000" />
+              ${renderNumberControl('mtu', 1280, 576, 9000, 'MTU')}
             </div>
             <div>
               <label for="globalKeepalive">Default Keepalive</label>
-              <input type="number" id="globalKeepalive" value="25" min="0" max="3600" />
+              ${renderNumberControl('globalKeepalive', 25, 0, 3600, 'Keepalive')}
             </div>
           </div>
 
@@ -415,24 +436,24 @@ ${bundledCss}
             </select>
           </div>
 
-          <div class="row">
-            <div><label for="jc">Jc</label><input type="number" id="jc" value="5" min="0" max="128" /></div>
-            <div><label for="jmin">Jmin</label><input type="number" id="jmin" value="50" min="0" max="65535" /></div>
-            <div><label for="jmax">Jmax</label><input type="number" id="jmax" value="100" min="0" max="65535" /></div>
+          <div class="row row-cols-3">
+            <div><label for="jc">Jc</label>${renderNumberControl('jc', 5, 0, 128, 'Jc')}</div>
+            <div><label for="jmin">Jmin</label>${renderNumberControl('jmin', 50, 0, 65535, 'Jmin')}</div>
+            <div><label for="jmax">Jmax</label>${renderNumberControl('jmax', 100, 0, 65535, 'Jmax')}</div>
           </div>
 
-          <div class="row">
-            <div><label for="s1">S1</label><input type="number" id="s1" value="0" min="0" max="65535" /></div>
-            <div><label for="s2">S2</label><input type="number" id="s2" value="0" min="0" max="65535" /></div>
-            <div><label for="s3">S3</label><input type="number" id="s3" value="0" min="0" max="65535" /></div>
-            <div><label for="s4">S4</label><input type="number" id="s4" value="0" min="0" max="65535" /></div>
+          <div class="row row-cols-4">
+            <div><label for="s1">S1</label>${renderNumberControl('s1', 0, 0, 65535, 'S1')}</div>
+            <div><label for="s2">S2</label>${renderNumberControl('s2', 0, 0, 65535, 'S2')}</div>
+            <div><label for="s3">S3</label>${renderNumberControl('s3', 0, 0, 65535, 'S3')}</div>
+            <div><label for="s4">S4</label>${renderNumberControl('s4', 0, 0, 65535, 'S4')}</div>
           </div>
 
-          <div class="row">
-            <div><label for="h1">H1</label><input type="number" id="h1" value="1" /></div>
-            <div><label for="h2">H2</label><input type="number" id="h2" value="2" /></div>
-            <div><label for="h3">H3</label><input type="number" id="h3" value="3" /></div>
-            <div><label for="h4">H4</label><input type="number" id="h4" value="4" /></div>
+          <div class="row row-cols-4">
+            <div><label for="h1">H1</label>${renderNumberControl('h1', 1, undefined, undefined, 'H1')}</div>
+            <div><label for="h2">H2</label>${renderNumberControl('h2', 2, undefined, undefined, 'H2')}</div>
+            <div><label for="h3">H3</label>${renderNumberControl('h3', 3, undefined, undefined, 'H3')}</div>
+            <div><label for="h4">H4</label>${renderNumberControl('h4', 4, undefined, undefined, 'H4')}</div>
           </div>
 
           <div class="row">

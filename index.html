@@ -431,6 +431,92 @@ input:focus, textarea:focus, select:focus {
   box-shadow: var(--shadow-inset-deep);
 }
 
+/* Suppress ugly default browser number spinners */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none !important;
+  margin: 0 !important;
+  display: none !important;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield !important;
+  appearance: textfield !important;
+}
+
+/* Custom Tactile Number Stepper Controls */
+.number-control {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.number-control input[type="number"] {
+  padding-right: 42px;
+  width: 100%;
+}
+
+.number-steppers {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  bottom: 5px;
+  width: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 2;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.stepper-btn {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  border-radius: 5px;
+  box-shadow: var(--shadow-extruded-sm);
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  touch-action: manipulation;
+  transition: background-color var(--transition-smooth), color var(--transition-smooth), border-color var(--transition-smooth), box-shadow var(--transition-smooth), transform var(--transition-smooth);
+}
+
+.stepper-btn svg {
+  display: block;
+  stroke-width: 2.5;
+  transition: transform 0.15s ease, stroke 0.15s ease;
+}
+
+.stepper-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--bg-surface-elevated);
+  box-shadow: var(--shadow-glow);
+}
+
+.stepper-btn:hover svg {
+  stroke: var(--accent);
+}
+
+.stepper-btn:active {
+  box-shadow: var(--shadow-inset-sm);
+  transform: scale(0.92);
+  color: var(--accent);
+}
+
+.stepper-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
 textarea {
   min-height: 125px;
   resize: vertical;
@@ -1192,9 +1278,16 @@ html[data-theme="light"] .level-compatible { color: #2B6CB0; }
 
 /* === css/responsive.css === */
 /**
- * Neumorphism Responsive Viewport Rules
+ * Neumorphism Responsive & Mobile UX Architecture
+ * Enterprise Multi-Protocol Converter
+ *
+ * Implements fluid typography, safe area insets, touch-friendly 44px+ hit targets,
+ * 2x2 grid segmented controls, ergonomic button hierarchy, and zero horizontal page overflow.
  */
 
+/* ==========================================================================
+   1. TABLET & COMPACT DESKTOP (<= 1120px)
+   ========================================================================== */
 @media (max-width: 1120px) {
   .workspace-grid {
     grid-template-columns: 1fr;
@@ -1202,72 +1295,329 @@ html[data-theme="light"] .level-compatible { color: #2B6CB0; }
   }
 }
 
+/* ==========================================================================
+   2. TABLET & LARGE MOBILE (<= 768px)
+   ========================================================================== */
 @media (max-width: 768px) {
   body {
-    padding: 20px 14px;
+    padding: clamp(16px, 4vw, 28px) clamp(12px, 3.5vw, 20px);
+    padding-left: max(clamp(12px, 3.5vw, 20px), env(safe-area-inset-left));
+    padding-right: max(clamp(12px, 3.5vw, 20px), env(safe-area-inset-right));
+    padding-bottom: max(clamp(16px, 4vw, 28px), env(safe-area-inset-bottom));
+  }
+
+  .app-header {
+    margin-bottom: 24px;
   }
 
   .app-title {
-    font-size: 26px;
+    font-size: clamp(24px, 5.5vw, 30px);
+    letter-spacing: -0.02em;
   }
 
   .app-subtitle {
     font-size: 13.5px;
+    line-height: 1.5;
   }
 
   .card-bezel {
-    border-radius: 24px;
-    padding: 4px;
+    border-radius: 22px;
+    padding: 5px;
   }
 
   .card-core {
-    padding: 16px 14px;
-    border-radius: 20px;
+    padding: 20px 16px;
+    border-radius: 17px;
   }
 
-  .row {
-    flex-direction: column;
+  /* Grid adaptations for AmneziaWG parameters */
+  .row.row-cols-4 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
   }
 
+  .row.row-cols-4 > div {
+    min-width: 0;
+  }
+
+  .row.row-cols-3 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .row.row-cols-3 > div:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .row.row-cols-3 > div {
+    min-width: 0;
+  }
+
   .row > div {
-    min-width: 100%;
-  }
-
-  .btn-row {
-    flex-direction: column;
-  }
-
-  .btn-row button {
-    width: 100%;
-    min-height: 46px; /* 44px+ touch-friendly target */
-    justify-content: center;
-  }
-
-  .export-tabs {
-    flex-direction: column;
-  }
-
-  .tab-btn {
-    text-align: center;
-    width: 100%;
-    min-height: 44px;
-  }
-
-  .mode-switch {
-    flex-direction: column;
-  }
-
-  .mode-tab-btn {
-    min-height: 44px;
+    min-width: 0;
   }
 
   .report-stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
   }
 
   .report-stat-item {
-    flex: 1 1 calc(50% - 8px);
+    flex: 1 1 auto;
+  }
+}
+
+/* ==========================================================================
+   3. STANDARD MOBILE PHONES (<= 640px)
+   ========================================================================== */
+@media (max-width: 640px) {
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .app-eyebrow {
+    font-size: 10.5px;
+    padding: 6px 12px;
+    gap: 6px;
+  }
+
+  .card-bezel {
+    border-radius: 18px;
+    padding: 4px;
+  }
+
+  .card-core {
+    padding: 16px 12px;
+    border-radius: 14px;
+  }
+
+  .section-title {
+    font-size: 11.5px;
+    margin: 18px 0 10px 0;
+  }
+
+  /* Mode switch: clean 2-column segmented control */
+  .mode-switch {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .mode-tab-btn {
+    min-height: 44px;
+    padding: 8px 6px;
+    font-size: 12.5px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Export tabs: space-efficient 2x2 grid preserving 44px touch targets */
+  .export-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .tab-btn {
+    width: 100%;
+    min-height: 44px;
+    padding: 8px 6px;
+    font-size: 12.5px;
+    text-align: center;
+    justify-content: center;
+    border-radius: 10px;
+  }
+
+  /* Action buttons: Hero CTA spans 100%, secondary actions paired underneath */
+  .btn-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .btn-row button:first-child {
+    grid-column: 1 / -1;
+    min-height: 48px;
+    font-size: 13.5px;
+    font-weight: 700;
+  }
+
+  .btn-row button:not(:first-child) {
+    min-height: 44px;
+    font-size: 12px;
+    padding: 8px 6px;
+  }
+
+  /* Two-item rows wrap gracefully without overflowing */
+  .row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .row.row-cols-4,
+  .row.row-cols-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* Checkbox rows remain side by side or cleanly stacked */
+  .checkbox-field {
+    min-height: 38px;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Inputs & Steppers */
+  input, textarea, select {
+    font-size: 13px;
+    padding: 10px 12px;
+  }
+
+  .number-control input[type="number"] {
+    padding-right: 40px;
+  }
+
+  .number-steppers {
+    width: 28px;
+    right: 4px;
+    top: 4px;
+    bottom: 4px;
+  }
+
+  /* Code & Result Area */
+  #resultArea {
+    min-height: 180px;
+    font-size: 12px;
+    line-height: 1.45;
+    white-space: pre;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* QR Code Responsive Framing */
+  .qr-wrapper {
+    padding: 14px;
+    margin-top: 12px;
+  }
+
+  .qr-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  .qr-box canvas,
+  .qr-box img {
+    max-width: min(220px, 65vw) !important;
+    height: auto !important;
+  }
+
+  /* Status Banner */
+  .status-banner {
+    font-size: 12px;
+    padding: 10px 12px;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+}
+
+/* ==========================================================================
+   4. ULTRA-COMPACT PHONES (<= 360px)
+   ========================================================================== */
+@media (max-width: 360px) {
+  body {
+    padding: 10px 4px;
+  }
+
+  .card-bezel {
+    border-radius: 14px;
+    padding: 3px;
+  }
+
+  .card-core {
+    padding: 12px 8px;
+    border-radius: 11px;
+  }
+
+  .header-top-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .app-title {
+    font-size: 20px;
+  }
+
+  .app-subtitle {
+    font-size: 11.5px;
+  }
+
+  .mode-switch {
+    grid-template-columns: 1fr;
+  }
+
+  .btn-row {
+    grid-template-columns: 1fr;
+  }
+
+  .btn-row button:first-child {
+    grid-column: 1;
+  }
+
+  .report-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .number-control input[type="number"] {
+    padding-right: 36px;
+    font-size: 12px;
+  }
+
+  .number-steppers {
+    width: 24px;
+    right: 3px;
+    top: 3px;
+    bottom: 3px;
+  }
+
+  .stepper-btn svg {
+    width: 9px;
+    height: 9px;
+  }
+}
+
+/* ==========================================================================
+   5. LANDSCAPE TOUCH DEVICES
+   ========================================================================== */
+@media (max-height: 500px) and (orientation: landscape) {
+  .app-header {
+    margin-bottom: 16px;
+  }
+
+  .app-subtitle {
+    display: none;
+  }
+
+  textarea {
+    min-height: 90px;
+  }
+
+  #resultArea {
+    min-height: 140px;
   }
 }
 
@@ -1383,7 +1733,17 @@ html[data-theme="light"] .level-compatible { color: #2B6CB0; }
               </div>
               <div>
                 <label for="manualKeepalive">Keepalive (seconds)</label>
-                <input type="number" id="manualKeepalive" value="25" min="0" max="3600" />
+                <div class="number-control">
+    <input type="number" id="manualKeepalive" value="25" min="0" max="3600" autocomplete="off" />
+    <div class="number-steppers">
+      <button type="button" class="stepper-btn" data-step="up" data-target="manualKeepalive" aria-label="Increase Keepalive" tabindex="-1">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg>
+      </button>
+      <button type="button" class="stepper-btn" data-step="down" data-target="manualKeepalive" aria-label="Decrease Keepalive" tabindex="-1">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+    </div>
+  </div>
               </div>
             </div>
 
@@ -1403,18 +1763,38 @@ html[data-theme="light"] .level-compatible { color: #2B6CB0; }
           <div class="section-title">
             <span>Global Defaults & Routing</span>
           </div>
-          <div class="row">
+          <div class="row row-cols-3">
             <div>
               <label for="dns">Remote DNS</label>
               <input type="text" id="dns" value="1.1.1.1" autocomplete="off" />
             </div>
             <div>
               <label for="mtu">MTU</label>
-              <input type="number" id="mtu" value="1280" min="576" max="9000" />
+              <div class="number-control">
+    <input type="number" id="mtu" value="1280" min="576" max="9000" autocomplete="off" />
+    <div class="number-steppers">
+      <button type="button" class="stepper-btn" data-step="up" data-target="mtu" aria-label="Increase MTU" tabindex="-1">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg>
+      </button>
+      <button type="button" class="stepper-btn" data-step="down" data-target="mtu" aria-label="Decrease MTU" tabindex="-1">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+    </div>
+  </div>
             </div>
             <div>
               <label for="globalKeepalive">Default Keepalive</label>
-              <input type="number" id="globalKeepalive" value="25" min="0" max="3600" />
+              <div class="number-control">
+    <input type="number" id="globalKeepalive" value="25" min="0" max="3600" autocomplete="off" />
+    <div class="number-steppers">
+      <button type="button" class="stepper-btn" data-step="up" data-target="globalKeepalive" aria-label="Increase Keepalive" tabindex="-1">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg>
+      </button>
+      <button type="button" class="stepper-btn" data-step="down" data-target="globalKeepalive" aria-label="Decrease Keepalive" tabindex="-1">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+    </div>
+  </div>
             </div>
           </div>
 
@@ -1457,24 +1837,134 @@ html[data-theme="light"] .level-compatible { color: #2B6CB0; }
             </select>
           </div>
 
-          <div class="row">
-            <div><label for="jc">Jc</label><input type="number" id="jc" value="5" min="0" max="128" /></div>
-            <div><label for="jmin">Jmin</label><input type="number" id="jmin" value="50" min="0" max="65535" /></div>
-            <div><label for="jmax">Jmax</label><input type="number" id="jmax" value="100" min="0" max="65535" /></div>
+          <div class="row row-cols-3">
+            <div><label for="jc">Jc</label><div class="number-control">
+    <input type="number" id="jc" value="5" min="0" max="128" autocomplete="off" />
+    <div class="number-steppers">
+      <button type="button" class="stepper-btn" data-step="up" data-target="jc" aria-label="Increase Jc" tabindex="-1">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg>
+      </button>
+      <button type="button" class="stepper-btn" data-step="down" data-target="jc" aria-label="Decrease Jc" tabindex="-1">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+    </div>
+  </div></div>
+            <div><label for="jmin">Jmin</label><div class="number-control">
+    <input type="number" id="jmin" value="50" min="0" max="65535" autocomplete="off" />
+    <div class="number-steppers">
+      <button type="button" class="stepper-btn" data-step="up" data-target="jmin" aria-label="Increase Jmin" tabindex="-1">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg>
+      </button>
+      <button type="button" class="stepper-btn" data-step="down" data-target="jmin" aria-label="Decrease Jmin" tabindex="-1">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+    </div>
+  </div></div>
+            <div><label for="jmax">Jmax</label><div class="number-control">
+    <input type="number" id="jmax" value="100" min="0" max="65535" autocomplete="off" />
+    <div class="number-steppers">
+      <button type="button" class="stepper-btn" data-step="up" data-target="jmax" aria-label="Increase Jmax" tabindex="-1">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg>
+      </button>
+      <button type="button" class="stepper-btn" data-step="down" data-target="jmax" aria-label="Decrease Jmax" tabindex="-1">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+    </div>
+  </div></div>
           </div>
 
-          <div class="row">
-            <div><label for="s1">S1</label><input type="number" id="s1" value="0" min="0" max="65535" /></div>
-            <div><label for="s2">S2</label><input type="number" id="s2" value="0" min="0" max="65535" /></div>
-            <div><label for="s3">S3</label><input type="number" id="s3" value="0" min="0" max="65535" /></div>
-            <div><label for="s4">S4</label><input type="number" id="s4" value="0" min="0" max="65535" /></div>
+          <div class="row row-cols-4">
+            <div><label for="s1">S1</label><div class="number-control">
+    <input type="number" id="s1" value="0" min="0" max="65535" autocomplete="off" />
+    <div class="number-steppers">
+      <button type="button" class="stepper-btn" data-step="up" data-target="s1" aria-label="Increase S1" tabindex="-1">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg>
+      </button>
+      <button type="button" class="stepper-btn" data-step="down" data-target="s1" aria-label="Decrease S1" tabindex="-1">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+    </div>
+  </div></div>
+            <div><label for="s2">S2</label><div class="number-control">
+    <input type="number" id="s2" value="0" min="0" max="65535" autocomplete="off" />
+    <div class="number-steppers">
+      <button type="button" class="stepper-btn" data-step="up" data-target="s2" aria-label="Increase S2" tabindex="-1">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg>
+      </button>
+      <button type="button" class="stepper-btn" data-step="down" data-target="s2" aria-label="Decrease S2" tabindex="-1">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+    </div>
+  </div></div>
+            <div><label for="s3">S3</label><div class="number-control">
+    <input type="number" id="s3" value="0" min="0" max="65535" autocomplete="off" />
+    <div class="number-steppers">
+      <button type="button" class="stepper-btn" data-step="up" data-target="s3" aria-label="Increase S3" tabindex="-1">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg>
+      </button>
+      <button type="button" class="stepper-btn" data-step="down" data-target="s3" aria-label="Decrease S3" tabindex="-1">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+    </div>
+  </div></div>
+            <div><label for="s4">S4</label><div class="number-control">
+    <input type="number" id="s4" value="0" min="0" max="65535" autocomplete="off" />
+    <div class="number-steppers">
+      <button type="button" class="stepper-btn" data-step="up" data-target="s4" aria-label="Increase S4" tabindex="-1">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg>
+      </button>
+      <button type="button" class="stepper-btn" data-step="down" data-target="s4" aria-label="Decrease S4" tabindex="-1">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+    </div>
+  </div></div>
           </div>
 
-          <div class="row">
-            <div><label for="h1">H1</label><input type="number" id="h1" value="1" /></div>
-            <div><label for="h2">H2</label><input type="number" id="h2" value="2" /></div>
-            <div><label for="h3">H3</label><input type="number" id="h3" value="3" /></div>
-            <div><label for="h4">H4</label><input type="number" id="h4" value="4" /></div>
+          <div class="row row-cols-4">
+            <div><label for="h1">H1</label><div class="number-control">
+    <input type="number" id="h1" value="1" autocomplete="off" />
+    <div class="number-steppers">
+      <button type="button" class="stepper-btn" data-step="up" data-target="h1" aria-label="Increase H1" tabindex="-1">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg>
+      </button>
+      <button type="button" class="stepper-btn" data-step="down" data-target="h1" aria-label="Decrease H1" tabindex="-1">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+    </div>
+  </div></div>
+            <div><label for="h2">H2</label><div class="number-control">
+    <input type="number" id="h2" value="2" autocomplete="off" />
+    <div class="number-steppers">
+      <button type="button" class="stepper-btn" data-step="up" data-target="h2" aria-label="Increase H2" tabindex="-1">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg>
+      </button>
+      <button type="button" class="stepper-btn" data-step="down" data-target="h2" aria-label="Decrease H2" tabindex="-1">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+    </div>
+  </div></div>
+            <div><label for="h3">H3</label><div class="number-control">
+    <input type="number" id="h3" value="3" autocomplete="off" />
+    <div class="number-steppers">
+      <button type="button" class="stepper-btn" data-step="up" data-target="h3" aria-label="Increase H3" tabindex="-1">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg>
+      </button>
+      <button type="button" class="stepper-btn" data-step="down" data-target="h3" aria-label="Decrease H3" tabindex="-1">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+    </div>
+  </div></div>
+            <div><label for="h4">H4</label><div class="number-control">
+    <input type="number" id="h4" value="4" autocomplete="off" />
+    <div class="number-steppers">
+      <button type="button" class="stepper-btn" data-step="up" data-target="h4" aria-label="Increase H4" tabindex="-1">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg>
+      </button>
+      <button type="button" class="stepper-btn" data-step="down" data-target="h4" aria-label="Decrease H4" tabindex="-1">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+    </div>
+  </div></div>
           </div>
 
           <div class="row">
@@ -2223,7 +2713,11 @@ const ICONS = {
   moon: `<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>`,
   link: `<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>`,
   'refresh-cw': `<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><path d="M8 16H3v5"></path>`,
-  'chevrons-up-down': `<path d="m7 15 5 5 5-5"></path><path d="m7 9 5-5 5 5"></path>`
+  'chevrons-up-down': `<path d="m7 15 5 5 5-5"></path><path d="m7 9 5-5 5 5"></path>`,
+  'chevron-up': `<path d="m18 15-6-6-6 6"></path>`,
+  'chevron-down': `<path d="m6 9 6 6 6-6"></path>`,
+  plus: `<path d="M5 12h14"></path><path d="M12 5v14"></path>`,
+  minus: `<path d="M5 12h14"></path>`
 };
 
 /**
@@ -4528,6 +5022,76 @@ class StateStore {
 const store = new StateStore();
 
 
+/* ==================== js/ui/stepper.js ==================== */
+/**
+ * Custom Tactile Number Stepper Controller
+ * Replaces browser-default spin arrows with sleek, accessible, responsive stepper controls.
+ */
+
+function setupNumberSteppers() {
+  const buttons = document.querySelectorAll('.stepper-btn');
+
+  buttons.forEach(btn => {
+    const isUp = btn.dataset.step === 'up';
+    const targetId = btn.dataset.target;
+    const input = document.getElementById(targetId);
+    if (!input) return;
+
+    const stepValue = () => {
+      const min = input.min !== '' ? Number(input.min) : -Infinity;
+      const max = input.max !== '' ? Number(input.max) : Infinity;
+      const step = input.step ? Number(input.step) : 1;
+      let current;
+      if (input.value === '' || isNaN(Number(input.value))) {
+        current = min !== -Infinity ? min : 0;
+      } else {
+        current = Number(input.value);
+      }
+
+      if (isUp) {
+        current = Math.min(max, current + step);
+      } else {
+        current = Math.max(min, current - step);
+      }
+
+      input.value = current;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    };
+
+    let timer = null;
+    let interval = null;
+
+    const start = (e) => {
+      if (e.cancelable) e.preventDefault();
+      stepValue();
+      timer = setTimeout(() => {
+        interval = setInterval(stepValue, 75);
+      }, 320);
+    };
+
+    const stop = () => {
+      if (timer) {
+        clearTimeout(timer);
+        timer = null;
+      }
+      if (interval) {
+        clearInterval(interval);
+        interval = null;
+      }
+    };
+
+    btn.addEventListener('mousedown', start);
+    btn.addEventListener('mouseup', stop);
+    btn.addEventListener('mouseleave', stop);
+
+    btn.addEventListener('touchstart', start, { passive: false });
+    btn.addEventListener('touchend', stop);
+    btn.addEventListener('touchcancel', stop);
+  });
+}
+
+
 /* ==================== js/ui/tabs.js ==================== */
 /**
  * Accessible Tabs Controller
@@ -5351,6 +5915,7 @@ const ThemeManager = {
 // ==================== Application Bootstrap ====================
 document.addEventListener('DOMContentLoaded', () => {
   ThemeManager.init();
+  setupNumberSteppers();
 
   const domElements = {
     modePasteBtn: document.getElementById('modePaste'),

@@ -40,6 +40,92 @@ input:focus, textarea:focus, select:focus {
   box-shadow: var(--shadow-inset-deep);
 }
 
+/* Suppress ugly default browser number spinners */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none !important;
+  margin: 0 !important;
+  display: none !important;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield !important;
+  appearance: textfield !important;
+}
+
+/* Custom Tactile Number Stepper Controls */
+.number-control {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.number-control input[type="number"] {
+  padding-right: 42px;
+  width: 100%;
+}
+
+.number-steppers {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  bottom: 5px;
+  width: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 2;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.stepper-btn {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  border-radius: 5px;
+  box-shadow: var(--shadow-extruded-sm);
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  touch-action: manipulation;
+  transition: background-color var(--transition-smooth), color var(--transition-smooth), border-color var(--transition-smooth), box-shadow var(--transition-smooth), transform var(--transition-smooth);
+}
+
+.stepper-btn svg {
+  display: block;
+  stroke-width: 2.5;
+  transition: transform 0.15s ease, stroke 0.15s ease;
+}
+
+.stepper-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--bg-surface-elevated);
+  box-shadow: var(--shadow-glow);
+}
+
+.stepper-btn:hover svg {
+  stroke: var(--accent);
+}
+
+.stepper-btn:active {
+  box-shadow: var(--shadow-inset-sm);
+  transform: scale(0.92);
+  color: var(--accent);
+}
+
+.stepper-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
 textarea {
   min-height: 125px;
   resize: vertical;

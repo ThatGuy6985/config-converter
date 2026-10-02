@@ -1,7 +1,14 @@
 /**
- * Neumorphism Responsive Viewport Rules
+ * Neumorphism Responsive & Mobile UX Architecture
+ * Enterprise Multi-Protocol Converter
+ *
+ * Implements fluid typography, safe area insets, touch-friendly 44px+ hit targets,
+ * 2x2 grid segmented controls, ergonomic button hierarchy, and zero horizontal page overflow.
  */
 
+/* ==========================================================================
+   1. TABLET & COMPACT DESKTOP (<= 1120px)
+   ========================================================================== */
 @media (max-width: 1120px) {
   .workspace-grid {
     grid-template-columns: 1fr;
@@ -9,71 +16,328 @@
   }
 }
 
+/* ==========================================================================
+   2. TABLET & LARGE MOBILE (<= 768px)
+   ========================================================================== */
 @media (max-width: 768px) {
   body {
-    padding: 20px 14px;
+    padding: clamp(16px, 4vw, 28px) clamp(12px, 3.5vw, 20px);
+    padding-left: max(clamp(12px, 3.5vw, 20px), env(safe-area-inset-left));
+    padding-right: max(clamp(12px, 3.5vw, 20px), env(safe-area-inset-right));
+    padding-bottom: max(clamp(16px, 4vw, 28px), env(safe-area-inset-bottom));
+  }
+
+  .app-header {
+    margin-bottom: 24px;
   }
 
   .app-title {
-    font-size: 26px;
+    font-size: clamp(24px, 5.5vw, 30px);
+    letter-spacing: -0.02em;
   }
 
   .app-subtitle {
     font-size: 13.5px;
+    line-height: 1.5;
   }
 
   .card-bezel {
-    border-radius: 24px;
-    padding: 4px;
+    border-radius: 22px;
+    padding: 5px;
   }
 
   .card-core {
-    padding: 16px 14px;
-    border-radius: 20px;
+    padding: 20px 16px;
+    border-radius: 17px;
   }
 
-  .row {
-    flex-direction: column;
+  /* Grid adaptations for AmneziaWG parameters */
+  .row.row-cols-4 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
   }
 
+  .row.row-cols-4 > div {
+    min-width: 0;
+  }
+
+  .row.row-cols-3 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .row.row-cols-3 > div:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .row.row-cols-3 > div {
+    min-width: 0;
+  }
+
   .row > div {
-    min-width: 100%;
-  }
-
-  .btn-row {
-    flex-direction: column;
-  }
-
-  .btn-row button {
-    width: 100%;
-    min-height: 46px; /* 44px+ touch-friendly target */
-    justify-content: center;
-  }
-
-  .export-tabs {
-    flex-direction: column;
-  }
-
-  .tab-btn {
-    text-align: center;
-    width: 100%;
-    min-height: 44px;
-  }
-
-  .mode-switch {
-    flex-direction: column;
-  }
-
-  .mode-tab-btn {
-    min-height: 44px;
+    min-width: 0;
   }
 
   .report-stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
   }
 
   .report-stat-item {
-    flex: 1 1 calc(50% - 8px);
+    flex: 1 1 auto;
+  }
+}
+
+/* ==========================================================================
+   3. STANDARD MOBILE PHONES (<= 640px)
+   ========================================================================== */
+@media (max-width: 640px) {
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .app-eyebrow {
+    font-size: 10.5px;
+    padding: 6px 12px;
+    gap: 6px;
+  }
+
+  .card-bezel {
+    border-radius: 18px;
+    padding: 4px;
+  }
+
+  .card-core {
+    padding: 16px 12px;
+    border-radius: 14px;
+  }
+
+  .section-title {
+    font-size: 11.5px;
+    margin: 18px 0 10px 0;
+  }
+
+  /* Mode switch: clean 2-column segmented control */
+  .mode-switch {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .mode-tab-btn {
+    min-height: 44px;
+    padding: 8px 6px;
+    font-size: 12.5px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Export tabs: space-efficient 2x2 grid preserving 44px touch targets */
+  .export-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .tab-btn {
+    width: 100%;
+    min-height: 44px;
+    padding: 8px 6px;
+    font-size: 12.5px;
+    text-align: center;
+    justify-content: center;
+    border-radius: 10px;
+  }
+
+  /* Action buttons: Hero CTA spans 100%, secondary actions paired underneath */
+  .btn-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .btn-row button:first-child {
+    grid-column: 1 / -1;
+    min-height: 48px;
+    font-size: 13.5px;
+    font-weight: 700;
+  }
+
+  .btn-row button:not(:first-child) {
+    min-height: 44px;
+    font-size: 12px;
+    padding: 8px 6px;
+  }
+
+  /* Two-item rows wrap gracefully without overflowing */
+  .row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .row.row-cols-4,
+  .row.row-cols-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* Checkbox rows remain side by side or cleanly stacked */
+  .checkbox-field {
+    min-height: 38px;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Inputs & Steppers */
+  input, textarea, select {
+    font-size: 13px;
+    padding: 10px 12px;
+  }
+
+  .number-control input[type="number"] {
+    padding-right: 40px;
+  }
+
+  .number-steppers {
+    width: 28px;
+    right: 4px;
+    top: 4px;
+    bottom: 4px;
+  }
+
+  /* Code & Result Area */
+  #resultArea {
+    min-height: 180px;
+    font-size: 12px;
+    line-height: 1.45;
+    white-space: pre;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* QR Code Responsive Framing */
+  .qr-wrapper {
+    padding: 14px;
+    margin-top: 12px;
+  }
+
+  .qr-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  .qr-box canvas,
+  .qr-box img {
+    max-width: min(220px, 65vw) !important;
+    height: auto !important;
+  }
+
+  /* Status Banner */
+  .status-banner {
+    font-size: 12px;
+    padding: 10px 12px;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+}
+
+/* ==========================================================================
+   4. ULTRA-COMPACT PHONES (<= 360px)
+   ========================================================================== */
+@media (max-width: 360px) {
+  body {
+    padding: 10px 4px;
+  }
+
+  .card-bezel {
+    border-radius: 14px;
+    padding: 3px;
+  }
+
+  .card-core {
+    padding: 12px 8px;
+    border-radius: 11px;
+  }
+
+  .header-top-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .app-title {
+    font-size: 20px;
+  }
+
+  .app-subtitle {
+    font-size: 11.5px;
+  }
+
+  .mode-switch {
+    grid-template-columns: 1fr;
+  }
+
+  .btn-row {
+    grid-template-columns: 1fr;
+  }
+
+  .btn-row button:first-child {
+    grid-column: 1;
+  }
+
+  .report-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .number-control input[type="number"] {
+    padding-right: 36px;
+    font-size: 12px;
+  }
+
+  .number-steppers {
+    width: 24px;
+    right: 3px;
+    top: 3px;
+    bottom: 3px;
+  }
+
+  .stepper-btn svg {
+    width: 9px;
+    height: 9px;
+  }
+}
+
+/* ==========================================================================
+   5. LANDSCAPE TOUCH DEVICES
+   ========================================================================== */
+@media (max-height: 500px) and (orientation: landscape) {
+  .app-header {
+    margin-bottom: 16px;
+  }
+
+  .app-subtitle {
+    display: none;
+  }
+
+  textarea {
+    min-height: 90px;
+  }
+
+  #resultArea {
+    min-height: 140px;
   }
 }

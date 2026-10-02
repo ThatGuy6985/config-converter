@@ -21,7 +21,11 @@ export const ICONS = {
   moon: `<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>`,
   link: `<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>`,
   'refresh-cw': `<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><path d="M8 16H3v5"></path>`,
-  'chevrons-up-down': `<path d="m7 15 5 5 5-5"></path><path d="m7 9 5-5 5 5"></path>`
+  'chevrons-up-down': `<path d="m7 15 5 5 5-5"></path><path d="m7 9 5-5 5 5"></path>`,
+  'chevron-up': `<path d="m18 15-6-6-6 6"></path>`,
+  'chevron-down': `<path d="m6 9 6 6 6-6"></path>`,
+  plus: `<path d="M5 12h14"></path><path d="M12 5v14"></path>`,
+  minus: `<path d="M5 12h14"></path>`
 };
 
 /**
