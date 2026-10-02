@@ -1,2 +1,16 @@
+# Dependencies & Build artifacts
 node_modules/
+dist/
+
+# Test & Automation artifacts
 .playwright-mcp/
+screenshots/
+
+# Agent Workflows, Local Skills & Graphify outputs
+.agents/
+graphify-out/
+.graphify/
+.hallmark/
+.impeccable/
+AGENTS.md
+CUSTOMIZATION.md
