@@ -1,8 +1,3 @@
-/**
- * Target Compatibility and Field Preservation Analysis
- * Never silently discard fields without warning the user.
- */
-
 export function checkCompatibility(config, target) {
   if (!config || !config.protocol) {
     return {
@@ -21,7 +16,6 @@ export function checkCompatibility(config, target) {
   const unsupported = [];
   const warnings = [];
 
-  // ==================== AMNEZIAWG TARGET ====================
   if (targetLower === 'amnezia') {
     if (proto !== 'wireguard') {
       return {
@@ -49,7 +43,6 @@ export function checkCompatibility(config, target) {
     };
   }
 
-  // ==================== CLASH META TARGET ====================
   if (targetLower === 'clash') {
     if (proto === 'vless') {
       preserved.push('Server Address', 'Port', 'Client UUID', 'UDP Support');
@@ -114,7 +107,6 @@ export function checkCompatibility(config, target) {
       preserved.push('Server Address', 'Port', 'Interface PrivateKey', 'Peer PublicKey', 'IP Address', 'AllowedIPs', 'PersistentKeepalive', 'MTU');
       if (config.peers?.[0]?.presharedKey) preserved.push('PresharedKey');
 
-      // Amnezia check
       const hasAwg = config.amnezia && (config.amnezia.s1 || config.amnezia.s2 || config.amnezia.jc !== 5);
       if (hasAwg) {
         warnings.push('AWG obfuscation parameters (Jc, S1-S4, H1-H4) cannot be represented in standard Clash Meta WireGuard. Converted as standard WireGuard (reserved bytes preserved where applicable).');
@@ -135,7 +127,6 @@ export function checkCompatibility(config, target) {
     }
   }
 
-  // ==================== SING-BOX TARGET ====================
   if (targetLower === 'singbox') {
     if (proto === 'vless') {
       preserved.push('Server', 'Server Port', 'Client UUID');
@@ -206,7 +197,6 @@ export function checkCompatibility(config, target) {
     }
   }
 
-  // ==================== XRAY JSON TARGET ====================
   if (targetLower === 'xray' || targetLower === 'json') {
     if (proto === 'vless') {
       preserved.push('vnext (address, port)', 'users (id, encryption, flow)');

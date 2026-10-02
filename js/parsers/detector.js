@@ -1,13 +1,3 @@
-/**
- * Input Detection and Multi-Input Parsing Coordinator
- * Deliberate detection order:
- * 1. Subscription URL
- * 2. Full JSON (Xray / Sing-box / v2rayN)
- * 3. WireGuard INI
- * 4. Base64 encoded payload
- * 5. Multi-line URI links (vless, vmess, trojan)
- */
-
 import { decodeBase64Safe, isLikelyBase64 } from '../utils/base64.js';
 import { parseVlessUri } from './vless.js';
 import { parseVmessUri } from './vmess.js';
@@ -19,12 +9,10 @@ export function detectInputType(rawInput) {
   const text = rawInput.trim();
   if (!text) return 'unknown';
 
-  // 1. Subscription URL
   if (/^https?:\/\/[^\s]+$/i.test(text)) {
     return 'subscription-url';
   }
 
-  // 2. Full JSON
   if ((text.startsWith('{') && text.endsWith('}')) || (text.startsWith('[') && text.endsWith(']'))) {
     try {
       const parsed = JSON.parse(text);
@@ -36,17 +24,14 @@ export function detectInputType(rawInput) {
     } catch {}
   }
 
-  // 3. WireGuard INI
   if (/\[interface\]/i.test(text) && (/\[peer\]/i.test(text) || /privatekey/i.test(text))) {
     return 'wireguard-ini';
   }
 
-  // 4. Base64 Encoded Content
   if (isLikelyBase64(text)) {
     return 'base64';
   }
 
-  // 5. Check URIs
   const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
   if (lines.length > 0) {
     const protocols = lines.map(line => {
@@ -80,7 +65,6 @@ export function parseAllInputs(rawInput, defaultName = 'Config-1') {
   let text = rawInput.trim();
   const detectedType = detectInputType(text);
 
-  // If detected as base64 or contains base64 subscription, attempt safe decode
   if (detectedType === 'base64') {
     text = decodeBase64Safe(text);
   }
@@ -89,7 +73,6 @@ export function parseAllInputs(rawInput, defaultName = 'Config-1') {
   const errors = [];
   const warnings = [];
 
-  // 1. Check if it's WireGuard INI
   if (/\[interface\]/i.test(text) && (/\[peer\]/i.test(text) || /privatekey/i.test(text))) {
     const wgRes = parseWireguardIni(text, defaultName);
     if (wgRes.success) {
@@ -106,7 +89,6 @@ export function parseAllInputs(rawInput, defaultName = 'Config-1') {
     }
   }
 
-  // 2. Check line by line for URIs or embedded payloads
   const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
   let parsedCount = 0;
 
@@ -141,7 +123,7 @@ export function parseAllInputs(rawInput, defaultName = 'Config-1') {
         errors.push(`Line ${i + 1}: ${res.error}`);
       }
     } else if (isLikelyBase64(line)) {
-      // Possible single-line Base64 containing a URI
+
       const decodedLine = decodeBase64Safe(line);
       if (decodedLine !== line && decodedLine.includes('://')) {
         const subResult = parseAllInputs(decodedLine, `${defaultName}-${i + 1}`);

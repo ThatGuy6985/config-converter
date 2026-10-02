@@ -1,7 +1,3 @@
-/**
- * Clash Meta (Mihomo) Exporter with Protocol-Specific Builders
- */
-
 import { escapeYamlString } from '../utils/escaping.js';
 import { createRoutingPolicy, translateRoutingToClash } from '../routing/policy.js';
 
@@ -113,7 +109,7 @@ export function buildClashTrojan(config) {
     type: 'trojan',
     server: config.server.address,
     port: config.server.port,
-    // CRITICAL: Trojan uses 'password', NEVER 'uuid'
+
     password: config.authentication.password,
     udp: config.network?.udp ?? true
   };
@@ -165,7 +161,6 @@ export function buildClashWireguard(config, globalSettings = {}) {
     p['preshared-key'] = primaryPeer.presharedKey;
   }
 
-  // Preserve reserved bytes for Warp / Mihomo if present
   if (config.amnezia && (config.amnezia.s1 || config.amnezia.s2 || config.amnezia.s3)) {
     p.reserved = [config.amnezia.s1, config.amnezia.s2, config.amnezia.s3];
   }
@@ -173,9 +168,6 @@ export function buildClashWireguard(config, globalSettings = {}) {
   return p;
 }
 
-/**
- * Builds complete Clash Meta YAML document
- */
 export function buildClashConfig(configs, settings = {}) {
   if (!Array.isArray(configs) || configs.length === 0) return '# No configuration available\n';
 
@@ -229,7 +221,7 @@ tun:
   auto-detect-interface: true
   dns-hijack:
     - any:53
-    - tcp://any:53
+    - tcp:
   mtu: ${mtuVal}
 
 proxies:

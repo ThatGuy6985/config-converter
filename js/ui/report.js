@@ -1,7 +1,3 @@
-/**
- * Conversion Report UI Component
- */
-
 import { escapeHtml } from '../utils/escaping.js';
 import { renderIcon } from '../utils/icons.js';
 

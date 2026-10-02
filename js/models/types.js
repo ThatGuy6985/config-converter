@@ -1,8 +1,3 @@
-/**
- * Normalized Internal Models for Universal Proxy Converter
- * Strict separation of protocol types and authentication schemes.
- */
-
 export function createVlessModel(data = {}) {
   return {
     protocol: 'vless',
@@ -17,24 +12,24 @@ export function createVlessModel(data = {}) {
     },
     authentication: {
       uuid: data.authentication?.uuid || '',
-      // VLESS does not have a password
+
       password: null
     },
     transport: {
-      type: (data.transport?.type || 'tcp').toLowerCase(), // tcp, ws, grpc, http
+      type: (data.transport?.type || 'tcp').toLowerCase(), 
       path: data.transport?.path || null,
       host: data.transport?.host || null,
       serviceName: data.transport?.serviceName || null,
       headers: data.transport?.headers || {}
     },
     security: {
-      type: (data.security?.type || 'none').toLowerCase(), // none, tls, reality
+      type: (data.security?.type || 'none').toLowerCase(), 
       serverName: data.security?.serverName || null,
       alpn: Array.isArray(data.security?.alpn) ? data.security.alpn : (data.security?.alpn ? [data.security.alpn] : []),
       fingerprint: data.security?.fingerprint || null,
-      publicKey: data.security?.publicKey || null, // Reality pbk
-      shortId: data.security?.shortId || null,     // Reality sid
-      flow: data.security?.flow || null            // xtls-rprx-vision
+      publicKey: data.security?.publicKey || null, 
+      shortId: data.security?.shortId || null,     
+      flow: data.security?.flow || null            
     },
     network: {
       udp: data.network?.udp ?? true
@@ -59,19 +54,19 @@ export function createTrojanModel(data = {}) {
       port: Number(data.server?.port) || 443
     },
     authentication: {
-      // Trojan authentication is strictly password-based. Never treat as UUID.
+
       password: data.authentication?.password || '',
       uuid: null
     },
     transport: {
-      type: (data.transport?.type || 'tcp').toLowerCase(), // tcp, ws, grpc
+      type: (data.transport?.type || 'tcp').toLowerCase(), 
       path: data.transport?.path || null,
       host: data.transport?.host || null,
       serviceName: data.transport?.serviceName || null,
       headers: data.transport?.headers || {}
     },
     security: {
-      type: (data.security?.type || 'tls').toLowerCase(), // default tls for Trojan
+      type: (data.security?.type || 'tls').toLowerCase(), 
       serverName: data.security?.serverName || null,
       alpn: Array.isArray(data.security?.alpn) ? data.security.alpn : (data.security?.alpn ? [data.security.alpn] : []),
       fingerprint: data.security?.fingerprint || null
@@ -105,14 +100,14 @@ export function createVmessModel(data = {}) {
       password: null
     },
     transport: {
-      type: (data.transport?.type || 'tcp').toLowerCase(), // tcp, ws, grpc, http, kcp
+      type: (data.transport?.type || 'tcp').toLowerCase(), 
       path: data.transport?.path || null,
       host: data.transport?.host || null,
       serviceName: data.transport?.serviceName || null,
       headers: data.transport?.headers || {}
     },
     security: {
-      type: (data.security?.type || 'none').toLowerCase(), // none, tls
+      type: (data.security?.type || 'none').toLowerCase(), 
       serverName: data.security?.serverName || null,
       alpn: Array.isArray(data.security?.alpn) ? data.security.alpn : (data.security?.alpn ? [data.security.alpn] : []),
       fingerprint: data.security?.fingerprint || null

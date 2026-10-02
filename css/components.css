@@ -1,9 +1,5 @@
-/**
- * Neumorphism (Soft UI) Components CSS
- * Tactile Extruded & Inset Depth, WCAG Compliant Contrast, and Ergonomic Controls
- */
 
-/* Form Inputs & Textareas */
+
 label {
   display: block;
   font-family: var(--font-display);
@@ -40,7 +36,6 @@ input:focus, textarea:focus, select:focus {
   box-shadow: var(--shadow-inset-deep);
 }
 
-/* Suppress ugly default browser number spinners */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none !important;
@@ -53,7 +48,6 @@ input[type="number"] {
   appearance: textfield !important;
 }
 
-/* Custom Tactile Number Stepper Controls */
 .number-control {
   position: relative;
   display: flex;
@@ -146,7 +140,6 @@ html[data-theme="light"] select {
   background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233D4852' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
 }
 
-/* Secret Input with Show/Hide Toggle */
 .secret-input-wrapper {
   position: relative;
   display: flex;
@@ -189,7 +182,6 @@ html[data-theme="light"] select {
   color: currentColor;
 }
 
-/* Checkbox Custom Styling */
 .checkbox-field {
   display: flex;
   align-items: center;
@@ -245,7 +237,6 @@ html[data-theme="light"] select {
   font-weight: normal;
 }
 
-/* Mode Switch Tabs (Carved Inset Track) */
 .mode-switch {
   display: flex;
   background: var(--bg-surface);
@@ -283,7 +274,6 @@ html[data-theme="light"] select {
   border: 1px solid var(--border);
 }
 
-/* Export Target Tabs */
 .export-tabs {
   display: flex;
   background: var(--bg-surface);
@@ -326,7 +316,6 @@ html[data-theme="light"] select {
   outline-offset: 2px;
 }
 
-/* Tactile Buttons */
 button {
   background: var(--accent);
   color: #ffffff;
@@ -412,7 +401,6 @@ button.success-btn:active {
   flex-wrap: wrap;
 }
 
-/* Status Notifications Banner */
 .status-banner {
   margin-top: 18px;
   padding: 14px 18px;
@@ -455,7 +443,6 @@ button.success-btn:active {
   stroke: currentColor;
 }
 
-/* Parsed Config Items List (Extruded Cards) */
 .config-item {
   background: var(--bg-surface);
   border-radius: 18px;
@@ -524,7 +511,6 @@ button.success-btn:active {
   margin-top: 6px;
 }
 
-/* Neumorphic Soft Badges */
 .badge {
   padding: 4px 10px;
   border-radius: var(--radius-pill);
@@ -546,7 +532,6 @@ button.success-btn:active {
 html[data-theme="light"] .badge-vless { color: #2B6CB0; }
 html[data-theme="light"] .badge-vmess { color: #C05621; }
 
-/* Compatibility Level Badges */
 .level-badge {
   padding: 4px 10px;
   border-radius: var(--radius-pill);
@@ -566,7 +551,6 @@ html[data-theme="light"] .badge-vmess { color: #C05621; }
 
 html[data-theme="light"] .level-compatible { color: #2B6CB0; }
 
-/* Conversion Report Box (Deep Inset Well) */
 .conversion-report {
   background: var(--bg-surface);
   border-radius: 20px;
@@ -654,7 +638,6 @@ html[data-theme="light"] .level-compatible { color: #2B6CB0; }
   margin-top: 2px;
 }
 
-/* QR Code Container (Deep Inset Well) */
 .qr-wrapper {
   margin-top: 18px;
   text-align: center;
@@ -695,7 +678,6 @@ html[data-theme="light"] .level-compatible { color: #2B6CB0; }
   display: none !important;
 }
 
-/* Keyframe animations */
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
@@ -705,9 +687,6 @@ html[data-theme="light"] .level-compatible { color: #2B6CB0; }
   animation: spin 1s linear infinite;
 }
 
-/* ========================================================
-   Sky Toggle (Animated Day/Night Theme Switcher)
-   ======================================================== */
 .theme-switch {
   --toggle-size: 13px;
   --container-width: 5.625em;
@@ -855,7 +834,6 @@ html[data-theme="light"] .level-compatible { color: #2B6CB0; }
   transition: var(--transition);
 }
 
-/* Checked (Dark Mode) State */
 .theme-switch__checkbox:checked + .theme-switch__container {
   background-color: var(--container-night-bg);
 }
@@ -885,9 +863,6 @@ html[data-theme="light"] .level-compatible { color: #2B6CB0; }
   transform: translateY(-50%);
 }
 
-/* ==========================================================================
-   Animated Custom Dropdown Component (@emerald-ui motion architecture)
-   ========================================================================== */
 .custom-dropdown-wrapper {
   position: relative;
   width: 100%;

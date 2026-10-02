@@ -1,8 +1,3 @@
-/**
- * Complete Trojan URI Parser
- * Format: trojan://password@host:port?query#name
- */
-
 import { createTrojanModel } from '../models/types.js';
 
 export function parseTrojanUri(uri) {

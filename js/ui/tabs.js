@@ -1,8 +1,3 @@
-/**
- * Accessible Tabs Controller
- * Manages WAI-ARIA tab semantics and keyboard arrow-key navigation.
- */
-
 export function setupAccessibleTabs(tablistEl, onTabSelect) {
   if (!tablistEl) return;
 

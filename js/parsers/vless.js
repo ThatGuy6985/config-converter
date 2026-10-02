@@ -1,8 +1,3 @@
-/**
- * Complete VLESS URI Parser
- * Format: vless://uuid@host:port?query#name
- */
-
 import { createVlessModel } from '../models/types.js';
 
 export function parseVlessUri(uri) {

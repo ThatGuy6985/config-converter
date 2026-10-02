@@ -1,8 +1,3 @@
-/**
- * Complete VMess Base64 JSON Parser
- * Format: vmess://<base64_encoded_json>
- */
-
 import { decodeBase64 } from '../utils/base64.js';
 import { createVmessModel } from '../models/types.js';
 

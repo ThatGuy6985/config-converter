@@ -1,9 +1,3 @@
-/**
- * Zero-Dependency Build Script
- * Bundles modular CSS and JS into a standalone production index.html
- * ensuring it works seamlessly both when served via HTTP and when opened directly via file://.
- */
-
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -12,7 +6,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, '..');
 
-// 1. Read CSS Files in order
 const cssFiles = [
   'css/variables.css',
   'css/layout.css',
@@ -24,11 +17,10 @@ let bundledCss = '';
 for (const file of cssFiles) {
   const filePath = path.join(rootDir, file);
   if (fs.existsSync(filePath)) {
-    bundledCss += `\n/* === ${file} === */\n` + fs.readFileSync(filePath, 'utf-8');
+    bundledCss += '\n' + fs.readFileSync(filePath, 'utf-8');
   }
 }
 
-// 2. Read JS Files in topological dependency order
 const jsFiles = [
   'js/models/types.js',
   'js/utils/endpoint.js',
@@ -69,23 +61,19 @@ for (const file of jsFiles) {
   if (fs.existsSync(filePath)) {
     let content = fs.readFileSync(filePath, 'utf-8');
 
-    // Strip ES import statements: import ... from '...';
-    content = content.replace(/^import\s+[\s\S]*?from\s+['"][^'"]+['"];?\s*$/gm, '');
+        content = content.replace(/^import\s+[\s\S]*?from\s+['"][^'"]+['"];?\s*$/gm, '');
     content = content.replace(/^import\s+['"][^'"]+['"];?\s*$/gm, '');
 
-    // Convert `export function foo` -> `function foo`
-    content = content.replace(/^export\s+(async\s+function|function|class|const|let|var)\s+/gm, '$1 ');
+        content = content.replace(/^export\s+(async\s+function|function|class|const|let|var)\s+/gm, '$1 ');
 
-    // Strip standalone `export { ... }` or `export default ...`
-    content = content.replace(/^export\s+\{[^}]*\};?\s*$/gm, '');
+        content = content.replace(/^export\s+\{[^}]*\};?\s*$/gm, '');
     content = content.replace(/^export\s+default\s+[^;]+;?\s*$/gm, '');
 
-    bundledJs += `\n/* ==================== ${file} ==================== */\n` + content + '\n';
+    bundledJs += '\n' + content + '\n';
   }
 }
 
 bundledJs += `
-// ==================== Centralized Theme Manager ====================
 const ThemeManager = {
   getSystemTheme: function() {
     if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
@@ -148,7 +136,6 @@ const ThemeManager = {
   }
 };
 
-// ==================== Application Bootstrap ====================
 document.addEventListener('DOMContentLoaded', () => {
   ThemeManager.init();
   initParticleDrift();
@@ -224,7 +211,6 @@ document.addEventListener('DOMContentLoaded', () => {
 })();
 `;
 
-// 3. Helper to render number input with custom tactile steppers
 function renderNumberControl(id, value, min, max, label) {
   const minAttr = min !== undefined ? ` min="${min}"` : '';
   const maxAttr = max !== undefined ? ` max="${max}"` : '';
@@ -243,14 +229,12 @@ function renderNumberControl(id, value, min, max, label) {
   </div>`;
 }
 
-// 4. Assemble HTML Template
 const htmlTemplate = `<!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="description" content="Professional client-side multi-protocol proxy configuration converter for VLESS, VMess, Trojan, WireGuard, and AmneziaWG."/>
-  <!-- Instant Pre-render Theme Initialization to Prevent Flash of Unstyled/Incorrect Theme -->
   <script>
     (function() {
       try {
@@ -268,14 +252,12 @@ const htmlTemplate = `<!DOCTYPE html>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
-  <!-- QRCode.js CDN for client-side QR generation -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
 ${bundledCss}
   </style>
 </head>
 <body>
-  <!-- Ambient Particle Drift Canvas Background -->
   <canvas id="particle-drift-canvas" class="particle-drift-canvas" aria-hidden="true"></canvas>
   <main class="container">
     <header class="app-header">
@@ -314,10 +296,8 @@ ${bundledCss}
     </header>
 
     <div class="workspace-grid">
-      <!-- LEFT PANEL: Configuration Input & Tuning -->
       <section class="card-bezel" aria-label="Input and Settings">
         <div class="card-core">
-          <!-- Mode Switch Tabs -->
           <div class="mode-switch" role="tablist" aria-label="Input Mode Switch">
             <button type="button" class="mode-tab-btn active" id="modePaste" role="tab" aria-selected="true" aria-controls="pasteSection">
               Universal Import
@@ -332,11 +312,10 @@ ${bundledCss}
             <input type="text" id="name" value="Config-1" placeholder="Config-1" autocomplete="off" />
           </div>
 
-          <!-- UNIVERSAL IMPORT MODE -->
           <div id="pasteSection" role="tabpanel" aria-labelledby="modePaste">
             <label for="inputData">URI Links / WireGuard INI / Full Xray JSON / Base64</label>
             <textarea id="inputData" placeholder="Paste vless://, trojan://, vmess://, WireGuard INI, or subscription links..." spellcheck="false" autocomplete="off"></textarea>
-            
+
             <div style="margin-top:8px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
               <button type="button" class="secondary" id="btnFetchSub" style="padding:6px 14px; font-size:12px;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg>
@@ -347,7 +326,6 @@ ${bundledCss}
             <div id="fetchLog" class="fetch-log" style="font-size:11.5px;color:var(--text-muted);margin-top:6px;max-height:80px;overflow-y:auto;"></div>
           </div>
 
-          <!-- MANUAL WIREGUARD MODE -->
           <div id="manualSection" class="hidden" role="tabpanel" aria-labelledby="modeManual">
             <div class="section-title">
               <span>WireGuard Credentials</span>
@@ -402,7 +380,6 @@ ${bundledCss}
             </div>
           </div>
 
-          <!-- GLOBAL DEFAULTS & ROUTING -->
           <div class="section-title">
             <span>Global Defaults & Routing</span>
           </div>
@@ -443,7 +420,6 @@ ${bundledCss}
             </div>
           </div>
 
-          <!-- AMNEZIA WG SETTINGS & PRESETS -->
           <div class="section-title">
             <span>AmneziaWG Obfuscation</span>
           </div>
@@ -491,7 +467,6 @@ ${bundledCss}
             </div>
           </div>
 
-          <!-- PRIMARY ACTION BUTTONS -->
           <div class="btn-row">
             <button type="button" id="btnConvert">
               <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-zap" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
@@ -507,12 +482,10 @@ ${bundledCss}
             </button>
           </div>
 
-          <!-- Status Notification Banner -->
           <div id="statusBanner" class="status-banner" role="status" aria-live="polite"></div>
         </div>
       </section>
 
-      <!-- RIGHT PANEL: Parsed Configs, Conversion Report & Export -->
       <section class="card-bezel" aria-label="Output and Export">
         <div class="card-core">
           <div class="action-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
@@ -529,17 +502,14 @@ ${bundledCss}
             </div>
           </div>
 
-          <!-- Parsed Config Items Container -->
           <div id="configList" style="max-height:280px;overflow-y:auto;margin-bottom:14px;" role="list" aria-label="Parsed Configurations"></div>
 
-          <!-- Conversion Report Container -->
           <div id="reportContainer" class="conversion-report hidden" aria-live="polite"></div>
 
           <div class="section-title">
             <span>Target Export</span>
           </div>
 
-          <!-- Export Target Tabs -->
           <div class="export-tabs" id="exportTablist" role="tablist" aria-label="Export Target Formats">
             <button type="button" class="tab-btn active" role="tab" aria-selected="true" data-tab="amnezia" id="tab-amnezia" aria-controls="resultArea">
               AmneziaWG
@@ -573,7 +543,6 @@ ${bundledCss}
             </button>
           </div>
 
-          <!-- QR Code Wrapper Area -->
           <div id="qrWrapper" class="qr-wrapper" aria-live="polite">
             <label style="color:var(--text-main);margin-bottom:6px;font-weight:600;">Scan Export QR Code</label>
             <div id="qrBox" class="qr-box"></div>
@@ -592,6 +561,5 @@ ${bundledJs}
 </html>
 `;
 
-// 4. Write bundled index.html
 fs.writeFileSync(path.join(rootDir, 'index.html'), htmlTemplate, 'utf-8');
 console.log('Successfully built standalone index.html (' + Buffer.byteLength(htmlTemplate) + ' bytes)');

@@ -1,7 +1,3 @@
-/**
- * Xray Core Exporter with Protocol-Specific Outbound Builders
- */
-
 import { createRoutingPolicy, translateRoutingToXray } from '../routing/policy.js';
 
 export function buildXrayVless(config) {
@@ -121,7 +117,7 @@ export function buildXrayVmess(config) {
 }
 
 export function buildXrayTrojan(config) {
-  // CRITICAL FIX: Xray Trojan outbound uses `servers`, NOT `vnext`!
+
   const outbound = {
     protocol: 'trojan',
     tag: config.metadata.name,

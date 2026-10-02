@@ -1,7 +1,4 @@
-/**
- * Neumorphism Layout & Container Architecture
- * Dual-theme foundation, responsive spacing, and accessibility
- */
+
 
 * {
   box-sizing: border-box;
@@ -38,7 +35,6 @@ body {
   outline-offset: 2px;
 }
 
-/* WebKit Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -59,7 +55,6 @@ body {
   background: var(--accent);
 }
 
-/* Ambient Particle Drift Canvas Background */
 .particle-drift-canvas {
   position: fixed;
   top: 0;
@@ -87,7 +82,6 @@ html[data-theme="light"] .particle-drift-canvas {
   z-index: 1;
 }
 
-/* Header Area */
 .app-header {
   text-align: center;
   margin-bottom: 32px;
@@ -160,7 +154,6 @@ html[data-theme="light"] .particle-drift-canvas {
   transition: color var(--transition-smooth);
 }
 
-/* Two-Column Responsive Split Layout */
 .workspace-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -168,7 +161,6 @@ html[data-theme="light"] .particle-drift-canvas {
   align-items: start;
 }
 
-/* Neumorphic Raised Card Container */
 .card-bezel {
   background: var(--bg-surface);
   border-radius: var(--radius-card);
@@ -234,7 +226,6 @@ html[data-theme="light"] .particle-drift-canvas {
   min-width: 120px;
 }
 
-/* Motion Preferences */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

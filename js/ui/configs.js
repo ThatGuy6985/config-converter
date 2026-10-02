@@ -1,7 +1,3 @@
-/**
- * Parsed Configurations List Renderer
- */
-
 import { escapeHtml } from '../utils/escaping.js';
 import { buildAmneziaWG } from '../exporters/amnezia.js';
 

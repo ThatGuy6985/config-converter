@@ -1,15 +1,6 @@
 'use client'
 
 import React from 'react'
-
-/**
- * @author: @emerald-ui
- * @description: Animated Dropdown Component with smooth transitions and click-outside behavior
- * @version: 1.0.0
- * @date: 2026-02-03
- * @license: MIT
- * @website: https://emerald-ui.com
- */
 import { useState, useRef, FC, ReactNode } from 'react'
 import { ChevronDown } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'

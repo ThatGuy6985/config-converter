@@ -1,7 +1,3 @@
-/**
- * Normalized Model Constraint Validation
- */
-
 import { isValidPort, isValidUuid, isValidBase64Key } from './input.js';
 
 export function validateNormalizedModel(model) {

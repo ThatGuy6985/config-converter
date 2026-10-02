@@ -134,7 +134,6 @@ describe('WireGuard & AmneziaWG Parser', () => {
     assert.equal(res.model.peers[1].endpoint.host, '2001:db8::10');
     assert.equal(res.model.peers[1].endpoint.port, 51820);
 
-    // AmneziaWG parameters
     assert.equal(res.model.amnezia.jc, 7);
     assert.equal(res.model.amnezia.jmin, 65);
     assert.equal(res.model.amnezia.jmax, 191);

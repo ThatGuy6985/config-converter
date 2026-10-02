@@ -1,8 +1,3 @@
-/**
- * Robust QR Code Generation Helper
- * Integrates with QRCode.js while providing payload size validation and graceful fallbacks.
- */
-
 export function renderQrCode(containerEl, errorEl, text, options = {}) {
   if (!containerEl) return { success: false, error: 'Container element not found' };
 
@@ -15,8 +10,6 @@ export function renderQrCode(containerEl, errorEl, text, options = {}) {
     return { success: false, error: 'Empty text' };
   }
 
-  // QR Code standard binary byte capacity: Level L max ~2953 bytes, Level M max ~2331 bytes
-  // Alphanumeric is slightly higher, but JSON/YAML/URIs contain binary symbols.
   if (trimmed.length > 2300) {
     const msg = 'QR unavailable: payload exceeds standard QR code density (~2.3 KB). Please use Copy or Download instead.';
     if (errorEl) errorEl.textContent = msg;

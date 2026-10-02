@@ -1,7 +1,3 @@
-/**
- * Sing-Box Exporter with Protocol-Specific Outbound Builders
- */
-
 import { createRoutingPolicy, translateRoutingToSingBox } from '../routing/policy.js';
 
 export function buildSingBoxVless(config) {
@@ -17,7 +13,6 @@ export function buildSingBoxVless(config) {
     outbound.flow = config.security.flow;
   }
 
-  // TLS & Reality configuration
   if (config.security?.type === 'tls' || config.security?.type === 'reality') {
     outbound.tls = {
       enabled: true,
@@ -44,7 +39,6 @@ export function buildSingBoxVless(config) {
     }
   }
 
-  // Transport configuration
   const transportType = config.transport?.type;
   if (transportType === 'ws' || transportType === 'websocket') {
     outbound.transport = {
@@ -113,7 +107,7 @@ export function buildSingBoxTrojan(config) {
     tag: config.metadata.name,
     server: config.server.address,
     server_port: config.server.port,
-    // CRITICAL: Trojan uses 'password', NOT 'uuid'
+
     password: config.authentication.password
   };
 

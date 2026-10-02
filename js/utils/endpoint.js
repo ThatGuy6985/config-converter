@@ -1,8 +1,3 @@
-/**
- * Robust Endpoint Parser and Validator
- * Supports IPv4, IPv6 (with brackets), and hostnames with ports.
- */
-
 export function parseEndpoint(endpoint, defaultPort = 51820) {
   if (!endpoint || typeof endpoint !== 'string') {
     return { valid: false, error: 'Endpoint must be a non-empty string' };
@@ -13,7 +8,6 @@ export function parseEndpoint(endpoint, defaultPort = 51820) {
     return { valid: false, error: 'Endpoint cannot be blank' };
   }
 
-  // IPv6 with brackets: [2001:db8::1] or [2001:db8::1]:51820
   const ipv6Match = trimmed.match(/^\[([a-fA-F0-9:]+)\](?::(\d+))?$/);
   if (ipv6Match) {
     const host = ipv6Match[1];
@@ -26,14 +20,12 @@ export function parseEndpoint(endpoint, defaultPort = 51820) {
     return { valid: true, host, port, isIpv6: true };
   }
 
-  // Check for unbracketed IPv6 with multiple colons
   const colonCount = (trimmed.match(/:/g) || []).length;
   if (colonCount > 1) {
-    // Looks like raw IPv6 without brackets
+
     return { valid: false, error: 'IPv6 endpoints with port must be enclosed in square brackets: [ipv6]:port' };
   }
 
-  // Standard hostname or IPv4 with optional port: example.com:443 or 1.2.3.4:80
   const lastColon = trimmed.lastIndexOf(':');
   if (lastColon > 0) {
     const host = trimmed.slice(0, lastColon);
@@ -55,7 +47,6 @@ export function parseEndpoint(endpoint, defaultPort = 51820) {
     return { valid: true, host, port, isIpv6: false };
   }
 
-  // Just host, no port specified
   if (defaultPort < 1 || defaultPort > 65535) {
     return { valid: false, error: `Invalid default port ${defaultPort}` };
   }

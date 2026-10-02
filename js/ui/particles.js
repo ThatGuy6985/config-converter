@@ -1,10 +1,3 @@
-/**
- * Particle Drift Ambient Canvas Background
- * Zero-dependency ASCII & Beam particle system adapted from @emerald-ui
- * Fully reactive to both Dark Mode and Light Mode, with high-DPI scaling
- * and accessibility support for prefers-reduced-motion.
- */
-
 export class ParticleDriftBackground {
   constructor(canvasId = 'particle-drift-canvas') {
     this.canvas = document.getElementById(canvasId);
@@ -129,14 +122,12 @@ export class ParticleDriftBackground {
 
     const isLight = mode === 'light';
 
-    // Theme color mappings
     const beamColor = isLight ? '37, 99, 235' : '96, 165, 250';
     const lineColor = isLight ? '36, 48, 68' : '156, 163, 175';
     const charColor = isLight ? 'rgba(36, 48, 68, 0.3)' : 'rgba(156, 163, 175, 0.35)';
     const activeColor = isLight ? '#2563EB' : '#60A5FA';
     const proximityAlpha = isLight ? 0.12 : 0.12;
 
-    // 1. Upward shooting beams
     for (let i = 0; i < this.beams.length; i++) {
       const b = this.beams[i];
       if (!this.isReducedMotion) {
@@ -159,7 +150,6 @@ export class ParticleDriftBackground {
       ctx.stroke();
     }
 
-    // 2. Inter-node proximity connection lines
     ctx.lineWidth = 0.5;
     const nodeLen = this.nodes.length;
     for (let i = 0; i < nodeLen; i++) {
@@ -177,7 +167,6 @@ export class ParticleDriftBackground {
       }
     }
 
-    // 3. Floating ASCII Nodes
     ctx.font = '11px monospace';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -194,12 +183,10 @@ export class ParticleDriftBackground {
 
       const mouseDist = Math.hypot(mouse.x - n.x, mouse.y - n.y);
 
-      // Dynamic Character Swap when near mouse
       if (mouseDist < 160 && Math.random() > 0.96) {
         n.char = this.chars[Math.floor(Math.random() * this.chars.length)];
       }
 
-      // Mouse Connection Line
       if (mouseDist < 160) {
         ctx.strokeStyle = `rgba(${beamColor}, ${0.35 * (1 - mouseDist / 160)})`;
         ctx.beginPath();

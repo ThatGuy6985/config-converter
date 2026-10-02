@@ -1,7 +1,3 @@
-/**
- * Abstract Routing Policy and Target-Specific Translators
- */
-
 export function createRoutingPolicy(options = {}) {
   const irBypass = options.irBypass ?? true;
   const privateBypass = options.privateBypass ?? true;
@@ -15,9 +11,6 @@ export function createRoutingPolicy(options = {}) {
   };
 }
 
-/**
- * Translates abstract routing policy into Clash Meta rules list.
- */
 export function translateRoutingToClash(policy) {
   const rules = [];
 
@@ -35,9 +28,6 @@ export function translateRoutingToClash(policy) {
   return rules;
 }
 
-/**
- * Translates abstract routing policy into Sing-Box route rules.
- */
 export function translateRoutingToSingBox(policy) {
   const rules = [];
 
@@ -62,9 +52,6 @@ export function translateRoutingToSingBox(policy) {
   return rules;
 }
 
-/**
- * Translates abstract routing policy into Xray routing rules.
- */
 export function translateRoutingToXray(policy) {
   const rules = [];
 

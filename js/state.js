@@ -1,15 +1,11 @@
-/**
- * Central Reactive Application State Store
- */
-
 import { AWG_PRESETS } from './exporters/amnezia.js';
 
 class StateStore {
   constructor() {
     this.listeners = new Set();
     this.state = {
-      mode: 'paste', // 'paste' | 'manual'
-      currentTab: 'amnezia', // 'amnezia' | 'clash' | 'singbox' | 'json'
+      mode: 'paste', 
+      currentTab: 'amnezia', 
       configs: [],
       allExpanded: false,
       isQrOpen: false,
@@ -20,13 +16,13 @@ class StateStore {
         irBypass: true,
         useNoise: true,
         useFragment: true,
-        allowLan: false, // Default false for security
+        allowLan: false, 
         awgPreset: 'noisy',
         awg: { ...AWG_PRESETS.noisy.params }
       },
       status: {
         visible: false,
-        type: 'info', // 'success' | 'warn' | 'error' | 'info'
+        type: 'info', 
         message: '',
         details: []
       },
@@ -63,7 +59,6 @@ class StateStore {
     }
   }
 
-  // Convenience actions
   setMode(mode) {
     this.setState({ mode });
   }

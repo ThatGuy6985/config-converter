@@ -23,7 +23,6 @@ describe('Round-Trip & Field Preservation Checks', () => {
   it('VLESS Reality: normalized model preserves all Reality tokens across Sing-Box and Xray', () => {
     const vless = parseVlessUri(SAMPLE_VLESS_REALITY).model;
 
-    // Sing-Box verification
     const sbConfig = buildSingBoxConfig([vless]);
     const sbOutbound = sbConfig.outbounds.find(o => o.type === 'vless');
     assert.equal(sbOutbound.server, vless.server.address);
@@ -33,7 +32,6 @@ describe('Round-Trip & Field Preservation Checks', () => {
     assert.equal(sbOutbound.tls.reality.short_id, vless.security.shortId);
     assert.equal(sbOutbound.tls.utls.fingerprint, vless.security.fingerprint);
 
-    // Xray verification
     const xrayConfig = buildXrayJsonConfig([vless]);
     const xrayOutbound = xrayConfig.outbounds.find(o => o.protocol === 'vless');
     assert.equal(xrayOutbound.settings.vnext[0].address, vless.server.address);

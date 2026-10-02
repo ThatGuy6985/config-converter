@@ -138,7 +138,6 @@ describe('AmneziaWG Exporter', () => {
     assert.ok(conf.includes('H3 = 987654'));
     assert.ok(conf.includes('H4 = 456789'));
 
-    // Both peers
     assert.ok(conf.includes('PublicKey = cGVlcjFwdWJsaWNrZXlwZWVyMXB1YmxpY2tleXRlc3Q='));
     assert.ok(conf.includes('Endpoint = 203.0.113.10:51820'));
     assert.ok(conf.includes('PublicKey = cGVlcjJwdWJsaWNrZXlwZWVyMnB1YmxpY2tleXRlc3Q='));

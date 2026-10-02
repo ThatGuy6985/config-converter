@@ -1,7 +1,3 @@
-/**
- * Status Notifications Banner Component
- */
-
 import { escapeHtml } from '../utils/escaping.js';
 import { renderIcon } from '../utils/icons.js';
 

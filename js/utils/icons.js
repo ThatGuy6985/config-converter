@@ -1,9 +1,3 @@
-/**
- * Lucide SVG Icons Utility
- * Zero-dependency SVG renderer using stroke="currentColor"
- * Automatically adapts icon colors across Dark and Light modes.
- */
-
 export const ICONS = {
   zap: `<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>`,
   dices: `<rect width="12" height="12" x="2" y="10" rx="2" ry="2"></rect><path d="m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3.18l-5.74-5.74a2.24 2.24 0 0 0-3.18 0L9 5.08"></path><path d="M6 14h.01"></path><path d="M10 18h.01"></path><path d="M14 14h.01"></path><path d="M10 14h.01"></path><path d="m15 9 1-1"></path><path d="m12 6 1-1"></path>`,
@@ -28,12 +22,6 @@ export const ICONS = {
   minus: `<path d="M5 12h14"></path>`
 };
 
-/**
- * Render Lucide icon as SVG string
- * @param {string} name
- * @param {object} options
- * @returns {string} SVG HTML markup
- */
 export function renderIcon(name, options = {}) {
   const size = options.size || 16;
   const className = options.className || '';

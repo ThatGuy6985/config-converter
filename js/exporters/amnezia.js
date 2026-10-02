@@ -1,7 +1,3 @@
-/**
- * AmneziaWG (AWG) INI Exporter with Multi-Peer Support & Preset System
- */
-
 export const AWG_PRESETS = {
   noisy: {
     name: 'Default Noisy (5/50/100)',
@@ -70,9 +66,6 @@ export const AWG_PRESETS = {
   }
 };
 
-/**
- * Randomize AmneziaWG parameters within valid protocol boundaries.
- */
 export function generateRandomAmneziaParams() {
   const jmin = Math.floor(Math.random() * 40) + 20;
   const jmax = jmin + Math.floor(Math.random() * 60) + 20;
@@ -82,7 +75,6 @@ export function generateRandomAmneziaParams() {
   const s3 = 0;
   const s4 = 0;
 
-  // 4 distinct 32-bit positive integer headers
   const headerSet = new Set();
   while (headerSet.size < 4) {
     headerSet.add(Math.floor(Math.random() * 2147483647) + 1);

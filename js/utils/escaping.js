@@ -1,7 +1,3 @@
-/**
- * HTML and YAML Escaping and Serialization Utilities
- */
-
 export function escapeHtml(str) {
   if (str === null || str === undefined) return '';
   return String(str)
@@ -12,16 +8,11 @@ export function escapeHtml(str) {
     .replace(/'/g, '&#39;');
 }
 
-/**
- * Escapes a string for safe inclusion in YAML.
- * Quotes if it contains YAML-special characters, colons, brackets, or numbers.
- */
 export function escapeYamlString(val) {
   if (val === null || val === undefined) return '""';
   if (typeof val === 'number' || typeof val === 'boolean') return String(val);
   const str = String(val);
 
-  // Escape backslashes, double quotes, and control chars
   const escaped = str
     .replace(/\\/g, '\\\\')
     .replace(/"/g, '\\"')
@@ -32,9 +23,6 @@ export function escapeYamlString(val) {
   return `"${escaped}"`;
 }
 
-/**
- * Lightweight safe YAML serializer for objects and arrays.
- */
 export function serializeYaml(obj, indent = 0) {
   const pad = '  '.repeat(indent);
 

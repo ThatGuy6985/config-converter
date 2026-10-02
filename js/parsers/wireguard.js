@@ -1,7 +1,3 @@
-/**
- * Multi-Peer WireGuard & AmneziaWG INI Parser
- */
-
 import { parseEndpoint } from '../utils/endpoint.js';
 import { createWireguardModel } from '../models/types.js';
 
@@ -21,7 +17,7 @@ export function parseWireguardIni(text, fallbackName = 'WireGuard-Tunnel') {
 
   const lines = text.split(/\r?\n/);
   let currentSection = '';
-  
+
   const iface = {
     privateKey: '',
     addresses: [],
@@ -46,7 +42,6 @@ export function parseWireguardIni(text, fallbackName = 'WireGuard-Tunnel') {
       continue;
     }
 
-    // Section header
     if (rawLine.startsWith('[') && rawLine.endsWith(']')) {
       const sectionName = rawLine.slice(1, -1).trim().toLowerCase();
       if (sectionName === 'interface') {

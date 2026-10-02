@@ -1,7 +1,3 @@
-/**
- * Test Fixtures for Universal Proxy Converter
- */
-
 export const SAMPLE_VLESS_REALITY =
   'vless://b0e77457-3f8d-4f10-9118-dfb79872e612@cloudflare.com:443?encryption=none&flow=xtls-rprx-vision&security=reality&sni=zoom.us&fp=chrome&pbk=1yH_K5F1q5N5Z8X9V4B7N1M2K3L4P5O6I7U8Y9T0R1E&sid=ab12cd34&type=tcp#VLESS%20Reality%20US';
 
@@ -17,7 +13,6 @@ export const SAMPLE_TROJAN_BASIC =
 export const SAMPLE_TROJAN_WS =
   'trojan://secureTrojanPswd@trojan-ws.example.com:443?security=tls&type=ws&path=%2Ftrojan-path&host=trojan-ws.example.com#Trojan%20WS';
 
-// VMess base64 JSON payload
 const vmessRawJson = JSON.stringify({
   v: '2',
   ps: 'VMess Test Node',

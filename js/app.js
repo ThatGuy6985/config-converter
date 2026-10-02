@@ -1,7 +1,3 @@
-/**
- * Universal Proxy Converter Application Coordinator
- */
-
 import { store } from './state.js';
 import { parseAllInputs } from './parsers/detector.js';
 import { createWireguardModel } from './models/types.js';
@@ -35,33 +31,27 @@ export class App {
 
   subscribeToState() {
     store.subscribe((state) => {
-      // 1. Update Mode
+
       const isPaste = state.mode === 'paste';
       this.dom.modePasteBtn.classList.toggle('active', isPaste);
       this.dom.modeManualBtn.classList.toggle('active', !isPaste);
       this.dom.pasteSection.classList.toggle('hidden', !isPaste);
       this.dom.manualSection.classList.toggle('hidden', isPaste);
 
-      // 2. Render Config List
       renderConfigList(this.dom.configList, state.configs, {
         allExpanded: state.allExpanded,
         settings: state.settings
       });
 
-      // 3. Update Config Count Label
       const count = state.configs.length;
       this.dom.configCountText.textContent = `Parsed ${count} Config${count === 1 ? '' : 's'}`;
 
-      // 4. Update Combined Export Textarea
       this.updateExportOutput(state);
 
-      // 5. Update Status Banner
       renderStatus(this.dom.statusBanner, state.status);
 
-      // 6. Update Conversion Report
       renderConversionReport(this.dom.reportContainer, state.report);
 
-      // 7. Update QR if active
       if (this.dom.qrWrapper.classList.contains('active')) {
         this.generateQr();
       }
@@ -69,35 +59,29 @@ export class App {
   }
 
   bindEvents() {
-    // Mode tabs
+
     this.dom.modePasteBtn.addEventListener('click', () => store.setMode('paste'));
     this.dom.modeManualBtn.addEventListener('click', () => store.setMode('manual'));
 
-    // Export tabs
     setupAccessibleTabs(this.dom.exportTablist, (tab) => {
       store.setCurrentTab(tab);
       this.recalculateReport();
     });
 
-    // Preset selection
     this.dom.awgPreset.addEventListener('change', (e) => {
       this.applyPreset(e.target.value, true);
     });
 
-    // Randomize AWG
     this.dom.btnRandomize.addEventListener('click', () => {
       this.randomizeAwg();
     });
 
-    // Manual Reserved sync
     this.dom.manualReserved.addEventListener('input', () => {
       this.syncReservedToAmneziaInputs();
     });
 
-    // Password / Secret toggles
     this.setupSecretToggles();
 
-    // Primary Actions
     this.dom.btnConvert.addEventListener('click', () => this.handleConvert());
     this.dom.btnClear.addEventListener('click', () => this.handleClear());
     this.dom.btnCopyAllLinks.addEventListener('click', () => this.handleCopyAllLinks());
@@ -107,7 +91,6 @@ export class App {
     this.dom.btnToggleQr.addEventListener('click', () => this.toggleQr());
     this.dom.btnFetchSub.addEventListener('click', () => this.handleFetchSubscription());
 
-    // Settings inputs live update
     const settingInputs = [
       this.dom.dns, this.dom.mtu, this.dom.globalKeepalive,
       this.dom.irBypass, this.dom.useNoise, this.dom.useFragment, this.dom.allowLan
@@ -244,7 +227,7 @@ export class App {
       parsingErrors = parseResult.errors;
       detectedType = parseResult.detectedType;
     } else {
-      // Manual WireGuard Mode
+
       const privKey = this.dom.manualPrivate.value.trim();
       const pubKey = this.dom.manualPublic.value.trim();
       const endpointStr = this.dom.manualEndpoint.value.trim();
@@ -274,7 +257,6 @@ export class App {
         amnezia: { ...state.settings.awg }
       });
 
-      // Fix endpoint if port is provided
       if (endpointStr.includes(':')) {
         const lastColon = endpointStr.lastIndexOf(':');
         const h = endpointStr.slice(0, lastColon).replace(/[\[\]]/g, '');
@@ -294,7 +276,6 @@ export class App {
       return;
     }
 
-    // Validate normalized models
     const validationErrors = [];
     const validationWarnings = [];
     parsedConfigs.forEach((c, idx) => {
@@ -309,7 +290,6 @@ export class App {
 
     store.setConfigs(parsedConfigs);
 
-    // Calculate Conversion Report & Compatibility
     this.recalculateReport(parsedConfigs, parsingErrors.length + parsedConfigs.length);
 
     if (validationErrors.length > 0) {
@@ -481,7 +461,6 @@ export class App {
       return;
     }
 
-    // SSRF & loopback protection notice
     if (/^https?:\/\/(localhost|127\.0\.0\.1|0\.0\.0\.0|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|192\.168\.|169\.254\.)/i.test(url)) {
       log.innerHTML = `<span style="color:var(--status-error);display:inline-flex;align-items:center;gap:4px;">${renderIcon('alert-triangle', { size: 14 })} Fetching from localhost, private, or link-local IP addresses is blocked for security.</span>`;
       return;
@@ -498,7 +477,6 @@ export class App {
       if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
       const text = await res.text();
 
-      // Safe size limit check (max 5 MB)
       if (text.length > 5 * 1024 * 1024) {
         throw new Error('Subscription content exceeds 5MB size limit.');
       }

@@ -1,21 +1,9 @@
-/**
- * Animated Custom Dropdown Controller
- * Inspired by @emerald-ui / Framer Motion
- *
- * Implements smooth spring-like entrance/exit animations, 180deg rotating chevron,
- * staggered option reveals, click-outside handling, and full keyboard navigation.
- * Progressively enhances native <select> elements while maintaining full two-way
- * synchronization with underlying DOM events.
- */
-
 export function setupAnimatedDropdown(selectEl) {
   if (!selectEl || selectEl.dataset.customDropdownInit) return;
   selectEl.dataset.customDropdownInit = 'true';
 
-  // 1. Visually hide the native select while keeping it functional in DOM
   selectEl.classList.add('sr-select-hidden');
 
-  // 2. Build the animated custom dropdown container
   const wrapper = document.createElement('div');
   wrapper.className = 'custom-dropdown-wrapper';
   wrapper.setAttribute('data-state', 'closed');
@@ -134,7 +122,6 @@ export function setupAnimatedDropdown(selectEl) {
     toggleDropdown();
   });
 
-  // Keyboard navigation: Enter/Space/ArrowDown to open, Arrow keys to navigate, Esc to close
   wrapper.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       closeDropdown();
@@ -161,14 +148,12 @@ export function setupAnimatedDropdown(selectEl) {
     }
   });
 
-  // Click outside listener
   document.addEventListener('click', (e) => {
     if (!wrapper.contains(e.target)) {
       closeDropdown();
     }
   });
 
-  // Two-way synchronization: If external code sets selectEl.value = '...', update display
   const originalValueSetter = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value')?.set;
   if (originalValueSetter) {
     Object.defineProperty(selectEl, 'value', {
@@ -194,7 +179,6 @@ export function setupAnimatedDropdown(selectEl) {
 
   renderItems();
 
-  // Mount wrapper around selectEl
   selectEl.parentNode.insertBefore(wrapper, selectEl);
   wrapper.appendChild(selectEl);
   wrapper.appendChild(trigger);

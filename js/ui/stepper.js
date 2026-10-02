@@ -1,8 +1,3 @@
-/**
- * Custom Tactile Number Stepper Controller
- * Replaces browser-default spin arrows with sleek, accessible, responsive stepper controls.
- */
-
 export function setupNumberSteppers() {
   const buttons = document.querySelectorAll('.stepper-btn');
 

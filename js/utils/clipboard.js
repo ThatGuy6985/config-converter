@@ -1,7 +1,3 @@
-/**
- * Reusable Asynchronous Clipboard Copy with Fallback
- */
-
 export async function copyText(text) {
   if (typeof text !== 'string') {
     return { success: false, error: 'Clipboard input must be a string' };
@@ -11,17 +7,15 @@ export async function copyText(text) {
     return { success: false, error: 'Nothing to copy: text is empty' };
   }
 
-  // 1. Try Modern Clipboard API (works under HTTPS or localhost)
   if (navigator?.clipboard && typeof navigator.clipboard.writeText === 'function') {
     try {
       await navigator.clipboard.writeText(text);
       return { success: true };
     } catch (err) {
-      // Permission denied or insecure context, proceed to fallback
+
     }
   }
 
-  // 2. Fallback: execCommand with offscreen textarea
   try {
     const textarea = document.createElement('textarea');
     textarea.value = text;

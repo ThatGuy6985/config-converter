@@ -131,9 +131,6 @@ function resolveBackground(
   return typeof background === "function" ? background(mode) : background;
 }
 
-// Verbatim content of particle-drift.html (self-contained hero markup + canvas particle script),
-// re-encoded as a template literal (backslash / backtick / ${ occurrences escaped) so it can be
-// embedded without a Vite `?raw` loader. Rendered inside a sandboxed iframe via srcDoc.
 const PARTICLE_DRIFT_SOURCE = `<!doctype html>
 <html lang="en">
 <head>
@@ -148,60 +145,46 @@ const PARTICLE_DRIFT_SOURCE = `<!doctype html>
 </head>
 <body class="bg-[#030509] min-h-screen flex items-center justify-center p-4 md:p-12 font-sans antialiased text-[#FFFFFF] overflow-x-hidden selection:bg-[#60A5FA] selection:text-[#030509]">
 
-    <!-- Gradient Border Shell Technique -->
     <div class="w-full max-w-[1440px] shadow-[0px_100px_80px_rgba(0,0,0,0.12),_0px_41.8px_33.4px_rgba(0,0,0,0.086),_0px_22.3px_17.9px_rgba(0,0,0,0.07)]" style="display:inline-block; padding:1px; border-radius:24px; background:linear-gradient(to right bottom, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.03), rgba(0, 0, 0, 0));">
         
-        <!-- Main Inner Surface -->
         <div class="relative w-full flex flex-col md:flex-row overflow-hidden min-h-[600px] md:min-h-[650px]" style="background:#030509; border-radius:23px; box-shadow:rgba(255, 255, 255, 0.02) 0px 0px 40px 0px inset;">
             
-            <!-- Canvas Particle System Background Field -->
             <canvas id="particle-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-0 opacity-100"></canvas>
 
-            <!-- Matte Noise Texture Overlay -->
             <div class="absolute inset-0 opacity-[0.15] mix-blend-overlay pointer-events-none z-10" style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E');"></div>
 
-            <!-- Left Column: Copy & Controls -->
             <div class="w-full md:w-[38%] px-8 lg:px-16 py-10 md:py-14 flex flex-col justify-between relative z-20 shrink-0 border-r border-white/5">
                 
-                <!-- Lineart Detail: Corner Brackets -->
                 <div class="absolute top-6 left-6 w-3 h-3 border-t border-l border-white/20"></div>
                 <div class="absolute top-6 right-6 w-3 h-3 border-t border-r border-white/20"></div>
                 <div class="absolute bottom-6 left-6 w-3 h-3 border-b border-l border-white/20"></div>
                 <div class="absolute bottom-6 right-6 w-3 h-3 border-b border-r border-white/20"></div>
 
-                <!-- Top Badge -->
                 <div class="fade-in-el opacity-0 inline-flex items-center gap-2 px-3 py-1 text-xs font-light tracking-widest uppercase mb-16 border border-white/10 text-[#60A5FA] rounded-full w-max bg-white/5 backdrop-blur-sm">
                     <iconify-icon icon="solar:server-square-linear" stroke-width="1.5" class="text-sm"></iconify-icon>
                     ZENITH COMPUTE
                 </div>
 
-                <!-- Heading (Playfair Display) -->
                 <div>
                     <h1 id="hero-heading" class="text-5xl md:text-7xl tracking-tight text-[#FFFFFF] mb-6 leading-none opacity-0 font-light" style="font-family: 'Playfair Display', serif;">
                         Infinite execution threads.<br>The cognitive backbone.
                     </h1>
 
-                    <!-- Body Text -->
                     <p class="fade-in-el opacity-0 text-[#9CA3AF] text-lg leading-relaxed max-w-[320px] font-light mb-8" style="font-family: 'Inter', sans-serif;">
                         An autonomous state-management protocol synchronizing distributed workloads across edge micro-clusters and centralized servers. Adjust the target environment to refine processing speed.
                     </p>
                     
-                    <!-- Primary Action Button -->
                     <button class="fade-in-el opacity-0 bg-[#60A5FA] text-[#030509] px-8 py-3.5 rounded-full text-sm font-light w-max hover:bg-blue-300 transition-colors flex items-center gap-2" style="font-family: 'Inter', sans-serif;">
                         Provision Network
                         <iconify-icon icon="solar:cpu-linear" stroke-width="1.5" class="text-lg"></iconify-icon>
                     </button>
                 </div>
 
-                <!-- Custom Slider Control -->
                 <div class="fade-in-el opacity-0 mt-16 pt-8 w-full relative">
-                    <!-- Track Line -->
                     <div class="w-full h-[1px] bg-white/10 relative">
-                        <!-- Thumb / Active Indicator -->
                         <div class="absolute top-1/2 left-[50%] -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-[#60A5FA] rounded-full shadow-[0_0_12px_rgba(96,165,250,0.6)]"></div>
                     </div>
                     
-                    <!-- Labels -->
                     <div class="flex justify-between mt-4 w-full" style="font-family: 'Inter', sans-serif;">
                         <span class="text-xs font-light tracking-widest uppercase text-white/30 transition-colors hover:text-[#60A5FA] cursor-pointer">Local</span>
                         <span class="text-xs font-light tracking-widest uppercase text-white/30 transition-colors hover:text-[#60A5FA] cursor-pointer">Edge</span>
@@ -213,14 +196,11 @@ const PARTICLE_DRIFT_SOURCE = `<!doctype html>
 
             </div>
 
-            <!-- Right Column: Media Frame -->
             <div class="w-full md:w-[62%] relative bg-transparent overflow-hidden min-h-[400px] md:min-h-0 border-t md:border-t-0 border-white/5 pointer-events-none" style="transform-style: preserve-3d;">
                 
-                <!-- Deep Integration Gradients -->
                 <div class="absolute inset-0 z-30 pointer-events-none bg-gradient-to-r from-[#030509] via-transparent to-transparent opacity-90"></div>
                 <div class="absolute inset-0 z-30 pointer-events-none bg-gradient-to-t from-[#030509] via-[#030509]/30 to-transparent opacity-80"></div>
                 
-                <!-- Glassmorphism Floating Logic Card -->
                 <div id="floating-card" class="absolute top-[25%] right-[12%] z-40 bg-white/[0.03] backdrop-blur-xl border border-[#60A5FA]/20 p-5 rounded-2xl shadow-[0_22px_40px_rgba(0,0,0,0.4)] w-[220px] text-[#60A5FA] pointer-events-auto">
                     <div class="flex items-center gap-3 mb-4">
                         <div class="w-8 h-8 rounded-full bg-[#60A5FA]/10 border border-[#60A5FA]/20 text-[#60A5FA] flex items-center justify-center">
@@ -240,7 +220,6 @@ const PARTICLE_DRIFT_SOURCE = `<!doctype html>
         document.addEventListener("DOMContentLoaded", () => {
             gsap.registerPlugin(ScrollTrigger);
 
-            // --- ASCII Particle System Implementation ---
             const canvas = document.getElementById('particle-canvas');
             const ctx = canvas.getContext('2d');
 
@@ -293,7 +272,6 @@ const PARTICLE_DRIFT_SOURCE = `<!doctype html>
             function draw() {
                 ctx.clearRect(0, 0, width, height);
 
-                // 1. Upward Beams (Fast)
                 beams.forEach(b => {
                     b.y -= b.speed;
                     if (b.y + b.length < 0) {
@@ -311,12 +289,10 @@ const PARTICLE_DRIFT_SOURCE = `<!doctype html>
                     ctx.stroke();
                 });
 
-                // 2. Interactive Nodes (ASCII)
                 ctx.font = '12px monospace';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 
-                // Proximity Lines
                 ctx.lineWidth = 0.5;
                 for(let i = 0; i < nodes.length; i++) {
                     let n1 = nodes[i];
@@ -334,7 +310,7 @@ const PARTICLE_DRIFT_SOURCE = `<!doctype html>
                 }
 
                 nodes.forEach(n => {
-                    n.y += n.vy; // Slow drift
+                    n.y += n.vy;
                     if(n.y > height + 20) {
                         n.y = -20;
                         n.x = Math.random() * width;
@@ -342,10 +318,8 @@ const PARTICLE_DRIFT_SOURCE = `<!doctype html>
 
                     let dist = Math.hypot(mouse.x - n.x, mouse.y - n.y);
 
-                    // Dynamic Character Swap
                     if (dist < 180 || Math.random() > 0.98) n.char = chars[Math.floor(Math.random() * chars.length)];
 
-                    // Mouse Connection
                     if (dist < 180) {
                         ctx.strokeStyle = \`rgba(96, 165, 250, \${0.5 * (1 - dist/180)})\`;
                         ctx.beginPath(); 
@@ -362,10 +336,8 @@ const PARTICLE_DRIFT_SOURCE = `<!doctype html>
             }
             draw();
 
-            // --- GSAP Timeline Reveals ---
             const heading = document.getElementById('hero-heading');
             
-            // Staggered vertical masked word setup
             const words = heading.innerHTML.trim().split(/(<br\\s*\\/?>|\\s+)/).filter(w => w.trim().length > 0 || w.toLowerCase().includes('<br'));
             let newHTML = '';
             words.forEach(word => {
@@ -402,10 +374,8 @@ const PARTICLE_DRIFT_SOURCE = `<!doctype html>
                 ease: "power3.out"
             }, 0.6);
 
-            // Canvas Timeline Integration
             tl.to(canvas, { opacity: 1, duration: 2, ease: "power2.inOut" }, 0.2);
 
-            // Floating Logic independent 3D shifts
             gsap.to('#floating-card', {
                 y: "-=12",
                 rotationX: 4,
@@ -446,8 +416,8 @@ const PARTICLE_DRIFT_DEFINITION: EffectDefinition = {
         `length: (Math.random() * 100 + 50) * \${length},`,
       )
       .replace(
-        "n.y += n.vy; // Slow drift",
-        "n.y += n.vy * ((window.__SF_CONTROLS&&window.__SF_CONTROLS.speed)||1); // Slow drift",
+        "n.y += n.vy;",
+        "n.y += n.vy * ((window.__SF_CONTROLS&&window.__SF_CONTROLS.speed)||1);",
       )
       .replace(
         "b.y -= b.speed;",

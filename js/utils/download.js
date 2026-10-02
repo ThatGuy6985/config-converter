@@ -1,7 +1,3 @@
-/**
- * Reusable File Download Utility
- */
-
 export function downloadFile(content, filename, mimeType = 'text/plain;charset=utf-8') {
   if (typeof content !== 'string') {
     return { success: false, error: 'Content must be a string' };
