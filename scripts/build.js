@@ -53,6 +53,7 @@ const jsFiles = [
   'js/exporters/xray.js',
   'js/state.js',
   'js/ui/stepper.js',
+  'js/ui/dropdown.js',
   'js/ui/tabs.js',
   'js/ui/configs.js',
   'js/ui/status.js',
@@ -134,6 +135,7 @@ const ThemeManager = {
 document.addEventListener('DOMContentLoaded', () => {
   ThemeManager.init();
   setupNumberSteppers();
+  setupAnimatedDropdowns();
 
   const domElements = {
     modePasteBtn: document.getElementById('modePaste'),
