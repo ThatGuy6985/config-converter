@@ -1,0 +1,61 @@
+/**
+ * Responsive Viewport Rules
+ */
+
+@media (max-width: 1120px) {
+  .workspace-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+}
+
+@media (max-width: 768px) {
+  body {
+    padding: 16px 12px;
+  }
+
+  .app-title {
+    font-size: 21px;
+  }
+
+  .card-bezel {
+    padding: 4px;
+    border-radius: 14px;
+  }
+
+  .card-core {
+    padding: 14px 12px;
+    border-radius: 10px;
+  }
+
+  .row {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .row > div {
+    min-width: 100%;
+  }
+
+  .btn-row {
+    flex-direction: column;
+  }
+
+  .btn-row button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .export-tabs {
+    flex-direction: column;
+  }
+
+  .tab-btn {
+    text-align: center;
+    width: 100%;
+  }
+
+  .report-stats {
+    gap: 10px;
+  }
+}
