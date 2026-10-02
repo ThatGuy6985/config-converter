@@ -1,4 +1,4 @@
-import ParticleDrift from "@/components/ui/particle-drift";
+import ParticleDrift from "./particle-drift";
 
 export default function ParticleDriftDemo() {
   return (

@@ -54,6 +54,7 @@ const jsFiles = [
   'js/state.js',
   'js/ui/stepper.js',
   'js/ui/dropdown.js',
+  'js/ui/particles.js',
   'js/ui/tabs.js',
   'js/ui/configs.js',
   'js/ui/status.js',
@@ -86,46 +87,62 @@ for (const file of jsFiles) {
 bundledJs += `
 // ==================== Centralized Theme Manager ====================
 const ThemeManager = {
-  getTheme: function() {
-    return document.documentElement.getAttribute('data-theme') || 'dark';
+  getSystemTheme: function() {
+    if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      return 'dark';
+    }
+    return 'light';
   },
-  setTheme: function(theme) {
+  getTheme: function() {
+    return document.documentElement.getAttribute('data-theme') || this.getSystemTheme();
+  },
+  setTheme: function(theme, persist) {
+    if (persist === undefined) persist = true;
     document.documentElement.setAttribute('data-theme', theme);
-    try {
-      localStorage.setItem('theme', theme);
-    } catch (e) {}
+    if (persist) {
+      try {
+        localStorage.setItem('theme', theme);
+      } catch (e) {}
+    }
     const toggle = document.querySelector('.theme-switch__checkbox');
     if (toggle) {
       toggle.checked = theme === 'dark';
     }
+    if (typeof window !== 'undefined' && window.ParticleDriftBg && typeof window.ParticleDriftBg.setMode === 'function') {
+      window.ParticleDriftBg.setMode(theme);
+    }
   },
   toggle: function() {
     const next = this.getTheme() === 'dark' ? 'light' : 'dark';
-    this.setTheme(next);
+    this.setTheme(next, true);
   },
   init: function() {
-    let theme = 'dark';
+    let theme = null;
     try {
-      const saved = localStorage.getItem('theme');
-      if (saved) {
-        theme = saved;
-      }
+      theme = localStorage.getItem('theme');
     } catch (e) {}
-    this.setTheme(theme);
+    if (!theme) {
+      theme = this.getSystemTheme();
+      this.setTheme(theme, false);
+    } else {
+      this.setTheme(theme, false);
+    }
 
-    if (window.matchMedia) {
+    if (typeof window !== 'undefined' && window.matchMedia) {
       window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-        if (!localStorage.getItem('theme')) {
-          this.setTheme(e.matches ? 'dark' : 'light');
-        }
+        try {
+          if (!localStorage.getItem('theme')) {
+            this.setTheme(e.matches ? 'dark' : 'light', false);
+          }
+        } catch (err) {}
       });
     }
 
     const toggle = document.querySelector('.theme-switch__checkbox');
     if (toggle) {
-      toggle.checked = theme === 'dark';
+      toggle.checked = (document.documentElement.getAttribute('data-theme') || theme) === 'dark';
       toggle.addEventListener('change', (e) => {
-        this.setTheme(e.target.checked ? 'dark' : 'light');
+        this.setTheme(e.target.checked ? 'dark' : 'light', true);
       });
     }
   }
@@ -134,6 +151,7 @@ const ThemeManager = {
 // ==================== Application Bootstrap ====================
 document.addEventListener('DOMContentLoaded', () => {
   ThemeManager.init();
+  initParticleDrift();
   setupNumberSteppers();
   setupAnimatedDropdowns();
 
@@ -236,8 +254,10 @@ const htmlTemplate = `<!DOCTYPE html>
   <script>
     (function() {
       try {
-        var saved = localStorage.getItem('theme');
-        var theme = saved ? saved : 'dark';
+        var saved = null;
+        try { saved = localStorage.getItem('theme'); } catch(e) {}
+        var systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var theme = saved ? saved : (systemDark ? 'dark' : 'light');
         document.documentElement.setAttribute('data-theme', theme);
       } catch (e) {
         document.documentElement.setAttribute('data-theme', 'dark');
@@ -255,6 +275,8 @@ ${bundledCss}
   </style>
 </head>
 <body>
+  <!-- Ambient Particle Drift Canvas Background -->
+  <canvas id="particle-drift-canvas" class="particle-drift-canvas" aria-hidden="true"></canvas>
   <main class="container">
     <header class="app-header">
       <div class="header-top-row">
